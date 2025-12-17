@@ -1,0 +1,92 @@
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 16px;
+  padding: 8px 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Mobile First - Compact */
+@media (max-width: 640px) {
+  .breadcrumb {
+    font-size: 12px;
+    padding: 6px 0;
+  }
+  
+  .breadcrumb__link,
+  .breadcrumb__current {
+    font-size: 11px;
+    padding: 2px 4px;
+  }
+  
+  .breadcrumb__separator {
+    margin: 0 4px;
+    font-size: 10px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .breadcrumb {
+    font-size: 13px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1025px) {
+  .breadcrumb {
+    font-size: 14px;
+  }
+}
+
+/* Truncation for very long paths */
+@media (max-width: 768px) {
+  .breadcrumb {
+    max-width: 100%;
+  }
+  
+  .breadcrumb__link:not(:first-child):not(:last-child),
+  .breadcrumb__current {
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+/* Mobile-specific breadcrumb styles */
+@media (max-width: 640px) {
+  .breadcrumb__home {
+    min-width: 32px;
+  }
+  
+  .breadcrumb__home span {
+    display: none;
+  }
+  
+  .breadcrumb__home::before {
+    content: '🏠';
+    font-size: 16px;
+  }
+  
+  .breadcrumb__separator {
+    font-weight: bold;
+  }
+  
+  .breadcrumb__ellipsis {
+    color: #999;
+    font-size: 12px;
+  }
+}
+
+/* Touch targets for mobile */
+@media (max-width: 640px) {
+  .breadcrumb__link,
+  .breadcrumb__current {
+    min-height: 32px;
+    min-width: 32px;
+    display: flex;
+    align-items: center;
+  }
+}

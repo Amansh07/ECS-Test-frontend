@@ -1,0 +1,141 @@
+/****** RegisterScreen Classes *****/
+
+.register-screen {
+  min-height: 100vh;
+  background: #f5fdf7; /* light greenish background */
+  padding: 24px 16px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.breadcrumb__link {
+  color: #038c4c;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.breadcrumb__separator {
+  margin: 0 8px;
+  color: #777;
+}
+
+.breadcrumb__current {
+  color: #555;
+  font-weight: 500;
+}
+
+/* Green header */
+.register-header {
+  background: linear-gradient(135deg, #00a651, #009345);
+  border-radius: 16px;
+  padding: 20px 16px;
+  color: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 120, 60, 0.3);
+  margin-bottom: 24px;
+}
+
+.step-indicators-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.step-indicator {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 4px;
+  font-weight: 700;
+  font-size: 14px;
+  background-color: #cfd4d8;
+  color: #ffffff;
+  border: 2px solid #b0b8bd;
+  transition: all 0.2s ease;
+}
+
+.step-indicator--active {
+  background-color: #00a651;
+  border-color: #007c3a;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.step-indicator--completed {
+  background-color: #ffffff;
+  color: #00a651;
+  border-color: #00a651;
+  box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.2);
+}
+
+.register-header__info {
+  text-align: center;
+}
+
+/* Card */
+.register-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 24px 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.step h3 {
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+.step__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.step__grid input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d5dde3;
+  font-size: 14px;
+}
+
+.step__grid input:focus {
+  outline: none;
+  border-color: #00a651;
+  box-shadow: 0 0 0 2px rgba(0, 166, 81, 0.2);
+}
+
+.step__footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.btn--secondary {
+  background-color: #e3e7eb;
+  color: #555;
+}
+
+.btn--primary {
+  background-color: #00a651;
+  color: #ffffff;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
