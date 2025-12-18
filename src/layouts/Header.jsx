@@ -1,18 +1,87 @@
+import { useState } from "react";
+import "./header.css";
+
 export default function Header() {
+  const [open, setOpen] = useState(false);
+
   return (
-    <header className="w-full bg-green-700 text-white flex items-center justify-between px-6 py-3 shadow">
-      <div className="flex items-center gap-3">
-        <span className="font-semibold text-lg">FPO Shakti</span>
-        <span className="text-sm opacity-80">Companies Act Registration</span>
+    <header className="fpo-header">
+      {/* Main green bar */}
+      <div className="fpo-header-top">
+        <div className="fpo-header-left">
+          {/* Logo block */}
+          <div className="fpo-logo-block">
+            {/* To Replace with actual logo <img> */}
+ 
+			<div className="fpo-logo-icon1" />
+			<div className="fpo-logo-icon2" />
+            <span className="fpo-logo-text">FPO Shakti</span>
+          </div>
+
+        </div>
+
+        {/* Center nav (desktop) */}
+        <nav className="fpo-nav-desktop">
+          <a href="/" className="fpo-nav-link">Home</a>
+          <a href="/services" className="fpo-nav-link">Services</a>
+          <a href="/about" className="fpo-nav-link">About</a>
+          <a href="/resources" className="fpo-nav-link">Resources</a>
+          <a href="/gallery" className="fpo-nav-link">Gallery</a>
+        </nav>
+
+        {/* Right side: skip link, search, profile, hamburger */}
+        <div className="fpo-header-right">
+
+          <div className="fpo-search-wrapper">
+            <input
+              type="text"
+              className="fpo-search-input"
+              placeholder="Search for"
+            />
+            <button className="fpo-search-button" aria-label="Search" />
+          </div>
+
+          <button className="fpo-profile-avatar" aria-label="Profile">
+            U
+          </button>
+
+          {/* Mobile hamburger */}
+          <button
+            type="button"
+            className="fpo-menu-toggle"
+            onClick={() => setOpen(!open)}
+            aria-label="Toggle navigation"
+          >
+            <span className="fpo-menu-bar" />
+            <span className="fpo-menu-bar" />
+            <span className="fpo-menu-bar" />
+          </button>
+        </div>
       </div>
-      <div className="flex items-center gap-4">
-        <input
-          type="search"
-          placeholder="Search for"
-          className="rounded-full px-4 py-1 text-sm text-gray-800 focus:outline-none"
-        />
-        <div className="w-8 h-8 rounded-full bg-white/20" />
+
+      {/* Breadcrumb area */}
+      <div className="fpo-breadcrumb-bar">
+        <nav className="fpo-breadcrumb" aria-label="Breadcrumb">
+          <a href="/" className="fpo-breadcrumb-link">Home</a>
+          <span className="fpo-breadcrumb-sep">/</span>
+          <a href="/signup" className="fpo-breadcrumb-link">Sign up</a>
+          <span className="fpo-breadcrumb-sep">/</span>
+          <a href="/register" className="fpo-breadcrumb-link">Register</a>
+          <span className="fpo-breadcrumb-sep">/</span>
+          <span className="fpo-breadcrumb-current">FPC - Companies Act</span>
+        </nav>
       </div>
+
+      {/* Mobile nav dropdown */}
+      {open && (
+        <nav className="fpo-nav-mobile">
+          <a href="/" className="fpo-nav-mobile-link">Home</a>
+          <a href="/services" className="fpo-nav-mobile-link">Services</a>
+          <a href="/about" className="fpo-nav-mobile-link">About</a>
+          <a href="/resources" className="fpo-nav-mobile-link">Resources</a>
+          <a href="/gallery" className="fpo-nav-mobile-link">Gallery</a>
+        </nav>
+      )}
     </header>
   );
 }

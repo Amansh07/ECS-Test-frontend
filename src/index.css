@@ -6,3 +6,8 @@ body {
  background:green !important;	
 }
 */
+.bg-green-700{
+  background-color: #4b7a00;
+  display: flex;
+  flex-directions:column !important;
+}

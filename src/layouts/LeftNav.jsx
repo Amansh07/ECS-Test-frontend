@@ -6,7 +6,7 @@ const linkActive = "bg-green-200 text-green-900";
 
 export default function LeftNav() {
   return (
-    <aside className="w-56 border-r bg-white">
+    <aside className="w-26 border-r bg-white">
       <nav className="p-4 space-y-1">
         <NavLink
           to="/register"

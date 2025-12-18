@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./RegisterScreen.css";
 
 const initialValues = {
   implementingAgency: "",
@@ -67,7 +68,7 @@ export default function Registration() {
       </div>
 
       <section className="bg-white rounded shadow-sm border">
-        <div className="border-b px-6 py-3">
+        <div className="px-6 py-3">
           <h2 className="font-semibold text-gray-800">Registration Form</h2>
         </div>
 
