@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./RegisterScreen.css";
+import UploadDocument from "../../components/UploadDocument";
 
 const initialValues = {
   implementingAgency: "",
@@ -16,6 +17,18 @@ const initialValues = {
   username: "",
   password: "",
   confirmPassword: "",
+};
+
+const pdfConfig = {
+  title: "Upload Share allotment Sheet of the Shareholders",
+  maxSizeMB: "PDF size - Max 5mb)",
+  allowedTypes: ["application/pdf"],
+};
+
+const imgConfig = {
+  title: "FPO Banner Image",
+  maxSizeMB: "JPEG only (max. 5 MB)",
+  allowedTypes: ["image/jpeg"],
 };
 
 export default function Registration() {
@@ -37,7 +50,7 @@ export default function Registration() {
       <h1 className="text-xl text-center font-semibold mb-4 text-gray-800">
         FPC Companies Act
       </h1>
-	  {/* Stepper */}
+      {/* Stepper */}
       <div className="flex items-center justify-center gap-8 mb-6 text-sm">
         {[
           { step: 1, label: "Select User" },
@@ -47,9 +60,8 @@ export default function Registration() {
         ].map((item, idx) => (
           <div key={item.step} className="flex items-center gap-2">
             <div
-              className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold ${
-                item.step <= 2 ? "bg-green-600" : "bg-gray-300"
-              }`}
+              className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold ${item.step <= 2 ? "bg-green-600" : "bg-gray-300"
+                }`}
             >
               {item.step}
             </div>
@@ -290,6 +302,18 @@ export default function Registration() {
               />
             </div>
           </div>
+
+
+
+          <UploadDocument
+            config={imgConfig}
+            onFileSelect={(file) => console.log(file)}
+          />
+          <UploadDocument
+            config={pdfConfig}
+            onFileSelect={(file) => console.log(file)}
+          />
+
 
           {/* Action buttons */}
           <div className="flex justify-end gap-3 pt-4 border-t">
