@@ -1,15 +1,25 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import MainLayout from "./layouts/MainLayout.jsx";
-import Registration from "./pages/registration/Registration.jsx";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import MainLayout from "./layouts/MainLayout";
+import PreRegistrationPage from "./pages/registration/PreRegistrationPage";
+import Registration from "./pages/registration/Registration";
+;
 
 export default function App() {
   return (
-    <Routes>
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<Navigate to="/register" replace />} />
-        <Route path="/register" element={<Registration />} />
-        {/* Add more routes here that share the same layout */}
-      </Route>
-    </Routes>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<MainLayout />}>
+        <Route path="/" element={<Registration />} />
+		<Route path="/registration-details" element={<PreRegistrationPage />}/>
+		<Route path="/registration" element={<Registration />} />
+		{/* other routes */}
+        </Route>
+	  </Routes>
+    </BrowserRouter>
   );
 }
+
+
+
+
+

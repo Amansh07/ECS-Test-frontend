@@ -38,7 +38,7 @@ export default function Registration() {
         FPC Companies Act
       </h1>
 	  {/* Stepper */}
-      <div className="flex items-center justify-center gap-8 mb-6 text-sm">
+      {/* <div className="flex items-center justify-center gap-8 mb-6 text-sm">
         {[
           { step: 1, label: "Select User" },
           { step: 2, label: "Registration Details" },
@@ -65,7 +65,7 @@ export default function Registration() {
             )}
           </div>
         ))}
-      </div>
+      </div> */}
 
       <section className="bg-white rounded shadow-sm border">
         <div className="px-6 py-3">
