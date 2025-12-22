@@ -3,6 +3,10 @@ import uploadImg from "../assets/upload.svg";
 import Cropper from "react-easy-crop";
 import zoomOut from "../assets/zoomOut.svg";
 import zoomIn from "../assets/zoomIn.svg";
+import trailingIcon from "../assets/Trailing_icon.svg";
+import tickMark from "../assets/Vector.svg";
+import Delete from "../assets/Delete.svg";
+import pdfUpload from "../assets/pdfUpload.svg";
 
 const UploadDocument = ({ config, onFileSelect }) => {
   const [error, setError] = useState("");
@@ -14,28 +18,24 @@ const UploadDocument = ({ config, onFileSelect }) => {
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [isImageFile, setIsImageFile] = useState(false);
+  const [finalImage, setFinalImage] = useState(null);
+  const [croppedSize, setCroppedSize] = useState("");
 
-  // Generate unique ID for this instance
+
   const inputId = useId();
-
-  const imageTypes = ["image/jpeg", "image/jpg", "image/png"];
 
   const handleFile = (file) => {
     if (!file) return;
 
     const allowedTypes = config.allowedTypes;
 
-    // Validate file type using array includes
     if (!allowedTypes.includes(file.type)) {
-      console.log("Selected file type:", file.type);
-      console.log("Allowed types:", allowedTypes);
       setError(`Only ${allowedTypes.join(", ")} files are allowed`);
       setFileName("");
       return;
     }
 
-    // Extract numeric value from maxSizeMB string for size validation
-    const maxSizeMatch = config.maxSizeMB.match(/\d+/); // extract digits
+    const maxSizeMatch = config.maxSizeMB.match(/\d+/);
     const maxSize = maxSizeMatch ? Number(maxSizeMatch[0]) : Infinity;
 
     if (file.size > maxSize * 1024 * 1024) {
@@ -47,7 +47,6 @@ const UploadDocument = ({ config, onFileSelect }) => {
     setFileName(file.name);
     setError("");
 
-    // Open modal only for images
     if (file.type.startsWith("image/")) {
       setIsImageFile(true);
       const reader = new FileReader();
@@ -63,7 +62,6 @@ const UploadDocument = ({ config, onFileSelect }) => {
     }
   };
 
-
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
@@ -76,7 +74,6 @@ const UploadDocument = ({ config, onFileSelect }) => {
   };
 
   const handleDragLeave = () => setIsDragging(false);
-
   const handleChange = (e) => handleFile(e.target.files[0]);
 
   const onCropComplete = useCallback((_, croppedAreaPixels) => {
@@ -113,21 +110,25 @@ const UploadDocument = ({ config, onFileSelect }) => {
 
     return new Promise((resolve) => {
       canvas.toBlob((blob) => {
-        const croppedFile = new File([blob], fileName, { type: "image/jpeg" });
-        resolve(croppedFile);
+        resolve(new File([blob], fileName, { type: "image/jpeg" }));
       }, "image/jpeg");
     });
   };
 
   const handleConfirm = async () => {
     const croppedFile = await getCroppedImage();
-    if (croppedFile) onFileSelect(croppedFile);
+    if (croppedFile) {
+      onFileSelect(croppedFile);
+      setFinalImage(URL.createObjectURL(croppedFile));
+
+      // Set the size in KB/MB
+      setCroppedSize(formatFileSize(croppedFile.size));
+    }
 
     setModalOpen(false);
     setImageSrc(null);
     setIsImageFile(false);
 
-    // 🔑 reset input after success too
     const input = document.getElementById(inputId);
     if (input) input.value = "";
   };
@@ -139,65 +140,123 @@ const UploadDocument = ({ config, onFileSelect }) => {
     setFileName("");
     setIsImageFile(false);
 
-    // 🔑 RESET FILE INPUT so same file can be re-selected
     const input = document.getElementById(inputId);
     if (input) input.value = "";
   };
 
+  const formatFileSize = (bytes) => {
+    if (!bytes) return "0 KB";
+
+    const kb = bytes / 1024;
+    if (kb < 1024) return `${kb.toFixed(2)} KB`;
+
+    const mb = kb / 1024;
+    return `${mb.toFixed(2)} MB`;
+  };
+
+
   return (
-
     <div>
-      {/* Upload Container */}
-      <div
-        className="w-full h-[84px] flex rounded-xl p-2 bg-[#F8FFE5] gap-5 cursor-pointer"
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={() => document.getElementById(inputId).click()}
-      >
-        <div className="flex items-center">
-          <img src={uploadImg} alt="upload" />
+      {/* Upload OR Preview */}
+      {!finalImage ? (
+        <div
+          className="w-full h-[84px] flex rounded-xl p-2 bg-[#F8FFE5] gap-5 cursor-pointer"
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => document.getElementById(inputId).click()}
+        >
+          <div className="flex items-center">
+            <img src={config?.allowedTypes.includes("application/pdf") ? pdfUpload : uploadImg} alt="upload" />
+          </div>
+          <div className="flex flex-col justify-center">
+            <p className="font-medium text-sm text-[#121212]">{config.title}</p>
+            <p className="font-medium text-[11px] text-[#58595B]">
+              {config.maxSizeMB} MB max
+            </p>
+            <p className="font-medium text-sm text-[#4A6600]">
+              {fileName || "Drag & Drop or Browse File"}
+            </p>
+          </div>
         </div>
-        <div className="flex flex-col justify-center">
-          <p className="font-medium text-sm text-[#121212]">{config.title}</p>
-          <p className="font-medium text-[11px] text-[#58595B]">{config.maxSizeMB} MB max</p>
-          <p className="font-medium text-sm text-[#4A6600]">
-            {fileName ? fileName : "Drag & Drop or Browse File"}
-          </p>
-        </div>
+      ) : (
+        <div className="w-full flex items-center h-[181px] rounded-xl gap-3 p-3 bg-[#F0EFF5] border-[2px] border-dashed border-[#1B7A00]">
+          <div className="flex items-center">
+            <img
+              src={finalImage}
+              alt="cropped"
+              className="w-[161px] h-[161px] rounded-md object-cover"
+            />
+          </div>
 
-        <input
-          type="file"
-          id={inputId} // unique per component
-          hidden
-          accept={config.allowedTypes} // strict filter
-          onChange={handleChange}
-        />
-      </div>
+          {/* This takes remaining width */}
+          <div className="flex-1 bg-[#ffffff] h-[161px] rounded-md flex flex-col justify-between p-2">
+            {/* Top (40px) */}
+            <div className="h-[40px] bg-transparent align-center flex gap-2">
+              <div className="w-[25px] mt-[3px]">
+                <img
+                  src={trailingIcon}
+                  alt="trailing icon"
+                />
+              </div>
+              <div className="flex-1">
+                <p className="text-[14px] font-normal">{fileName}</p>
+                <p className="text-[12px] font-medium">{croppedSize}</p>
+              </div>
+              <div className="w-[60px] flex justify-around">
+                <div className="mt-[3px]">   <img
+                  src={tickMark}
+                  alt="tick icon"
+                /></div>
 
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+                <div className="mt-[3px]">   <img
+                  src={Delete}
+                  alt="delete icon"
+                  className="cursor-pointer"
+                  onClick={() => {
+                    setFinalImage(null);
+                    setFileName("");
+                    onFileSelect(null);
+                  }}
+                /></div>
 
-      {/* Modal only for images */}
-      {modalOpen && isImageFile && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-[500px] p-4 flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-medium">Upload Photograph</h2>
+              </div>
+            </div>
 
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="text-xl font-semibold text-[#000000] leading-none"
-                aria-label="Close"
-              >
-                ✕
+            {/* Bottom (32px) */}
+            <div className="flex h-[32px] bg-transparent justify-end">
+              <button className="w-[82px] text-[12px] font-medium border-[1px] text-[#253300] border-[#253300] rounded-[8px] h-[32px] flex items-center justify-center px-4 py-2 cursor-pointer" onClick={() => document.getElementById(inputId).click()} >
+                Add File
               </button>
             </div>
 
-            <p className="font-normal text-sm text-[#727272] mb-4">Crop/Adjust image magnification</p>
+          </div>
 
-            {imageSrc && (
-              <div className="relative h-64 flex items-center justify-center bg-[#464646]/10">
+        </div>
+
+      )}
+
+      <input
+        type="file"
+        id={inputId}
+        hidden
+        accept={config.allowedTypes}
+        onChange={handleChange}
+      />
+
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+
+      {/* Image Crop Modal */}
+      {modalOpen && isImageFile && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-[400px] p-4">
+            <div className="flex justify-between mb-3">
+              <h2 className="text-base font-medium">Upload Photograph</h2>
+              <button onClick={handleCancel}>✕</button>
+            </div>
+
+            <div className="relative h-[350px] flex items-center justify-center bg-[#464646] rounded-[8px]">
+              <div className="relative w-[256px] h-[256px] overflow-hidden rounded-[8px]">
                 <Cropper
                   image={imageSrc}
                   crop={crop}
@@ -206,40 +265,34 @@ const UploadDocument = ({ config, onFileSelect }) => {
                   onCropChange={setCrop}
                   onCropComplete={onCropComplete}
                   onZoomChange={setZoom}
-                  cropShape="rect"
                   showGrid={false}
                 />
               </div>
-            )}
+            </div>
 
-
-            <div className="flex items-center gap-4 w-full mt-4">
-              <img src={zoomOut} alt="zoomOut" className="h-4 w-4" />
-
+            <div className="flex items-center gap-4 mt-4">
+              <img src={zoomOut} alt="-" className="h-4 w-4" />
               <input
                 type="range"
                 min={1}
                 max={3}
                 step={0.1}
                 value={zoom}
-                onChange={(e) => setZoom(Number(e.target.value))}
-                className="flex-1 h-1 rounded-lg accent-[#709900] cursor-pointer"
+                onChange={(e) => setZoom(+e.target.value)}
+                className="flex-1 accent-[#709900]"
               />
-
-              <img src={zoomIn} alt="zoomIn" className="h-10 w-10" />
+              <img src={zoomIn} alt="+" className="h-6 w-6" />
             </div>
 
             <div className="flex justify-end gap-2 mt-4">
               <button
-                className="px-4 py-2 rounded-[8px] border border-[1px] border-[#B7131A] text-[#B7131A] text-sm font-medium"
+                className="px-4 py-2 rounded-md border border-[#B7131A] text-[#B7131A]"
                 onClick={handleCancel}
               >
                 Cancel
               </button>
-
-
               <button
-                className="px-4 py-2 rounded-[8px] bg-[#1B7A00] text-white rounded text-sm font-medium"
+                className="px-4 py-2 rounded-md bg-[#1B7A00] text-white"
                 onClick={handleConfirm}
               >
                 Confirm Image
