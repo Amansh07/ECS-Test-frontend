@@ -1,18 +1,35 @@
+/******* src/pages/registration/Registration.jsx  *************/
 import { useState } from "react";
-import "./RegisterScreen.css";
+// import Breadcrumb from "../../components/Breadcrumb";
+import Stepper from "../../components/Stepper";
+import { AccordionGroup } from "../../components/Accordion";
+import { TextField, SelectField } from "../../components/FormFields";
+import "./Registration.css";
 
 const initialValues = {
+  // Registration Details (Accordions)
+  registeredUnder: "companies",
+  cin: "",
+  doi: "",
+  companyName: "",
+  rocName: "",
+  companyStatus: "",
+  addressType: "",
+  address1: "",
+  address2: "",
+  pincode: "",
+  primaryEmail: "",
+  primaryContact: "",
+  secondaryEmail: "",
+  secondaryContact: "",
+  totalShareholders: "",
+  financialYear: "",
+  turnOver: "",
+  totalLand: "",
+  // Registration form fields (below accordions)
   implementingAgency: "",
   block: "",
   communicationAddress: "",
-  pincode: "",
-  totalShareholders: "",
-  femaleShareholders: "",
-  maleShareholders: "",
-  femalePercentage: "",
-  totalLand: "",
-  secondaryEmail: "",
-  secondaryContact: "",
   username: "",
   password: "",
   confirmPassword: "",
@@ -20,60 +37,261 @@ const initialValues = {
 
 export default function Registration() {
   const [values, setValues] = useState(initialValues);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [stepsCompleted, setStepsCompleted] = useState([true, true, false, false]);
 
-  function handleChange(e) {
-    const { name, value } = e.target;
+  const steps = ["Select User", "Registration Details", "Add Documents", "Review"];
+
+  const handleChange = (e) => {
+    const { name, type } = e.target;
+    const value = type === "radio" ? e.target.value : e.target.value;
     setValues((prev) => ({ ...prev, [name]: value }));
-  }
+  };
 
-  function handleSubmit(e) {
+  const markStepCompleted = (index, completed = true) => {
+    setStepsCompleted((prev) => {
+      const next = [...prev];
+      next[index] = completed;
+      return next;
+    });
+  };
+
+  const goNext = () => {
+    // Validate both sections before proceeding
+    if (!values.cin || !values.companyName || !values.username) {
+      alert("Please fill mandatory fields (CIN, Company Name, Username).");
+      return;
+    }
+    markStepCompleted(2, true);
+    if (currentStep < 4) {
+      setCurrentStep((s) => s + 1);
+    }
+  };
+
+  const goBack = () => {
+    if (currentStep > 1) setCurrentStep((s) => s - 1);
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: submit to API
-    console.log("Form submit", values);
-  }
+    console.log("Submit Registration", values);
+  };
 
-  return (
-    <div className="max-w-full mx-auto">
-      <h1 className="text-xl text-center font-semibold mb-4 text-gray-800">
-        FPC Companies Act
-      </h1>
-	  {/* Stepper */}
-      {/* <div className="flex items-center justify-center gap-8 mb-6 text-sm">
-        {[
-          { step: 1, label: "Select User" },
-          { step: 2, label: "Registration Details" },
-          { step: 3, label: "Add Documents" },
-          { step: 4, label: "Review" },
-        ].map((item, idx) => (
-          <div key={item.step} className="flex items-center gap-2">
-            <div
-              className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold ${
-                item.step <= 2 ? "bg-green-600" : "bg-gray-300"
-              }`}
-            >
-              {item.step}
+  // STEP 1: Registration Details Accordions
+  const renderRegistrationDetails = () => {
+    const items = [
+      {
+        id: "reg-main",
+        title: "Registration Details",
+        isInitiallyOpen: true,
+        content: (
+          <>
+            <p className="registration-help-text">
+              Register FPO into the system and after approval credentials communicate
+              to them via mail/SMS.
+            </p>
+
+            <div className="mb-4">
+              <p className="registration-label">
+                Registered Under
+                <span className="registration-label-required">*</span>
+              </p>
+              <div className="flex flex-wrap gap-6 text-sm">
+                <label className="inline-flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="registeredUnder"
+                    value="companies"
+                    checked={values.registeredUnder === "companies"}
+                    onChange={handleChange}
+                  />
+                  <span>Companies Act</span>
+                </label>
+                <label className="inline-flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="registeredUnder"
+                    value="cooperatives"
+                    checked={values.registeredUnder === "cooperatives"}
+                    onChange={handleChange}
+                  />
+                  <span>Cooperatives/Societies Act</span>
+                </label>
+              </div>
             </div>
-            <span
-              className={
-                item.step <= 2 ? "text-green-700 font-medium" : "text-gray-500"
-              }
-            >
-              {item.label}
-            </span>
-            {idx < 3 && (
-              <div className="w-10 h-px bg-gray-300 mx-1" aria-hidden="true" />
-            )}
-          </div>
-        ))}
-      </div> */}
 
-      <section className="bg-white rounded shadow-sm border">
-        <div className="px-6 py-3">
-          <h2 className="font-semibold text-gray-800">Registration Form</h2>
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <TextField
+                label="CIN / LLPIN / FCRN"
+                required
+                name="cin"
+                placeholder="Enter CIN / LLPIN / FCRN"
+                value={values.cin}
+                onChange={handleChange}
+              />
+              <TextField
+                label="Date of Incorporation"
+                required
+                name="doi"
+                type="date"
+                placeholder="(dd/mm/yyyy)"
+                value={values.doi}
+                onChange={handleChange}
+              />
+            </div>
 
-        <form onSubmit={handleSubmit} className="px-6 py-5 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <TextField
+                label="Name of Company"
+                required
+                name="companyName"
+                placeholder="Name of Company"
+                value={values.companyName}
+                onChange={handleChange}
+              />
+              <TextField
+                label="ROC Name"
+                required
+                name="rocName"
+                placeholder="ROC Name"
+                value={values.rocName}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <SelectField
+                label="Company status"
+                required
+                name="companyStatus"
+                value={values.companyStatus}
+                onChange={handleChange}
+              >
+                <option value="">Company status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </SelectField>
+              <div />
+            </div>
+          </>
+        ),
+      },
+      {
+        id: "address",
+        title: "Address Details",
+        isInitiallyOpen: false,
+        content: (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <SelectField
+              label="Address Type"
+              name="addressType"
+              value={values.addressType}
+              onChange={handleChange}
+            >
+              <option value="">Address Type</option>
+              <option value="reg">Registered Office</option>
+              <option value="branch">Branch Office</option>
+            </SelectField>
+            <TextField
+              label="Address Line 1"
+              required
+              name="address1"
+              placeholder="Address Line 1"
+              value={values.address1}
+              onChange={handleChange}
+            />
+            <TextField
+              label="Address Line 2"
+              name="address2"
+              placeholder="Address Line 2"
+              value={values.address2}
+              onChange={handleChange}
+            />
+            <TextField
+              label="Pincode"
+              required
+              name="pincode"
+              placeholder="Pincode"
+              value={values.pincode}
+              onChange={handleChange}
+            />
+          </div>
+        ),
+      },
+      {
+        id: "contact",
+        title: "Contact Details",
+        isInitiallyOpen: false,
+        content: (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <TextField
+              label="Primary Email"
+              required
+              name="primaryEmail"
+              type="email"
+              placeholder="Primary Email"
+              value={values.primaryEmail}
+              onChange={handleChange}
+            />
+            <TextField
+              label="Primary Contact Number"
+              required
+              name="primaryContact"
+              placeholder="Primary Contact Number"
+              value={values.primaryContact}
+              onChange={handleChange}
+            />
+            <TextField
+              label="Secondary Email"
+              name="secondaryEmail"
+              type="email"
+              placeholder="Secondary Email"
+              value={values.secondaryEmail}
+              onChange={handleChange}
+            />
+            <TextField
+              label="Secondary Contact Number"
+              name="secondaryContact"
+              placeholder="Secondary Contact Number"
+              value={values.secondaryContact}
+              onChange={handleChange}
+            />
+          </div>
+        ),
+      },
+	    {
+      id: "other-details",
+      title: "Financial Details of Company",
+      isInitiallyOpen: false,
+      content: (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <TextField
+            label="Financial Year"
+			required
+            name="financialYear"
+            placeholder="Financial Year"
+          />
+          <TextField
+            label="Turnover "
+			required
+            name="turnOver"
+            placeholder="Turnover"
+          />
+        </div>
+      ),
+    },  
+    ];
+
+    return <AccordionGroup items={items} />;
+  };
+
+  // Registration form fields (below accordions)
+  const renderRegistrationForm = () => (
+    <div className="mt-6 pt-6 border-t border-gray-200">
+      <h3 className="text-sm font-semibold text-gray-800 mb-4">
+        Registration Information
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Implementing Agency */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -290,24 +508,59 @@ export default function Registration() {
               />
             </div>
           </div>
+    </div>
+  );
 
-          {/* Action buttons */}
-          <div className="flex justify-end gap-3 pt-4 border-t">
+  // Render ALL content together (accordions + form fields)
+  const renderStepContent = () => (
+    <>
+      {renderRegistrationDetails()}
+      {renderRegistrationForm()}
+    </>
+  );
+
+  return (
+   <div className="max-w-full mx-auto">
+	<div className="registration-page">
+	{/*<Breadcrumb />*/}
+
+      <h2 className="registration-page-title">FPC – Companies Act</h2>
+
+      <Stepper steps={steps} currentStep={currentStep} completed={stepsCompleted} />
+
+      <section className="registration-card">
+        <h2 className="registration-section-title">Complete Registration</h2>
+
+        <form onSubmit={handleSubmit}>
+          {renderStepContent()}
+
+          <div className="registration-button-bar">
             <button
               type="button"
-              className="px-5 py-2 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50"
+              className="registration-btn-back"
+              onClick={goBack}
+              disabled={currentStep === 1}
             >
               Back
             </button>
-            <button
-              type="submit"
-              className="px-6 py-2 rounded text-sm font-semibold bg-green-600 text-white hover:bg-green-700"
-            >
-              Next
-            </button>
+
+            {currentStep < 4 ? (
+              <button
+                type="button"
+                className="registration-btn-next"
+                onClick={goNext}
+              >
+                Next
+              </button>
+            ) : (
+              <button type="submit" className="registration-btn-next">
+                Submit
+              </button>
+            )}
           </div>
         </form>
       </section>
-    </div>
+     </div>
+	</div>
   );
 }

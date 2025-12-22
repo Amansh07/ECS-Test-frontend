@@ -1,0 +1,126 @@
+/* Registration Page Tailwind3 Classes */
+.registration-page {
+  @apply w-full mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-6;
+}
+
+/* title */
+.registration-page-title {
+  @apply text-xl md:text-2xl font-semibold text-gray-800 mb-4 text-center;
+}
+
+/* breadcrumb */
+.registration-breadcrumb {
+  @apply text-xs md:text-sm text-gray-600 mb-2;
+}
+
+.registration-breadcrumb-link {
+  @apply text-[#4b7a00] font-medium hover:underline;
+}
+
+.registration-breadcrumb-sep {
+  @apply mx-1 text-gray-400;
+}
+
+.registration-breadcrumb-current {
+  @apply font-semibold;
+}
+
+/* stepper */
+.register-header {
+  @apply bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl px-4 md:px-6 py-4 mb-5 shadow;
+}
+
+.stepper-row {
+  @apply flex items-center justify-center gap-3 md:gap-4 flex-wrap;
+}
+
+.stepper-item {
+  @apply flex items-center;
+}
+
+.step-indicator {
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-bold bg-gray-300 text-white border border-gray-400 transition;
+}
+
+.step-indicator--active {
+  @apply bg-emerald-600 border-white shadow;
+}
+
+.step-indicator--completed {
+  @apply bg-white text-emerald-600 border-emerald-500 shadow;
+}
+
+.stepper-label {
+  @apply ml-2 text-xs md:text-sm text-white whitespace-nowrap;
+}
+
+.stepper-line-h {
+  @apply w-10 md:w-16 h-px bg-white/70 ml-2;
+}
+
+/* main card */
+.registration-card {
+  @apply bg-white rounded-xl shadow-sm border border-gray-200 px-4 md:px-6 py-4 md:py-6 mt-2;
+}
+
+.registration-section-title {
+  @apply text-base md:text-lg font-semibold text-gray-800 mb-4;
+}
+
+/* labels / inputs reused via FormFields */
+.registration-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #374151; /* gray-700 */
+  margin-bottom: 0.25rem;
+}
+
+.registration-label-required {
+  color: #dc2626; /* red-600 */
+  margin-left: 2px;
+}
+
+.registration-input,
+.registration-select {
+  width: 100%;
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #111827;
+  background-color: #ffffff;
+}
+
+.registration-input:focus,
+.registration-select:focus {
+  outline: none;
+  border-color: #4b7a00;
+  box-shadow: 0 0 0 1px #4b7a00;
+}
+
+/* help text */
+.registration-help-text {
+  font-size: 0.75rem;
+  color: #b91c1c;
+  margin-bottom: 1rem;
+}
+
+/* bottom buttons */
+.registration-button-bar {
+  @apply flex justify-end gap-3 mt-6;
+}
+
+.registration-btn-back {
+  @apply px-5 py-2 text-xs md:text-sm font-semibold rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.registration-btn-next {
+  @apply px-7 py-2 text-xs md:text-sm font-semibold rounded-md bg-[#4b7a00] text-white hover:bg-[#3b6100];
+}
+
+/* small-screen tweaks */
+@media (max-width: 640px) {
+  .registration-button-bar {
+    @apply justify-between;
+  }
+}
