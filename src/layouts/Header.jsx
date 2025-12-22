@@ -11,10 +11,8 @@ export default function Header() {
         <div className="fpo-header-left">
           {/* Logo block */}
           <div className="fpo-logo-block">
-            {/* To Replace with actual logo <img> */}
- 
-			<div className="fpo-logo-icon1" />
-			<div className="fpo-logo-icon2" />
+            {/* Replace with actual logo <img> if you have one */}
+            <div className="fpo-logo-icon" />
             <span className="fpo-logo-text">FPO Shakti</span>
           </div>
 
@@ -66,7 +64,7 @@ export default function Header() {
           <span className="fpo-breadcrumb-sep">/</span>
           <a href="/signup" className="fpo-breadcrumb-link">Sign up</a>
           <span className="fpo-breadcrumb-sep">/</span>
-          <a href="/register" className="fpo-breadcrumb-link">Register</a>
+          <a href="/registration" className="fpo-breadcrumb-link">Register</a>
           <span className="fpo-breadcrumb-sep">/</span>
           <span className="fpo-breadcrumb-current">FPC - Companies Act</span>
         </nav>

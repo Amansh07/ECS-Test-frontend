@@ -14,9 +14,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #4b7a00; /* dark green */
+  background-color: #4b7a00;
+  /* dark green */
   color: #ffffff;
-  padding: -20px 24px;
+  padding: 5px 24px;
 }
 
 /* Left logo area */
@@ -35,16 +36,18 @@
   width: 32px;
   height: 32px;
   border-radius: 4px;
-  background-color: #f2f4c2;  /* placeholder */
-  margin:5px 0 5px 8px
+  background-color: #f2f4c2;
+  /* placeholder */
+  margin: 5px 0 5px 8px
 }
 
 .fpo-logo-icon2 {
   width: 32px;
   height: 32px;
   border-radius: 4px;
-  background-color: #f2f4c2; /* placeholder */
-  margin:5px 20px 5px 4px;
+  background-color: #f2f4c2;
+  /* placeholder */
+  margin: 5px 20px 5px 4px;
 }
 
 .fpo-logo-text {
@@ -127,7 +130,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-right:10px;
+  margin-right: 10px;
 }
 
 /* Mobile menu button */
@@ -233,6 +236,7 @@
 }
 
 .app-page-with-header {
-  padding-top: 100px!important; /* header + breadcrumb height */
-  max-width:100%;	
+  padding-top: 72px !important;
+  /* header + breadcrumb height */
+  max-width: 100%;
 }
