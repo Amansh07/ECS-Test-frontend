@@ -4,13 +4,17 @@ import App from "./App.jsx";
 import "./index.css";
 import { ThemeProvider } from "./theme/ThemeProvider.jsx";
 import { BrowserRouter } from "react-router-dom";
+import { Provider } from "react-redux";
+import store from "./store";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
+      <Provider store={store}>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      </Provider>
     </BrowserRouter>
   </React.StrictMode>
 );
