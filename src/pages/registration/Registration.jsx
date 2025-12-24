@@ -5,6 +5,7 @@ import SelectUser from "./SelectUser";
 import RegistrationForm from "./RegistrationForm";
 import AddDocuments from "../../components/AddDocuments";
 import Review from "./Review";
+import { Button } from "../../components/Buttons";
 
 const initialValues = {
   // Registration Details (Accordions)
@@ -182,21 +183,26 @@ export default function Registration() {
           {/* Action buttons */}
           <div className="flex justify-end gap-3 pt-4 border-t mt-6 shrink-0">
             {activeStep > 1 && (
-              <button
+              
+
+              <Button
                 type="button"
                 onClick={handleBack}
-                className="px-5 py-2 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50"
+                
+                buttonClassName="px-5 py-2 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50"
               >
                 Back
-              </button>
+              </Button>
             )}
-            <button
+           
+
+             <Button
               type="button"
               onClick={handleNext}
-              className="px-6 py-2 rounded text-sm font-semibold bg-green-600 text-white hover:bg-green-700"
+              buttonClassName="px-6 py-2 rounded text-sm font-semibold bg-green-600 text-white hover:bg-green-700"
             >
               {activeStep === 4 ? "Submit" : "Next"}
-            </button>
+            </Button>
           </div>
         </div>
       </section>

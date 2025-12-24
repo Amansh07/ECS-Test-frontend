@@ -1,5 +1,5 @@
 import React from "react";
-
+import { Button } from "./Buttons";
 export default function SelectableCard({
     icon,
     text,
@@ -8,10 +8,10 @@ export default function SelectableCard({
     className = "",
 }) {
     return (
-        <button
+        <Button
             type="button"
             onClick={onSelect}
-            className={[
+            buttonClassName={[
                 "group w-full sm:w-[300px] md:w-[320px] lg:w-[340px] rounded-2xl bg-text-light text-left transition",
                 // Default: thin border always visible
                 "border border-stroke-200",
@@ -51,6 +51,6 @@ export default function SelectableCard({
                     </div>
                 </div>
             </div>
-        </button>
+        </Button>
     );
 }

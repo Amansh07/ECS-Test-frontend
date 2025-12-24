@@ -7,6 +7,7 @@ import trailingIcon from "../assets/Trailing_icon.svg";
 import tickMark from "../assets/Vector.svg";
 import Delete from "../assets/Delete.svg";
 import pdfUpload from "../assets/pdfUpload.svg";
+import { Button } from "./Buttons";
 
 const UploadDocument = ({ config, onFileSelect }) => {
   const [error, setError] = useState("");
@@ -225,9 +226,9 @@ const UploadDocument = ({ config, onFileSelect }) => {
 
             {/* Bottom (32px) */}
             <div className="flex h-[32px] bg-transparent justify-end">
-              <button className="w-[82px] text-[12px] font-medium border-[1px] text-[#253300] border-[#253300] rounded-[8px] h-[32px] flex items-center justify-center px-4 py-2 cursor-pointer" onClick={() => document.getElementById(inputId).click()} >
+              <Button buttonClassName="w-[82px] text-[12px] font-medium border-[1px] text-[#253300] border-[#253300] rounded-[8px] h-[32px] flex items-center justify-center px-4 py-2 cursor-pointer" onClick={() => document.getElementById(inputId).click()} >
                 Add File
-              </button>
+              </Button>
             </div>
 
           </div>
@@ -252,7 +253,7 @@ const UploadDocument = ({ config, onFileSelect }) => {
           <div className="bg-white rounded-lg shadow-lg w-full max-w-[400px] p-4">
             <div className="flex justify-between mb-3">
               <h2 className="text-base font-medium">Upload Photograph</h2>
-              <button onClick={handleCancel}>✕</button>
+              <Button onClick={handleCancel}>✕</Button>
             </div>
 
             <div className="relative h-[350px] flex items-center justify-center bg-[#464646] rounded-[8px]">
@@ -285,18 +286,18 @@ const UploadDocument = ({ config, onFileSelect }) => {
             </div>
 
             <div className="flex justify-end gap-2 mt-4">
-              <button
-                className="px-4 py-2 rounded-md border border-[#B7131A] text-[#B7131A]"
+              <Button
+                buttonClassName="px-4 py-2 rounded-md border border-[#B7131A] text-[#B7131A]"
                 onClick={handleCancel}
               >
                 Cancel
-              </button>
-              <button
-                className="px-4 py-2 rounded-md bg-[#1B7A00] text-white"
+              </Button>
+              <Button
+                buttonClassName="px-4 py-2 rounded-md bg-[#1B7A00] text-white"
                 onClick={handleConfirm}
               >
                 Confirm Image
-              </button>
+              </Button>
             </div>
           </div>
         </div>

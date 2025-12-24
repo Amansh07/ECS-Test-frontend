@@ -85,6 +85,7 @@ import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import LeftNav from "./LeftNav";
+import { Button } from "../components/Buttons";
 
 export default function MainLayout() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -112,10 +113,10 @@ export default function MainLayout() {
         ].join(" ")}
       >
         {/* Mobile hamburger (below header, not overlapping) */}
-        <button
+        <Button
           type="button"
           onClick={() => setMobileOpen(true)}
-          className={[
+          buttonClassName={[
             "lg:hidden",
             "fixed left-3 z-50",
             "top-[calc(var(--app-header-h)+var(--app-gutter))]", // positions below header [web:129][web:152]
@@ -126,7 +127,7 @@ export default function MainLayout() {
           aria-label="Open menu"
         >
           ☰
-        </button>
+        </Button>
 
         <div className="flex h-full">
           <LeftNav

@@ -1,5 +1,6 @@
 import axios from "axios";
 import AuthService from "../auth/AuthService";
+import { useErrorBoundary } from "react-error-boundary";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -19,9 +20,13 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
  */
 apiClient.interceptors.request.use(
   async (config) => {
-    const token = await AuthService.getAccessToken();
+     const { showBoundary } = useErrorBoundary();
+   try { const token = await AuthService.getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }}
+    catch(err){
+      showBoundary(err); 
     }
     return config;
   },
@@ -54,8 +59,15 @@ apiClient.interceptors.response.use(
     /**
      * Let OIDC handle session expiry
      */
+    const { showBoundary } = useErrorBoundary()
     if (status === 401) {
-      AuthService.signIn();
+      try{
+        AuthService.signIn();
+      }catch (err) {
+      // This manually triggers the Error Boundary
+      showBoundary(err); 
+    }
+      
     }
 
     return Promise.reject({

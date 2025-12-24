@@ -1,20 +1,23 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import AuthService from "../auth/AuthService";
+// import { useErrorBoundary } from "react-error-boundary";
 
 const PrivateRoute = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
-
+// const { showBoundary } = useErrorBoundary();
   useEffect(() => {
     let isMounted = true;
 
     const checkAuth = async () => {
+      
       try {
         const user = await AuthService.getUser();
         if (!isMounted) return;
 
         setIsAuthenticated(!!user && !user.expired);
       } catch (error) {
+        // showBoundary(error); 
         if (isMounted) setIsAuthenticated(false);
       }
     };

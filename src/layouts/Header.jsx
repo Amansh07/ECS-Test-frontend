@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./header.css";
+import { Button } from "../components/Buttons";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -36,24 +37,24 @@ export default function Header() {
               className="fpo-search-input"
               placeholder="Search for"
             />
-            <button className="fpo-search-button" aria-label="Search" />
+            <Button buttonClassName="fpo-search-button" aria-label="Search" />
           </div>
 
-          <button className="fpo-profile-avatar" aria-label="Profile">
+          <Button buttonClassName="fpo-profile-avatar" aria-label="Profile">
             U
-          </button>
+          </Button>
 
           {/* Mobile hamburger */}
-          <button
+          <Button
             type="button"
-            className="fpo-menu-toggle"
+            buttonClassName="fpo-menu-toggle"
             onClick={() => setOpen(!open)}
             aria-label="Toggle navigation"
           >
             <span className="fpo-menu-bar" />
             <span className="fpo-menu-bar" />
             <span className="fpo-menu-bar" />
-          </button>
+          </Button>
         </div>
       </div>
 
