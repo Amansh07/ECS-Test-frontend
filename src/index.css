@@ -17,8 +17,8 @@ body,
 *::before,
 *::after {
   box-sizing: border-box;
-  margin:0;
-  padding:0,
+  margin: 0;
+  padding: 0,
 }
 
 body {
@@ -198,11 +198,22 @@ body {
 
   /* height */
   --app-header-h: 100px;
-  /* your app already uses padding-top:100px */
+  /* matched to .app-page-with-header in header.css */
   --app-footer-h: 56px;
   /* set to your footer bar height */
-  --app-gutter: 12px;
+  --app-gutter: 24px;
   /* small spacing for hamburger */
+}
+
+@media (max-width: 640px) {
+  :root[data-theme="default"] {
+    --app-footer-h: 84px;
+    /* Increased height for stacked footer */
+  }
+
+  :root[data-theme="alt"] {
+    --app-footer-h: 84px;
+  }
 }
 
 :root[data-theme="alt"] {

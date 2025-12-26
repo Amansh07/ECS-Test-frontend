@@ -1,4 +1,6 @@
-registrationregistration/* Registration Page Tailwind3 Classes */
+registrationregistration
+
+/* Registration Page Tailwind3 Classes */
 .registration-page {
   @apply w-full mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-6;
 }
@@ -71,12 +73,14 @@ registrationregistration/* Registration Page Tailwind3 Classes */
 .registration-label {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #374151; /* gray-700 */
+  color: #374151;
+  /* gray-700 */
   margin-bottom: 0.25rem;
 }
 
 .registration-label-required {
-  color: #dc2626; /* red-600 */
+  color: #dc2626;
+  /* red-600 */
   margin-left: 2px;
 }
 
@@ -98,6 +102,18 @@ registrationregistration/* Registration Page Tailwind3 Classes */
   box-shadow: 0 0 0 1px #4b7a00;
 }
 
+.registration-input:disabled,
+.registration-select:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background-color: rgb(var(--grey-100));
+  color: rgb(var(--grey-600));
+  border-color: rgb(var(--grey-300));
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
 /* help text */
 .registration-help-text {
   font-size: 0.75rem;
@@ -117,6 +133,7 @@ registrationregistration/* Registration Page Tailwind3 Classes */
 .registration-btn-next {
   @apply px-7 py-2 text-xs md:text-sm font-semibold rounded-md bg-[#4b7a00] text-white hover:bg-[#3b6100];
 }
+
 .registration-table-wrapper {
   width: 100%;
   overflow-x: auto;
@@ -129,12 +146,13 @@ registrationregistration/* Registration Page Tailwind3 Classes */
   font-size: 0.85rem;
 
 }
-.registration-table-header{
-	background-color: rgb(229 231 235 / var(--tw-border-opacity, 1));
-	border-style: solid;
-    border-color: #e5e7eb;
-	margin-bottom: 1rem;
-	overflow: hidden;
+
+.registration-table-header {
+  background-color: rgb(229 231 235 / var(--tw-border-opacity, 1));
+  border-style: solid;
+  border-color: #e5e7eb;
+  margin-bottom: 1rem;
+  overflow: hidden;
 }
 
 .registration-table th,

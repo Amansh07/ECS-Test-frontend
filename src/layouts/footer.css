@@ -5,7 +5,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: #4b7a00;
+  /* background-color: #4b7a00; */
   color: #ffffff;
   padding: 10px 40px;
   display: flex;
@@ -35,4 +35,20 @@
 
 .footer-separator {
   opacity: 0.7;
+}
+
+@media (max-width: 640px) {
+  .register-footer {
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    height: var(--app-footer-h);
+  }
+
+  .footer-left {
+    white-space: normal;
+    text-align: center;
+    font-size: 12px;
+  }
 }

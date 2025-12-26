@@ -40,10 +40,10 @@ export default function LeftNav({
       <aside
         className={[
           "hidden lg:flex lg:flex-col",
-          "lg:sticky lg:top-[var(--app-header-h)]",
-          "lg:h-[calc(100vh-var(--app-header-h)-var(--app-footer-h))]",
-          "lg:border-r lg:border-[#384d00] bg-[#253300]",
-          "transition-[width] duration-300 ease-in-out rounded-r-xl", // smooth minimize/expand [web:111]
+          "lg:h-[calc(100%)]", // Height relative to parent (which fits between header/footer) minus margin
+          "lg:bg-primary-900",
+          "lg:m-2", // 4px gap all around
+          "transition-[width] duration-300 ease-in-out rounded-xl", // smooth minimize/expand [web:111], uniform radius
           collapsed ? "lg:w-20" : "lg:w-64",
         ].join(" ")}
       >
@@ -95,9 +95,8 @@ export default function LeftNav({
       {/* ---------- Mobile drawer (full width, with X close) ---------- */}
       <aside
         className={[
-          "lg:hidden fixed left-0 z-50 w-full bg-[#253300]",
-          "top-[var(--app-header-h)]",
-          "h-[calc(100vh-var(--app-header-h)-var(--app-footer-h))]",
+          "lg:hidden fixed inset-0 z-[60] w-full bg-[#253300]",
+          "h-full", // Full screen height
           "overflow-y-auto",
           "transform transition-transform duration-300 ease-in-out", // slide [web:111][web:123]
           mobileOpen ? "translate-x-0" : "-translate-x-full",

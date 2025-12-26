@@ -31,7 +31,7 @@ export default function SelectableCard({
                         // Default icon background: light green
                         "bg-primary-50",
                         // Hover icon bg: slightly deeper
-                        selected ? "bg-primary-700" : "group-hover:bg-primary-100",
+                        selected ? "bg-primary-600" : "group-hover:bg-primary-100",
                     ].join(" ")}
                 >
                     <div className={["text-lg sm:text-xl", selected ? "text-white" : "text-primary-900"].join(" ")}>
@@ -40,7 +40,7 @@ export default function SelectableCard({
                 </div>
 
                 {/* Text block */}
-                <div className="px-3 py-3 sm:px-4 sm:py-6 flex items-center">
+                <div className={["flex-1 px-3 py-3 sm:px-4 sm:py-6 flex items-center", selected ? "bg-primary-50" : ""].join(" ")}>
                     <div
                         className={[
                             "text-sm sm:text-lg text-text-dark",

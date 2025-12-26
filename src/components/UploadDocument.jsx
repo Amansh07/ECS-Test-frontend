@@ -9,7 +9,7 @@ import Delete from "../assets/Delete.svg";
 import pdfUpload from "../assets/pdfUpload.svg";
 import { Button } from "./Buttons";
 
-const UploadDocument = ({ config, onFileSelect }) => {
+const UploadDocument = ({ config, onFileSelect, disabled = false }) => {
   const [error, setError] = useState("");
   const [fileName, setFileName] = useState("");
   const [isDragging, setIsDragging] = useState(false);
@@ -165,7 +165,8 @@ const UploadDocument = ({ config, onFileSelect }) => {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          onClick={() => document.getElementById(inputId).click()}
+          onClick={() => !disabled && document.getElementById(inputId).click()}
+          style={{ cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.7 : 1 }}
         >
           <div className="flex items-center">
             <img src={config?.allowedTypes.includes("application/pdf") ? pdfUpload : uploadImg} alt="upload" />
