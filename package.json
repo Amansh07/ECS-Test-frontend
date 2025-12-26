@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev" :  "vite --mode dev",
+     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -17,7 +17,8 @@
     "react-dom": "^19.2.0",
     "react-easy-crop": "^5.5.6",
     "react-redux": "^9.2.0",
-    "react-router-dom": "^7.10.1"
+    "react-router-dom": "^7.10.1",
+    "toolkit": "^1.5.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

@@ -1,4 +1,4 @@
-/* Registration Page Tailwind3 Classes */
+registrationregistration/* Registration Page Tailwind3 Classes */
 .registration-page {
   @apply w-full mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-6;
 }
@@ -116,6 +116,78 @@
 
 .registration-btn-next {
   @apply px-7 py-2 text-xs md:text-sm font-semibold rounded-md bg-[#4b7a00] text-white hover:bg-[#3b6100];
+}
+.registration-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.registration-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-width: 10px;
+  font-size: 0.85rem;
+
+}
+.registration-table-header{
+	background-color: rgb(229 231 235 / var(--tw-border-opacity, 1));
+	border-style: solid;
+    border-color: #e5e7eb;
+	margin-bottom: 1rem;
+	overflow: hidden;
+}
+
+.registration-table th,
+.registration-table td {
+  border: 1px solid #e5e7eb;
+  padding: 0.25rem 0.5rem;
+  vertical-align: top;
+}
+
+.actions-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: 0 0.15rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.icon-btn-green {
+  border-color: #16a34a;
+  color: #166534;
+  background-color: #ecfdf3;
+}
+
+.icon-btn-red {
+  border-color: #dc2626;
+  color: #b91c1c;
+  background-color: #fef2f2;
+}
+
+.icon-btn-add {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid #16a34a;
+  color: #166534;
+  background-color: #ecfdf3;
+  font-size: 0.8rem;
+}
+
+/* small-screen tweaks */
+@media (max-width: 640px) {
+  .registration-button-bar {
+    @apply justify-between;
+  }
 }
 
 /* small-screen tweaks */

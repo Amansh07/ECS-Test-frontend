@@ -34,6 +34,7 @@ const initialValues = {
   username: "",
   password: "",
   confirmPassword: "",
+  fpopan: "",
   bannerImage: null,
   shareholderSheet: null,
 };
