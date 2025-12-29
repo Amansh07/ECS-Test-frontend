@@ -11,6 +11,7 @@ const oidcConfig = {
   automaticSilentRenew: true,
 };
 
+
 if (!oidcConfig.authority || !oidcConfig.client_id) {
   throw new Error("OIDC configuration missing");
 }

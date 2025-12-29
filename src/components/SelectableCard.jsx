@@ -1,5 +1,5 @@
 import React from "react";
-
+import { Button } from "./Buttons";
 export default function SelectableCard({
     icon,
     text,
@@ -8,10 +8,10 @@ export default function SelectableCard({
     className = "",
 }) {
     return (
-        <button
+        <Button
             type="button"
             onClick={onSelect}
-            className={[
+            buttonClassName={[
                 "group w-full sm:w-[300px] md:w-[320px] lg:w-[340px] rounded-2xl bg-text-light text-left transition",
                 // Default: thin border always visible
                 "border border-stroke-200",
@@ -31,7 +31,7 @@ export default function SelectableCard({
                         // Default icon background: light green
                         "bg-primary-50",
                         // Hover icon bg: slightly deeper
-                        selected ? "bg-primary-700" : "group-hover:bg-primary-100",
+                        selected ? "bg-primary-600" : "group-hover:bg-primary-100",
                     ].join(" ")}
                 >
                     <div className={["text-lg sm:text-xl", selected ? "text-white" : "text-primary-900"].join(" ")}>
@@ -40,7 +40,7 @@ export default function SelectableCard({
                 </div>
 
                 {/* Text block */}
-                <div className="px-3 py-3 sm:px-4 sm:py-6 flex items-center">
+                <div className={["flex-1 px-3 py-3 sm:px-4 sm:py-6 flex items-center", selected ? "bg-primary-50" : ""].join(" ")}>
                     <div
                         className={[
                             "text-sm sm:text-lg text-text-dark",
@@ -51,6 +51,6 @@ export default function SelectableCard({
                     </div>
                 </div>
             </div>
-        </button>
+        </Button>
     );
 }

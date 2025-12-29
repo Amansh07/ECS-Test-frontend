@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import "./header.css";
+import { Button } from "../components/Buttons";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -10,9 +11,26 @@ export default function Header() {
     location.pathname === "/login";
 
   return (
-    <header className="fpo-header">
+    <header className="fpo-header" style={{ zIndex: open ? 100 : undefined }}>
+      {/* Top Black Bar */}
+      <div className="flex justify-end items-center px-4 md:px-6 py-1 text-[10px] md:text-xs gap-3 bg-[#000000] text-primary-700 font-medium tracking-wide border-b border-white/10">
+        <a href="#main-content" className="hover:underline hover:text-primary-500 transition-colors">Skip to Main Content</a>
+        <span className="opacity-50">|</span>
+        <div className="flex gap-2 items-center">
+          <button className="hover:text-primary-500 transition-colors font-bold" aria-label="Decrease font size">A-</button>
+          <button className="hover:text-primary-500 transition-colors font-bold" aria-label="Reset font size">A</button>
+          <button className="hover:text-primary-500 transition-colors font-bold" aria-label="Increase font size">A+</button>
+        </div>
+        <span className="opacity-50">|</span>
+        <button aria-label="Toggle Theme" className="hover:text-primary-500 transition-colors flex items-center">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+            <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z" />
+          </svg>
+        </button>
+      </div>
+
       {/* Main green bar */}
-      <div className="fpo-header-top">
+      <div className="fpo-header-top bg-primary-800">
         <div className="fpo-header-left">
           {/* Logo block */}
           <div className="fpo-logo-block">
@@ -41,24 +59,24 @@ export default function Header() {
               className="fpo-search-input"
               placeholder="Search for"
             />
-            <button className="fpo-search-button" aria-label="Search" />
+            <Button buttonClassName="fpo-search-button" aria-label="Search" />
           </div>
 
-          <button className="fpo-profile-avatar" aria-label="Profile">
+          <Button buttonClassName="fpo-profile-avatar" aria-label="Profile">
             U
-          </button>
+          </Button>
 
           {/* Mobile hamburger */}
-          <button
+          <Button
             type="button"
-            className="fpo-menu-toggle"
+            buttonClassName="fpo-menu-toggle"
             onClick={() => setOpen(!open)}
             aria-label="Toggle navigation"
           >
             <span className="fpo-menu-bar" />
             <span className="fpo-menu-bar" />
             <span className="fpo-menu-bar" />
-          </button>
+          </Button>
         </div>
       </div>
 
