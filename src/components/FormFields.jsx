@@ -5,6 +5,7 @@ export function TextField({
   required,
   labelClassName = "",
   inputClassName = "",
+  imageSrc,
   ...inputProps
 }) {
   return (
@@ -17,10 +18,27 @@ export function TextField({
           )}
         </label>
       )}
-      <input
+       {/* Input wrapper */}
+      <div className="relative">
+        {imageSrc && (
+          <img
+            src={imageSrc}
+            alt=""
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
+          />
+        )}
+
+        <input
+          {...inputProps}
+          className={`registration-input ${
+            imageSrc ? "pl-10" : ""
+          } ${inputClassName}`}
+        />
+      </div>
+      {/* <input
         {...inputProps}
         className={`registration-input ${inputClassName}`}
-      />
+      /> */}
     </div>
   );
 }

@@ -1,8 +1,13 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import "./header.css";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+   const location = useLocation();
+
+  const hideBreadcrumb =
+    location.pathname === "/login";
 
   return (
     <header className="fpo-header">
@@ -58,7 +63,7 @@ export default function Header() {
       </div>
 
       {/* Breadcrumb area */}
-      <div className="fpo-breadcrumb-bar">
+      {!hideBreadcrumb && (<div className="fpo-breadcrumb-bar">
         <nav className="fpo-breadcrumb" aria-label="Breadcrumb">
           <a href="/" className="fpo-breadcrumb-link">Home</a>
           <span className="fpo-breadcrumb-sep">/</span>
@@ -68,7 +73,7 @@ export default function Header() {
           <span className="fpo-breadcrumb-sep">/</span>
           <span className="fpo-breadcrumb-current">FPC - Companies Act</span>
         </nav>
-      </div>
+      </div>)}
 
       {/* Mobile nav dropdown */}
       {open && (
