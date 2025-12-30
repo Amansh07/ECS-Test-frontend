@@ -2,7 +2,7 @@
 import React from "react";
 import { AccordionGroup } from "../../components/Accordion";
 import { TextField, SelectField, RadioGroup } from "../../components/FormFields";
-import FinancialDetailsTable from "../../components/FinancialDetailsTable";
+import FinancialDetailsTable from "../../components/Table";
 import "./Registration.css";
 
 const RegistrationForm = ({ values, handleChange, disabled = false }) => {

@@ -63,7 +63,7 @@ export function SelectField({
       )}
       <select
         {...selectProps}
-        className={`registration-select ${selectClassName}`}
+        className={`registration-select ${selectClassName} `}
       >
         {children}
       </select>
@@ -90,7 +90,7 @@ export function RadioGroup({
         </p>
       )}
 
-      <div className="flex flex-col gap-2 text-sm">
+      <div className="flex flex-col md:flex-row gap-4 text-sm">
         {options.map((opt) => (
           <label
             key={opt.value}
@@ -110,3 +110,4 @@ export function RadioGroup({
     </div>
   );
 }
+

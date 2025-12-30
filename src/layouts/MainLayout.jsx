@@ -102,7 +102,7 @@ export default function MainLayout() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-grey-50">
+    <div className="min-h-screen bg-white">
       <Header />
 
       {/* CONTENT ZONE: exactly between fixed header and footer */}
