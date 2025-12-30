@@ -144,9 +144,46 @@ export default function MainLayout() {
           />
 
           {/* Only main scrolls */}
-          <main id="main-content" className="flex-1 overflow-y-auto p-4 lg:p-6">
-            <Outlet />
-          </main>
+       <main id="main-content" className="flex-1 overflow-y-auto p-4 lg:p-6">
+  {/* Dynamic tabs only for member-management */}
+  {window.location.pathname.startsWith("/member-management") && (
+    <div className="mb-4">
+      <div className="flex gap-4 relative">
+        {/* Single line under tabs */}
+        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-[#C5C0D8]"></div>
+
+        {[ 
+          { title: "Farmers", path: "farmers" },
+          { title: "Board Members", path: "board-members" },
+          { title: "Resources", path: "resources" },
+          { title: "Mentors", path: "mentors" },
+        ].map((tab) => {
+          const isActive = window.location.pathname.endsWith(tab.path);
+          return (
+            <div
+              key={tab.path}
+              onClick={() =>
+                (window.location.href = `/member-management/${tab.path}`)
+              }
+              className={[
+                "cursor-pointer rounded-tr-[8px] rounded-tl-[8px] z-10 h-[36px] flex items-center justify-center p-2",
+                isActive
+                  ? "bg-[#F8FFE5] border-b-2 border-[#4A6600]"
+                  : "hover:border-b-2 hover:border-b-[#4A6600]",
+              ].join(" ")}
+            >
+              <p className="text-[14px] font-medium">{tab.title}</p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  )}
+
+  <Outlet />
+</main>
+
+
         </div>
       </div>
 

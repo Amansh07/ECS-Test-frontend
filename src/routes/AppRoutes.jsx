@@ -2,8 +2,9 @@ import { Routes, Route } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import AuthLayout from "../layouts/AuthLayout";
 import Registration from "../pages/registration/Registration";
-import Login from "../pages/login/Login";
+import Login from "../pages/login/login";
 import PrivateRoute from "./PrivateRoute";
+import MemberManagementRoutes from "./MemberManagementRoutes";
 
 const AppRoutes = () => {
   return (
@@ -14,6 +15,7 @@ const AppRoutes = () => {
       <Route element={<MainLayout />}>
         <Route path="/" element={<Registration />} />
         <Route path="/registration" element={<Registration />} />
+        {MemberManagementRoutes()}
 
         {/*
         <Route

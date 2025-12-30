@@ -1,13 +1,14 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { Button } from "../components/Buttons";
+import memberManagement from "../assets/memberManagement.svg";
 
 const navItems = [
   { to: "/registration", label: "Registration", icon: "📝" },
   { to: "/production", label: "Production Details", icon: "🌾" },
   { to: "/compliance", label: "Compliance", icon: "✅" },
   { to: "/services", label: "FPO Services", icon: "🧰" },
-  { to: "/members", label: "Member Management", icon: "👥" },
+  { to: "/member-management", label: "Member Management", icon: "", src: memberManagement },
 ];
 
 const linkBase =
@@ -85,7 +86,7 @@ export default function LeftNav({
               }
               title={collapsed ? item.label : undefined}
             >
-              <span className="text-lg">{item.icon}</span>
+              <span className="text-lg">{item.icon ? item.icon :  <img src={item.src} alt={item.src} />}</span>
               <span className={collapsed ? "hidden" : ""}>{item.label}</span>
             </NavLink>
           ))}
@@ -136,7 +137,7 @@ export default function LeftNav({
                 [linkBase, isActive ? linkActive : linkIdle].join(" ")
               }
             >
-              <span className="text-lg">{item.icon}</span>
+             <span className="text-lg">{item.icon ? item.icon :  <img src={item.src} alt={item.src} />}</span>
               <span>{item.label}</span>
             </NavLink>
           ))}
