@@ -8,6 +8,7 @@ import mentors from "../../assets/mentors.svg";
 const cards = [
   { title: "Farmers", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "farmers" },
   { title: "Board Members", description: "Lorem ipsum dolor sit amet", icon: boardMembers, path: "board-members" },
+  { title: "Board Members (Company Act)", description: "Lorem ipsum dolor sit amet", icon: boardMembers, path: "board-members-company-act" },
   { title: "Resources", description: "Lorem ipsum dolor sit amet", icon: resources, path: "resources" },
   { title: "Mentors", description: "Lorem ipsum dolor sit amet", icon: mentors, path: "mentors" },
 ];

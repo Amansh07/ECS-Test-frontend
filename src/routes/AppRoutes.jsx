@@ -6,10 +6,11 @@ import Login from "../pages/login/login";
 import PrivateRoute from "./PrivateRoute";
 import MemberManagementRoutes from "./MemberManagementRoutes";
 
+// Force HMR update
 const AppRoutes = () => {
   return (
     <Routes>
-       <Route element={<AuthLayout />}>
+      <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
       </Route>
       <Route element={<MainLayout />}>

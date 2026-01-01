@@ -1,46 +1,3 @@
-// // src/components/Table.jsx
-// import React from "react";
-// const defaultColumns = [
-//   "Financial Year",
-//   "Turnover",
-//   "Profit/Loss",
-//   "Financial Range",
-//   "Audit Status Applicability",
-//   "Audit Status",
-//   "Type",
-// ];
-
-// export default function Table({
-//   columns = defaultColumns,
-//   rows = 4,
-//   placeholder = "Value",
-// }) {
-//   const rowArray = Array.from({ length: rows });
-
-//   return (
-//     <div className="registration-table-wrapper">
-//       <table className="registration-table">
-//         <thead>
-//           <tr>
-//             {columns.map((col) => (
-//               <th key={col}>{col}</th>
-//             ))}
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {rowArray.map((_, index) => (
-//             <tr key={index}>
-//               {columns.map((col) => (
-//                 <td key={col}>{placeholder}</td>
-//               ))}
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//     </div>
-//   );
-// }
-
 // src/components/Table.jsx
 
 import React from "react";
@@ -49,20 +6,35 @@ export default function Table({
   columns = ["Name", "Father's/Husband's Name", "Designation", "Gender", "Actions"],
   data = [], // Array of objects for rows
   renderActions, // Function to render custom action buttons per row
+  stickyLastColumn = false, // Enable sticky last column
 }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full border-collapse">
+    <div className="overflow-x-auto relative">
+      <table className="border-collapse" style={{ minWidth: '100%' }}>
         <thead>
           <tr>
-            {columns.map((col) => (
-              <th
-                key={col}
-                className="text-center text-[12px] bg-[#F3F3F3] h-[67px] px-4 py-5 text-sm font-[700]"
-              >
-                {col}
-              </th>
-            ))}
+            {columns.map((col, index) => {
+              const isLastColumn = index === columns.length - 1;
+              const isActionsColumn = col === "Actions";
+
+              return (
+                <th
+                  key={col}
+                  className={[
+                    "text-center text-[12px] bg-[#F3F3F3] h-[67px] px-4 py-5 text-sm font-[700] whitespace-nowrap",
+                    stickyLastColumn && isLastColumn
+                      ? "sticky right-0 z-10 shadow-[-4px_0_8px_rgba(0,0,0,0.05)]"
+                      : "",
+                  ].join(" ")}
+                  style={{
+                    minWidth: isActionsColumn ? '120px' : '180px',
+                    width: isActionsColumn ? '120px' : 'auto',
+                  }}
+                >
+                  {col}
+                </th>
+              );
+            })}
           </tr>
         </thead>
 
@@ -73,12 +45,24 @@ export default function Table({
                 key={rowIndex}
                 className="bg-white border-t border-b border-[#F1FFCC]"
               >
-                {columns.map((col) => {
+                {columns.map((col, colIndex) => {
+                  const isLastColumn = colIndex === columns.length - 1;
+                  const isActionsColumn = col === "Actions";
+
                   if (col === "Actions") {
                     return (
                       <td
                         key={col}
-                        className="text-center px-4 py-5 text-[12px] h-[60px] font-normal"
+                        className={[
+                          "text-center px-4 py-5 text-[12px] h-[60px] font-normal bg-white whitespace-nowrap",
+                          stickyLastColumn && isLastColumn
+                            ? "sticky right-0 z-10 shadow-[-4px_0_8px_rgba(0,0,0,0.05)]"
+                            : "",
+                        ].join(" ")}
+                        style={{
+                          minWidth: '120px',
+                          width: '120px',
+                        }}
                       >
                         {renderActions ? renderActions(row, rowIndex) : null}
                       </td>
@@ -91,7 +75,15 @@ export default function Table({
                   return (
                     <td
                       key={col}
-                      className="text-center px-4 py-5 text-sm h-[60px]"
+                      className={[
+                        "text-center px-4 py-5 text-sm h-[60px] whitespace-nowrap",
+                        stickyLastColumn && isLastColumn
+                          ? "sticky right-0 z-10 bg-white shadow-[-4px_0_8px_rgba(0,0,0,0.05)]"
+                          : "",
+                      ].join(" ")}
+                      style={{
+                        minWidth: '180px',
+                      }}
                     >
                       {value}
                     </td>
