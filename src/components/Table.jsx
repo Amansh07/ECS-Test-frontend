@@ -27,8 +27,8 @@ export default function Table({
                       : "",
                   ].join(" ")}
                   style={{
-                    minWidth: isActionsColumn ? '120px' : '180px',
-                    width: isActionsColumn ? '120px' : 'auto',
+                    minWidth: isActionsColumn ? '280px' : '150px',
+                    width: isActionsColumn ? '280px' : 'auto',
                   }}
                 >
                   {col}
@@ -60,8 +60,8 @@ export default function Table({
                             : "",
                         ].join(" ")}
                         style={{
-                          minWidth: '120px',
-                          width: '120px',
+                          minWidth: '280px',
+                          width: '280px',
                         }}
                       >
                         {renderActions ? renderActions(row, rowIndex) : null}
@@ -82,7 +82,7 @@ export default function Table({
                           : "",
                       ].join(" ")}
                       style={{
-                        minWidth: '180px',
+                        minWidth: '150px',
                       }}
                     >
                       {value}

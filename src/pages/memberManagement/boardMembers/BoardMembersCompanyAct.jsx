@@ -3,11 +3,13 @@ import { TextField } from '../../../components/FormFields';
 import Table from '../../../components/Table';
 import FormModal from '../../../components/FormModal';
 import ConfirmationModal from '../../../components/ConfirmationModal';
+import StatusModal from '../../../components/StatusModal';
 import editSvg from "../../../assets/edit.svg";
 
 export const BoardMembersCompanyAct = () => {
     const [isFormModalOpen, setIsFormModalOpen] = useState(false);
     const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+    const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
     const [currentRow, setCurrentRow] = useState(null);
 
     const sampleData = [
@@ -102,8 +104,13 @@ export const BoardMembersCompanyAct = () => {
     };
 
     const handleConfirmationConfirm = () => {
-        // Handle successful confirmation
+        // Close confirmation modal and show status modal
         setIsConfirmationModalOpen(false);
+        setIsStatusModalOpen(true);
+    };
+
+    const handleStatusModalClose = () => {
+        setIsStatusModalOpen(false);
         setCurrentRow(null);
     };
 
@@ -168,8 +175,16 @@ export const BoardMembersCompanyAct = () => {
                 isOpen={isConfirmationModalOpen}
                 onClose={handleConfirmationClose}
                 onConfirm={handleConfirmationConfirm}
-                title="Success"
-                description="Board member details have been updated successfully."
+                title="Confirm Update"
+                description="Are you sure you want to update these board member details?"
+            />
+
+            {/* Status Modal */}
+            <StatusModal
+                isOpen={isStatusModalOpen}
+                onClose={handleStatusModalClose}
+                status={true}
+                message="Board member details have been updated successfully."
             />
         </div>
     );

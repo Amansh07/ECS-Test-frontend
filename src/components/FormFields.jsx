@@ -18,7 +18,7 @@ export function TextField({
           )}
         </label>
       )}
-       {/* Input wrapper */}
+      {/* Input wrapper */}
       <div className="relative">
         {imageSrc && (
           <img
@@ -30,9 +30,8 @@ export function TextField({
 
         <input
           {...inputProps}
-          className={`registration-input ${
-            imageSrc ? "pl-10" : ""
-          } ${inputClassName}`}
+          className={`registration-input ${imageSrc ? "pl-10" : ""
+            } ${inputClassName}`}
         />
       </div>
       {/* <input
@@ -107,6 +106,34 @@ export function RadioGroup({
           </label>
         ))}
       </div>
+    </div>
+  );
+}
+
+export function CheckboxField({
+  label,
+  name,
+  checked,
+  onChange,
+  labelClassName = "",
+  checkboxClassName = "",
+  ...checkboxProps
+}) {
+  return (
+    <div className="mb-4 flex items-center">
+      <input
+        type="checkbox"
+        name={name}
+        checked={checked}
+        onChange={onChange}
+        className={`w-5 h-5 text-success bg-grey-100 border-grey-300 rounded focus:ring-success focus:ring-2 ${checkboxClassName}`}
+        {...checkboxProps}
+      />
+      {label && (
+        <label className={`ml-2 text-sm font-medium text-grey-900 cursor-pointer ${labelClassName}`}>
+          {label}
+        </label>
+      )}
     </div>
   );
 }
