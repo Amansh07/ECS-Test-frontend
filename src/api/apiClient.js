@@ -1,6 +1,5 @@
 import axios from "axios";
 import AuthService from "../auth/AuthService";
-import { useErrorBoundary } from "react-error-boundary";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -20,13 +19,16 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
  */
 apiClient.interceptors.request.use(
   async (config) => {
-     const { showBoundary } = useErrorBoundary();
-   try { const token = await AuthService.getAccessToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }}
-    catch(err){
-      showBoundary(err); 
+    try {
+      const token = await AuthService.getAccessToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (err) {
+      console.error("Error getting token:", err);
+      // Instead of useErrorBoundary, just log or handle globally
+      // You can also throw it to be caught in response interceptor
+      throw err;
     }
     return config;
   },
@@ -42,9 +44,7 @@ apiClient.interceptors.response.use(
     const originalRequest = error.config;
     const status = error?.response?.status;
 
-    /**
-     * Retry GET requests once for server errors
-     */
+    // Retry GET requests once for server errors
     if (
       status &&
       [500, 502, 503, 504].includes(status) &&
@@ -56,18 +56,14 @@ apiClient.interceptors.response.use(
       return apiClient(originalRequest);
     }
 
-    /**
-     * Let OIDC handle session expiry
-     */
-    const { showBoundary } = useErrorBoundary()
+    // Handle 401 (unauthorized)
     if (status === 401) {
-      try{
+      try {
         AuthService.signIn();
-      }catch (err) {
-      // This manually triggers the Error Boundary
-      showBoundary(err); 
-    }
-      
+      } catch (err) {
+        console.error("AuthService signIn failed:", err);
+        // Could trigger a global modal or notification here
+      }
     }
 
     return Promise.reject({
