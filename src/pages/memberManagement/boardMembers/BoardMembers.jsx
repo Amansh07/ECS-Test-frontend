@@ -80,7 +80,6 @@ export const BoardMembers = () => {
         await addBoardMember(boardMemberCooperativeData);
         alert("Board member added successfully!");
 
-        // Reset everything after successful save
         setBoardMemberCooperativeData(initialBoardMemberCooperativeData);
         formik.resetForm();
         setBoardMemberCooperativeErrors({});
@@ -94,22 +93,21 @@ export const BoardMembers = () => {
     validateAndSubmit();
   }, [isSaveClicked]);
 
-  /* ================= HANDLE CHANGE ================= */
-  const handleChange = (e) => {
-    formik.handleChange(e);
-  };
+  /* ================= HANDLERS ================= */
+  const handleChange = (e) => formik.handleChange(e);
 
-  /* ================= HANDLE RESET ================= */
   const handleReset = () => {
     setBoardMemberCooperativeData(initialBoardMemberCooperativeData);
-    formik.resetForm(); // resets Formik values, errors, touched
+    formik.resetForm();
     setBoardMemberCooperativeErrors({});
   };
 
   /* ================= UI ================= */
   return (
     <div>
-      <h2 className="text-base font-normal">Board Member Update Form</h2>
+      <h2 className="text-base font-normal text-text-dark">
+        Board Member Update Form
+      </h2>
 
       {/* Board Member Name */}
       <div className="grid grid-cols-12 gap-4">
@@ -219,77 +217,49 @@ export const BoardMembers = () => {
         </div>
       </div>
 
-      {/* District + Block + Gram Panchayat + Village */}
+      {/* Location */}
       <div className="grid grid-cols-12 gap-4 mt-4">
-        <div className="col-span-12 md:col-span-6">
-          <SelectField
-            label="District"
-            required
-            name="district"
-            value={boardMemberCooperativeData.district}
-            onChange={handleChange}
-            onBlur={formik.handleBlur}
-            error={boardMemberCooperativeErrors.district}
-            touched={formik.touched.district}
-          >
-            <option value="">Select District</option>
-          </SelectField>
-        </div>
+        {["district", "block", "gramPanchayat", "village"].map((field) => {
+          // Convert camelCase to "Camel Case" format
+          const formattedField = field
+            .replace(/([A-Z])/g, " $1")   // Add space before capital letters
+            .replace(/^./, (str) => str.toUpperCase()); // Capitalize first letter
 
-        <div className="col-span-12 md:col-span-6">
-          <SelectField
-            label="Block"
-            required
-            name="block"
-            value={boardMemberCooperativeData.block}
-            onChange={handleChange}
-            onBlur={formik.handleBlur}
-            error={boardMemberCooperativeErrors.block}
-            touched={formik.touched.block}
-          >
-            <option value="">Select Block</option>
-          </SelectField>
-        </div>
-
-        <div className="col-span-12 md:col-span-6">
-          <SelectField
-            label="Gram Panchayat"
-            required
-            name="gramPanchayat"
-            value={boardMemberCooperativeData.gramPanchayat}
-            onChange={handleChange}
-            onBlur={formik.handleBlur}
-            error={boardMemberCooperativeErrors.gramPanchayat}
-            touched={formik.touched.gramPanchayat}
-          >
-            <option value="">Select Gram Panchayat</option>
-          </SelectField>
-        </div>
-
-        <div className="col-span-12 md:col-span-6">
-          <SelectField
-            label="Village"
-            required
-            name="village"
-            value={boardMemberCooperativeData.village}
-            onChange={handleChange}
-            onBlur={formik.handleBlur}
-            error={boardMemberCooperativeErrors.village}
-            touched={formik.touched.village}
-          >
-            <option value="">Select Village</option>
-          </SelectField>
-        </div>
+          return (
+            <div key={field} className="col-span-12 md:col-span-6">
+              <SelectField
+                label={formattedField}
+                required
+                name={field}
+                value={boardMemberCooperativeData[field]}
+                onChange={handleChange}
+                onBlur={formik.handleBlur}
+                error={boardMemberCooperativeErrors[field]}
+                touched={formik.touched[field]}
+              >
+                <option value="">Select {formattedField}</option>
+              </SelectField>
+            </div>
+          );
+        })}
       </div>
 
-      <hr className="border-1 my-[16px]" />
+
+      <hr className="border border-stroke-200 my-4" />
 
       {/* Buttons */}
       <div className="h-[64px] flex justify-end gap-4 items-center">
         <button
           type="button"
           onClick={handleReset}
-          className="border border-[#253300] rounded-[8px] w-[95px] h-[43px] text-sm font-medium text-[#253300]"
+          className="
+            border border-primary
+            text-primary
+            rounded-lg
+            w-[95px] h-[43px]
+            text-sm font-medium
+            hover:bg-primary-50
+          "
         >
           Reset
         </button>
@@ -297,27 +267,38 @@ export const BoardMembers = () => {
         <button
           type="button"
           onClick={() => setIsSaveClicked(true)}
-          className="rounded-[8px] w-[226px] h-[43px] text-sm font-medium bg-[#3C9718] text-white"
+          className="
+            rounded-lg
+            w-[226px] h-[43px]
+            text-sm font-medium
+            bg-success
+            text-text-light
+            hover:bg-success-600
+          "
         >
           Add to Board Member List
         </button>
       </div>
 
-      <hr className="border-1 my-[16px]" />
+      <hr className="border border-stroke-200 my-4" />
 
-      <h2 className="text-base font-medium my-[16px]">Board Member Detail view form</h2>
+      <h2 className="text-base font-medium my-4 text-text-dark">
+        Board Member Detail view form
+      </h2>
 
       <Table
         columns={["Name", "Father's/Husband's Name", "Designation", "Gender", "Actions"]}
         data={sampleData}
         renderActions={() => (
-          <div className="flex items-center justify-center gap-[34px]">
-            <img src={editSvg} alt="Edit" className="w-[32px] h-[32px] cursor-pointer" />
+          <div className="flex items-center justify-center gap-8">
+            <img
+              src={editSvg}
+              alt="Edit"
+              className="w-8 h-8 cursor-pointer"
+            />
           </div>
         )}
       />
     </div>
   );
 };
-
-
