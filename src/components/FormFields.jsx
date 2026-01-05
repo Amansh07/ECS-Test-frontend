@@ -189,6 +189,45 @@ export function TextField({
   );
 }
 
+/* ================= TEXT AREA ================= */
+export function TextArea({
+  label,
+  required,
+  labelClassName = "",
+  textareaClassName = "",
+  error,
+  touched,
+  rows = 4,
+  ...textareaProps
+}) {
+  return (
+    <div className="mb-4">
+      {label && (
+        <label className={`registration-label ${labelClassName}`}>
+          {label}
+          {required && <span className="registration-label-required">*</span>}
+        </label>
+      )}
+
+      <textarea
+        {...textareaProps}
+        rows={rows}
+        className={`
+          registration-input
+          resize-none
+          ${touched && error ? "border-red-500" : ""}
+          ${textareaClassName}
+        `}
+      />
+
+      {touched && error && (
+        <p className="mt-1 text-[12px] text-red-500">{error}</p>
+      )}
+    </div>
+  );
+}
+
+
 /* ================= SELECT FIELD ================= */
 export function SelectField({
   label,
