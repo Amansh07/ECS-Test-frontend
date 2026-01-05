@@ -6,7 +6,7 @@ import memberManagement from "../assets/memberManagement.svg";
 const navItems = [
   { to: "/registration", label: "Registration", icon: "📝" },
   { to: "/production-details", label: "Production Details", icon: "🌾" },
-  { to: "/compliance", label: "Compliance", icon: "✅" },
+  { to: "/compliance/annual-turnover", label: "Compliance", icon: "✅" },
   { to: "/services", label: "FPO Services", icon: "🧰" },
   { to: "/member-management", label: "Member Management", icon: "", src: memberManagement },
 ];
