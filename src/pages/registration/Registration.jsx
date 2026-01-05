@@ -30,6 +30,19 @@ const initialValues = {
   financialYear: "",
   turnOver: "",
   totalLand: "",
+  // Cooperative specific
+  regdNo: "",
+  coopsocietyName: "",
+  doreg: "",
+  roaName: "",
+  area: "",
+  emailAddress: "",
+  contactNumber: "",
+  profitLoss: "",
+  financialRange: "",
+  auditApplicability: "",
+  auditStatus: "",
+  auditType: "",
   // Registration form fields (below accordions)
   implementingAgency: "",
   block: "",
@@ -120,7 +133,7 @@ export default function Registration() {
   return (
     <div className="relative">
       <StepWizard
-        title="FPC Companies Act"
+        title={values.registeredUnder === "cooperatives" ? "Cooperatives/Societies Act" : "FPC Companies Act"}
         steps={steps}
         onComplete={handleSubmit}
       />

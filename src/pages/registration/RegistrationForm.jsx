@@ -1,11 +1,21 @@
-
 import React from "react";
 import { AccordionGroup } from "../../components/Accordion";
 import { TextField, SelectField, RadioGroup } from "../../components/FormFields";
 import FinancialDetailsTable from "../../components/Table";
 import "./Registration.css";
+import RegistrationCoopForm from "./RegistrationCoopForm";
 
 const RegistrationForm = ({ values, handleChange, disabled = false }) => {
+  if (values.registeredUnder === "cooperatives") {
+    return (
+      <RegistrationCoopForm
+        values={values}
+        handleChange={handleChange}
+        disabled={disabled}
+      />
+    );
+  }
+
   // STEP 1: Registration Details Accordions
   const renderRegistrationDetails = () => {
     const items = [

@@ -4,7 +4,7 @@ import { AccordionGroup } from "../../components/Accordion";
 import { TextField, SelectField, RadioGroup } from "../../components/FormFields";
 import "./Registration.css";
 
-const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
+const RegistrationCoopForm = ({ values = {}, handleChange = () => { }, disabled = false }) => {
   // STEP 1: Registration Details Accordions
   const renderRegistrationDetails = () => {
     const items = [
@@ -32,6 +32,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
                     value="companies"
                     checked={values.registeredUnder === "companies"}
                     onChange={handleChange}
+                    disabled={disabled}
                   />
                   <span>Companies Act</span>
                 </label>
@@ -42,6 +43,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
                     value="cooperatives"
                     checked={values.registeredUnder === "cooperatives"}
                     onChange={handleChange}
+                    disabled={disabled}
                   />
                   <span>Cooperatives/Societies Act</span>
                 </label>
@@ -56,6 +58,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
                 placeholder="Registration Number"
                 value={values.regdNo || ""}
                 onChange={handleChange}
+                disabled={disabled}
               />
               <TextField
                 label="Name of Cooperatives/Societies"
@@ -64,6 +67,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
                 placeholder="Name of Cooperatives/Societies"
                 value={values.coopsocietyName || ""}
                 onChange={handleChange}
+                disabled={disabled}
               />
             </div>
 
@@ -76,6 +80,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
                 placeholder="dd/mm/yyyy"
                 value={values.doreg || ""}
                 onChange={handleChange}
+                disabled={disabled}
               />
               <SelectField
                 label="Cooperative/Society status"
@@ -83,6 +88,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
                 name="companyStatus"
                 value={values.companyStatus || ""}
                 onChange={handleChange}
+                disabled={disabled}
               >
                 <option value="">Company status</option>
                 <option value="active">Active</option>
@@ -98,6 +104,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
                 placeholder="Registration Authority Name"
                 value={values.roaName || ""}
                 onChange={handleChange}
+                disabled={disabled}
               />
             </div>
           </>
@@ -237,6 +244,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
                 name="financialYear"
                 value={values.financialYear || ""}
                 onChange={handleChange}
+                disabled={disabled}
               >
                 <option value="">Select Year</option>
                 <option value="2023-24">2023-24</option>
@@ -249,6 +257,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
                 placeholder="Enter Value"
                 value={values.turnOver || ""}
                 onChange={handleChange}
+                disabled={disabled}
               />
               <TextField
                 label="Profit/Loss"
@@ -257,6 +266,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
                 placeholder="Enter Value"
                 value={values.profitLoss || ""}
                 onChange={handleChange}
+                disabled={disabled}
               />
               <SelectField
                 label="Financial Range"
@@ -264,6 +274,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
                 name="financialRange"
                 value={values.financialRange || ""}
                 onChange={handleChange}
+                disabled={disabled}
               >
                 <option value="">Select Range</option>
                 <option value="1-5Crores">1-5 Crores</option>
@@ -282,6 +293,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
                   { value: "yes", label: "Yes" },
                   { value: "no", label: "No" },
                 ]}
+                disabled={disabled}
               />
               <RadioGroup
                 label="Audit Status"
@@ -293,6 +305,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
                   { value: "done", label: "Done" },
                   { value: "notdone", label: "Not Done" },
                 ]}
+                disabled={disabled}
               />
             </div>
 
@@ -303,6 +316,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
                 name="auditType"
                 value={values.auditType || ""}
                 onChange={handleChange}
+                disabled={disabled}
               >
                 <option value="na">Not Applicable</option>
                 <option value="internal">Internal Audit</option>
@@ -330,6 +344,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
           name="implementingAgency"
           value={values.implementingAgency || ""}
           onChange={handleChange}
+          disabled={disabled}
         >
           <option value="">Select Agency</option>
           <option value="sima">SIMA</option>
@@ -342,6 +357,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
           name="block"
           value={values.block || ""}
           onChange={handleChange}
+          disabled={disabled}
         >
           <option value="">Select Block</option>
           <option value="bloc-a">Block-A</option>
@@ -354,6 +370,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
           placeholder="Enter Communication Address"
           value={values.communicationAddress || ""}
           onChange={handleChange}
+          disabled={disabled}
         />
 
         <TextField
@@ -364,6 +381,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
           placeholder="Enter Value"
           value={values.pincode || ""}
           onChange={handleChange}
+          disabled={disabled}
         />
 
         <TextField
@@ -374,6 +392,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
           placeholder="Enter Value"
           value={values.totalShareholders || ""}
           onChange={handleChange}
+          disabled={disabled}
         />
 
         <TextField
@@ -384,6 +403,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
           placeholder="Enter Value"
           value={values.femaleShareholders || ""}
           onChange={handleChange}
+          disabled={disabled}
         />
 
         <TextField
@@ -394,6 +414,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
           placeholder="Enter Value"
           value={values.maleShareholders || ""}
           onChange={handleChange}
+          disabled={disabled}
         />
 
         <TextField
@@ -403,6 +424,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
           placeholder="Enter Value"
           value={values.femalePercentage || ""}
           onChange={handleChange}
+          disabled={disabled}
         />
 
         <TextField
@@ -413,6 +435,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
           placeholder="Enter Value"
           value={values.totalLand || ""}
           onChange={handleChange}
+          disabled={disabled}
         />
 
         <TextField
@@ -423,6 +446,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
           placeholder="Enter Email"
           value={values.secondaryEmail || ""}
           onChange={handleChange}
+          disabled={disabled}
         />
 
         <TextField
@@ -433,6 +457,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
           placeholder="Enter Contact Number"
           value={values.secondaryContact || ""}
           onChange={handleChange}
+          disabled={disabled}
         />
 
         <TextField
@@ -443,6 +468,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
           placeholder="Enter Text"
           value={values.username || ""}
           onChange={handleChange}
+          disabled={disabled}
         />
 
         <TextField
@@ -453,6 +479,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
           placeholder="Enter Password"
           value={values.password || ""}
           onChange={handleChange}
+          disabled={disabled}
         />
 
         <TextField
@@ -463,6 +490,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
           placeholder="Confirm Password"
           value={values.confirmPassword || ""}
           onChange={handleChange}
+          disabled={disabled}
         />
 
         <TextField
@@ -473,6 +501,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => {} }) => {
           placeholder="FPO Pan Number"
           value={values.fpopan || ""}
           onChange={handleChange}
+          disabled={disabled}
         />
       </div>
     </div>
