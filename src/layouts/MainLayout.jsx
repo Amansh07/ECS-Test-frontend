@@ -1,84 +1,3 @@
-// import { Outlet } from "react-router-dom";
-// import Header from "../layouts/Header.jsx";
-// import LeftNav from "../layouts/LeftNav.jsx";
-// import Footer from "../layouts/Footer.jsx";
-
-
-// export default function MainLayout() {
-//   return (
-//     <div className="min-h-screen flex flex-col bg-gray-50">
-//       <Header />
-
-//       <div className="flex flex-1">
-//         <LeftNav />
-//         <main id="main-content" className="flex-1 p-6 app-page-with-header">
-//           <Outlet />
-//         </main>
-//       </div>
-//       <Footer />
-//     </div>
-//   );
-// }
-
-// import React from "react";
-// import { Outlet } from "react-router-dom";
-// import Header from "./Header";
-// import Footer from "./Footer";
-// import LeftNav from "./LeftNav";
-
-// export default function MainLayout() {
-//   const [mobileOpen, setMobileOpen] = React.useState(false);
-//   const [collapsed, setCollapsed] = React.useState(false);
-
-//   // Close mobile drawer when switching to desktop (lg)
-//   React.useEffect(() => {
-//     const mq = window.matchMedia("(min-width: 1024px)");
-//     const handler = (e) => {
-//       if (e.matches) setMobileOpen(false);
-//     };
-//     handler(mq);
-//     mq.addEventListener("change", handler);
-//     return () => mq.removeEventListener("change", handler);
-//   }, []);
-
-//   return (
-//     <div className="min-h-screen flex flex-col bg-grey-50">
-//       <Header />
-
-//       {/* Mobile hamburger: below header, top-left */}
-//       <button
-//         type="button"
-//         onClick={() => setMobileOpen(true)}
-//         className={[
-//           "lg:hidden",
-//           "fixed left-3 top-16 z-50",              // positioning [web:128][web:129][web:127]
-//           "h-10 w-10 rounded-md",
-//           "bg-text-light border border-stroke-200 shadow-sm",
-//           "flex items-center justify-center",
-//           "transition hover:border-primary-300",
-//         ].join(" ")}
-//         aria-label="Open menu"
-//       >
-//         ☰
-//       </button>
-
-//       <div className="flex flex-1">
-//         <LeftNav
-//           mobileOpen={mobileOpen}
-//           onCloseMobile={() => setMobileOpen(false)}
-//           collapsed={collapsed}
-//           onToggleCollapsed={() => setCollapsed((v) => !v)}
-//         />
-
-//         <main id="main-content" className="flex-1 p-4 lg:p-6 app-page-with-header">
-//           <Outlet />
-//         </main>
-//       </div>
-
-//       <Footer />
-//     </div>
-//   );
-// }
 // MainLayout.jsx
 import React from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -86,6 +5,114 @@ import Header from "./Header";
 import Footer from "./Footer";
 import LeftNav from "./LeftNav";
 import { Button } from "../components/Buttons";
+
+// TabsWithScroll Component
+function TabsWithScroll({ location, navigate }) {
+  const scrollContainerRef = React.useRef(null);
+  const [showLeftArrow, setShowLeftArrow] = React.useState(false);
+  const [showRightArrow, setShowRightArrow] = React.useState(false);
+
+  const tabs = [
+    { title: "Farmers", path: "farmers" },
+    { title: "Board Members", path: "board-members" },
+    { title: "Board Members (Company Act)", path: "board-members-company-act" },
+    { title: "Resources", path: "resources" },
+    { title: "Mentors", path: "mentors" },
+  ];
+
+  // Check scroll position to show/hide arrows
+  const checkScroll = () => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    setShowLeftArrow(scrollLeft > 0);
+    setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
+  };
+
+  // Scroll left by 200px
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+    }
+  };
+
+  // Scroll right by 200px
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+    }
+  };
+
+  // Check scroll on mount and when tabs change
+  React.useEffect(() => {
+    checkScroll();
+    window.addEventListener('resize', checkScroll);
+    return () => window.removeEventListener('resize', checkScroll);
+  }, []);
+
+  return (
+    <div className="relative">
+      {/* Left Arrow */}
+      {showLeftArrow && (
+        <button
+          onClick={scrollLeft}
+          className="absolute -left-2 top-1/2 -translate-y-1/2 z-20 bg-gradient-to-r from-white to-white/80 shadow-lg rounded-full p-2.5 hover:shadow-xl transition-all border border-grey-200"
+          aria-label="Scroll left"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A6600" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+      )}
+
+      {/* Scrollable Tabs Container */}
+      <div className="relative">
+        {/* Single line under tabs - positioned relative to outer container */}
+        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-stroke-200 z-0"></div>
+
+        <div
+          ref={scrollContainerRef}
+          onScroll={checkScroll}
+          className="flex gap-4 relative overflow-x-auto scrollbar-hide scroll-smooth"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {tabs.map((tab) => {
+            const isActive = location.pathname.endsWith(tab.path);
+            return (
+              <div
+                key={tab.path}
+                onClick={() => navigate(`/member-management/${tab.path}`)}
+                className={[
+                  "cursor-pointer rounded-tr-[8px] rounded-tl-[8px] z-10 h-[36px] flex items-center justify-center px-4 whitespace-nowrap flex-shrink-0",
+                  isActive
+                    ? "bg-[#F8FFE5] border-b-2 border-[#4A6600]"
+                    : "hover:border-b-2 hover:border-b-[#4A6600]",
+                ].join(" ")}
+              >
+                <p className="text-[14px] font-medium">{tab.title}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Right Arrow */}
+      {showRightArrow && (
+        <button
+          onClick={scrollRight}
+          className="absolute -right-2 top-1/2 -translate-y-1/2 z-20 bg-gradient-to-l from-white to-white/80 shadow-lg rounded-full p-2.5 hover:shadow-xl transition-all border border-grey-200"
+          aria-label="Scroll right"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A6600" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      )}
+    </div>
+  );
+}
+
 
 export default function MainLayout() {
   const location = useLocation();
@@ -149,35 +176,8 @@ export default function MainLayout() {
           <main id="main-content" className="flex-1 overflow-y-auto p-4 lg:p-6">
             {/* Dynamic tabs only for member-management */}
             {location.pathname.startsWith("/member-management") && (
-              <div className="mb-4">
-                <div className="flex gap-4 relative">
-                  {/* Single line under tabs */}
-                  <div className="absolute bottom-0 left-0 w-full h-[2px] bg-[#C5C0D8]"></div>
-
-                  {[
-                    { title: "Farmers", path: "farmers" },
-                    { title: "Board Members", path: "board-members" },
-                    { title: "Board Members (Company Act)", path: "board-members-company-act" },
-                    { title: "Resources", path: "resources" },
-                    { title: "Mentors", path: "mentors" },
-                  ].map((tab) => {
-                    const isActive = location.pathname.endsWith(tab.path);
-                    return (
-                      <div
-                        key={tab.path}
-                        onClick={() => navigate(`/member-management/${tab.path}`)}
-                        className={[
-                          "cursor-pointer rounded-tr-[8px] rounded-tl-[8px] z-10 h-[36px] flex items-center justify-center p-2",
-                          isActive
-                            ? "bg-[#F8FFE5] border-b-2 border-[#4A6600]"
-                            : "hover:border-b-2 hover:border-b-[#4A6600]",
-                        ].join(" ")}
-                      >
-                        <p className="text-[14px] font-medium">{tab.title}</p>
-                      </div>
-                    );
-                  })}
-                </div>
+              <div className="mb-4 mt-16 lg:mt-0">
+                <TabsWithScroll location={location} navigate={navigate} />
               </div>
             )}
 

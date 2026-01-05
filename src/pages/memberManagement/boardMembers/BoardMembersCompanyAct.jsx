@@ -116,22 +116,23 @@ export const BoardMembersCompanyAct = () => {
 
     return (
         <div>
-            <h2 className="text-base font-bold mb-4">Board Member Details</h2>
+            <div className='border border-stroke-200 rounded-[8px] p-[16px]'>
+                <h2 className="text-base font-bold mb-4">Board Member Details</h2>
 
-            <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-12 md:col-span-6">
-                    <TextField
-                        label="CIN / LLPIN / FCRN"
-                        required
-                        name="cinNumber"
-                        placeholder="CIN / LLPIN / FCRN Number"
-                        value=""
-                        disabled
-                    />
+                <div className="grid grid-cols-12 gap-4">
+                    <div className="col-span-12 md:col-span-6">
+                        <TextField
+                            label="CIN / LLPIN / FCRN"
+                            required
+                            name="cinNumber"
+                            placeholder="CIN / LLPIN / FCRN Number"
+                            value=""
+                            disabled
+                        />
+                    </div>
                 </div>
             </div>
-
-            <hr className="border-1 my-[16px]" />
+            {/* <hr className="border-1 my-[16px]" /> */}
 
             <h2 className="text-base font-medium my-[16px]">Board Member Detail view form</h2>
 
@@ -148,7 +149,7 @@ export const BoardMembersCompanyAct = () => {
                     "Actions"
                 ]}
                 data={sampleData}
-                stickyLastColumn={true}
+                stickyLastColumn={false}
                 renderActions={(row) => (
                     <div className="flex items-center justify-center gap-[34px]">
                         <img

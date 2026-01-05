@@ -6,6 +6,7 @@ import Login from "../pages/login/login";
 import PrivateRoute from "./PrivateRoute";
 import MemberManagementRoutes from "./MemberManagementRoutes";
 import ProductionDetailsRoutes from "./ProductionDetailsRoutes";
+import ComplianceRoutes from "./ComplianceRoutes";
 
 // Force HMR update
 const AppRoutes = () => {
@@ -19,6 +20,7 @@ const AppRoutes = () => {
         <Route path="/registration" element={<Registration />} />
         {MemberManagementRoutes()}
         {ProductionDetailsRoutes()}
+        {ComplianceRoutes()}
 
         {/*
         <Route
