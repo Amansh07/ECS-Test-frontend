@@ -4,7 +4,7 @@ import Cropper from "react-easy-crop";
 import zoomOut from "../assets/zoomOut.svg";
 import zoomIn from "../assets/zoomIn.svg";
 import trailingIcon from "../assets/Trailing_icon.svg";
-import tickMark from "../assets/Vector.svg";
+import tickMark from "../assets/tickMark.svg";
 import Delete from "../assets/Delete.svg";
 import pdfUpload from "../assets/pdfUpload.svg";
 import { Button } from "./Buttons";
