@@ -1,0 +1,204 @@
+
+* { box-sizing: border-box; }
+
+.data-table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  table-layout: fixed;  /* ✅ FIXED: Prevents layout issues */
+}
+
+.data-table th {
+  background: #f9fafb !important;
+  font-weight: 600 !important;
+  color: #374151 !important;
+  padding: 16px 12px !important;
+  text-align: left !important;
+  border-bottom: 2px solid #e5e7eb !important;
+  white-space: nowrap !important;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.data-table td {
+  padding: 16px 12px !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+  color: #6b7280 !important;
+  vertical-align: middle;
+}
+
+.data-table tr:hover {
+  background: #f9fafb !important;
+}
+
+/* Search Input - FIXED */
+.search-input-wrapper {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  width: 100%;
+  max-width: 300px;
+}
+
+.search-icon {
+  position: absolute !important;
+  left: 12px !important;
+  width: 18px !important;  /* ✅ FIXED */
+  height: 18px !important; /* ✅ FIXED */
+  color: #9ca3af !important;
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.search-input {
+  width: 100% !important;
+  padding: 10px 12px 10px 40px !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  outline: none !important;
+}
+
+.search-input:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.1) !important;
+}
+
+/* Export Buttons - FIXED */
+.export-buttons-group {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+.export-btn {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 8px 12px !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  min-height: 36px !important;
+  white-space: nowrap !important;
+}
+
+.export-btn.excel {
+  background: #2563eb !important;
+  color: white !important;
+}
+
+.export-btn.excel:hover:not(:disabled) {
+  background: #1d4ed8 !important;
+}
+
+.export-btn.pdf {
+  background: #dc2626 !important;
+  color: white !important;
+}
+
+.export-btn.pdf:hover:not(:disabled) {
+  background: #b91c1c !important;
+}
+
+.export-btn:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+.export-label {
+  font-size: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* Pagination - FIXED */
+.pagination-wrapper {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 16px 0 !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+}
+
+.records-info {
+  font-size: 14px !important;
+  color: #6b7280 !important;
+  white-space: nowrap !important;
+}
+
+.pagination-buttons {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.page-btn {
+  padding: 8px 16px !important;
+  border: 1px solid #d1d5db !important;
+  background: white !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: #10b981 !important;
+  background: #f0fdf4 !important;
+}
+
+.page-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.page-info {
+  font-size: 14px !important;
+  color: #374151 !important;
+  font-weight: 500 !important;
+  min-width: 120px !important;
+  text-align: center !important;
+}
+
+/* Empty State */
+.empty-table {
+  text-align: center !important;
+  padding: 48px 24px !important;
+  color: #9ca3af !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .search-input-wrapper {
+    max-width: 100% !important;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 12px 8px !important;
+    font-size: 13px !important;
+  }
+  
+  .table-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .data-table {
+    font-size: 12px !important;
+  }
+}
