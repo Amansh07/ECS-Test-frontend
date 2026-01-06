@@ -2,13 +2,16 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { Button } from "../components/Buttons";
 import memberManagement from "../assets/memberManagement.svg";
+import fpograding from "../assets/fpograding.svg";
+import fposervice from "../assets/fposervice.svg";
 
 const navItems = [
   { to: "/registration", label: "Registration", icon: "📝" },
   { to: "/production-details", label: "Production Details", icon: "🌾" },
   { to: "/compliance/annual-turnover", label: "Compliance", icon: "✅" },
-  { to: "/fpo-services", label: "FPO Services", icon: "🧰" },
+  { to: "/fpo-services", label: "FPO Services", icon: "", src: fposervice },
   { to: "/member-management", label: "Member Management", icon: "", src: memberManagement },
+  { to: "/fpograding", label: "FPO Grading", icon: "", src: fpograding },
 ];
 
 const linkBase =

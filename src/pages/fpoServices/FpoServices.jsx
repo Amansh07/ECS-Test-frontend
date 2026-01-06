@@ -5,6 +5,7 @@ import farmers from "../../assets/farmers.svg";
 const cards = [
   { title: "Fertilizer Details", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "fertilizer-details" },
   { title: "Insecticide/Pesticide Details", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "insecticide-or-pesticide-details" },
+  { title: "Machinery/Equipment Details", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "machinery" },
 ];
 
 export const FpoServices = () => {
