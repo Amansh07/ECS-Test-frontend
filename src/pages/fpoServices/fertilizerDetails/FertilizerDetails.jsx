@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useFormik } from "formik";
 
 import { TextField, SelectField, TextArea } from "../../../components/FormFields";
@@ -11,33 +11,20 @@ import { Button } from "../../../components/Buttons";
 
 import editSvg from "../../../assets/edit.svg";
 import viewSvg from "../../../assets/view.svg";
-import { cropProductionValidationSchema } from "../validation";
+import { fertilizerDetailsValidationSchema } from "../validation";
 
-/* ================= DROPDOWN DATA ================= */
-const seasonCropMap = {
-    Rabi: {
-        Wheat: ["HD-2967", "PBW-343"],
-        Mustard: ["Pusa Bold", "Varuna"],
-    },
-    Kharif: {
-        Rice: ["IR-64", "Swarna"],
-        Maize: ["HQPM-1", "DHM-117"],
-    },
-};
-
-/* ================= INITIAL VALUES ================= */
-const initialValues = {
-    season: "",
-    crop: "",
-    cropVariety: "",
-    productionInQtl: "",
-    estHarMarSupInQtl: "",
-    dateOfHarvesting: "",
-    estOrHar: "",
+/* ================= INITIAL FERTILIZER VALUES ================= */
+const initialFertilizerDetailsData = {
+    fertilizerType: "",
+    fertilizerName: "",
+    fertilizerGrade: "",
+    nameOfManufacturer: "",
+    quantityType: "",
+    quantity: "",
     cropDescription: "",
 };
 
-export const CropProduction = () => {
+export const FertilizerDetails = () => {
     const [uploadedImage, setUploadedImage] = useState(null);
     const [uploadResetKey, setUploadResetKey] = useState(0);
     const [publishOnEmart, setPublishOnEmart] = useState(false);
@@ -45,47 +32,28 @@ export const CropProduction = () => {
     const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
     const [isAddImageExpanded, setIsAddImageExpanded] = useState(false);
 
-    const [productionList, setProductionList] = useState([]);
+    const [fertilizerList, setFertilizerList] = useState([]);
 
     const uploadConfig = {
-        title: "Add Crop Image *",
+        title: "Upload Fertilizer Photo *",
         maxSizeMB: "Max - 5mb",
         allowedTypes: ["image/jpeg", "image/png", "image/jpg"],
     };
 
     /* ================= FORMIK ================= */
     const formik = useFormik({
-        initialValues,
-        validationSchema: cropProductionValidationSchema,
+        initialValues: initialFertilizerDetailsData,
+        validationSchema: fertilizerDetailsValidationSchema,
         validateOnChange: false,
         validateOnBlur: true,
     });
-
-    /* ================= DEPENDENT DROPDOWNS ================= */
-    const crops = formik.values.season
-        ? Object.keys(seasonCropMap[formik.values.season])
-        : [];
-
-    const varieties =
-        formik.values.season && formik.values.crop
-            ? seasonCropMap[formik.values.season][formik.values.crop]
-            : [];
-
-    useEffect(() => {
-        formik.setFieldValue("crop", "");
-        formik.setFieldValue("cropVariety", "");
-    }, [formik.values.season]);
-
-    useEffect(() => {
-        formik.setFieldValue("cropVariety", "");
-    }, [formik.values.crop]);
 
     /* ================= HANDLERS ================= */
     const handleFileSelect = (file) => {
         setUploadedImage(file ? URL.createObjectURL(file) : null);
     };
 
-    const handleAddToProductionList = async () => {
+    const handleAddToList = async () => {
         const errors = await formik.validateForm();
 
         if (Object.keys(errors).length > 0) {
@@ -102,13 +70,14 @@ export const CropProduction = () => {
     };
 
     const handlePreviewConfirm = () => {
-        setProductionList((prev) => [
+        setFertilizerList((prev) => [
             ...prev,
             {
-                Season: formik.values.season,
-                "Crop Name": formik.values.crop,
-                Variety: formik.values.cropVariety,
-                "Production (in Qtl.)": formik.values.productionInQtl,
+                "Fertilizer Type": formik.values.fertilizerType,
+                "Fertilizer Name": formik.values.fertilizerName,
+                Grade: formik.values.fertilizerGrade,
+                Manufacturer: formik.values.nameOfManufacturer,
+                Quantity: `${formik.values.quantity} ${formik.values.quantityType}`,
                 "Publish Emart": publishOnEmart,
             },
         ]);
@@ -119,125 +88,104 @@ export const CropProduction = () => {
         formik.resetForm();
         setUploadedImage(null);
         setPublishOnEmart(false);
-
-        // THIS resets UploadDocument completely
-        setUploadResetKey(prev => prev + 1);
+        setUploadResetKey((prev) => prev + 1);
     };
-
 
     /* ================= PREVIEW DATA ================= */
     const previewData = [
-        { label: "Season", value: formik.values.season },
-        { label: "Crop", value: formik.values.crop },
-        { label: "Variety", value: formik.values.cropVariety },
-        { label: "Production (Qtl.)", value: formik.values.productionInQtl },
-        { label: "Marketable Surplus", value: formik.values.estHarMarSupInQtl },
-        { label: "Harvest Date", value: formik.values.dateOfHarvesting },
-        { label: "Estimated/Harvested", value: formik.values.estOrHar },
+        { label: "Fertilizer Type", value: formik.values.fertilizerType },
+        { label: "Fertilizer Name", value: formik.values.fertilizerName },
+        { label: "Grade", value: formik.values.fertilizerGrade },
+        { label: "Manufacturer", value: formik.values.nameOfManufacturer },
+        { label: "Quantity Type", value: formik.values.quantityType },
+        { label: "Quantity", value: formik.values.quantity },
         { label: "Description", value: formik.values.cropDescription },
         { label: "Publish on e-Mart", value: publishOnEmart ? "Yes" : "No" },
     ];
 
-    /* ================= UI (UNCHANGED) ================= */
+    /* ================= UI ================= */
     return (
         <div>
-            <h2 className="text-base font-bold mb-6">Crop Production Update</h2>
+            <h2 className="text-base font-bold mb-6">Fertilizer Details</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <SelectField
-                    label="Season"
+                    label="Fertilizer Type"
                     required
-                    name="season"
-                    value={formik.values.season}
+                    name="fertilizerType"
+                    value={formik.values.fertilizerType}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.errors.season}
-                    touched={formik.touched.season}
+                    error={formik.errors.fertilizerType}
+                    touched={formik.touched.fertilizerType}
                 >
-                    <option value="">Select Season</option>
-                    {Object.keys(seasonCropMap).map((s) => (
-                        <option key={s}>{s}</option>
-                    ))}
+                    <option value="">Enter Category</option>
+                    <option value="Organic">Organic</option>
+                    <option value="Inorganic">Inorganic</option>
                 </SelectField>
+
+                <TextField
+                    label="Fertilizer Name"
+                    required
+                    placeholder="Fertilizer Name"
+                    name="fertilizerName"
+                    value={formik.values.fertilizerName}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.fertilizerName}
+                    touched={formik.touched.fertilizerName}
+                />
+
+                <TextField
+                    label="Fertilizer Grade"
+                    required
+                    name="fertilizerGrade"
+                    placeholder="Enter Name"
+                    value={formik.values.fertilizerGrade}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.fertilizerGrade}
+                    touched={formik.touched.fertilizerGrade}
+                />
+
+                <TextField
+                    label="Name of Manufacturer"
+                    required
+                    name="nameOfManufacturer"
+                    placeholder="Enter Name"
+                    value={formik.values.nameOfManufacturer}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.nameOfManufacturer}
+                    touched={formik.touched.nameOfManufacturer}
+                />
 
                 <SelectField
-                    label="Crop"
+                    label="Quantity Type"
                     required
-                    name="crop"
-                    value={formik.values.crop}
+                    name="quantityType"
+                    value={formik.values.quantityType}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.errors.crop}
-                    touched={formik.touched.crop}
+                    error={formik.errors.quantityType}
+                    touched={formik.touched.quantityType}
                 >
-                    <option value="">Select Crop which is filtered by Season</option>
-                    {crops.map((c) => (
-                        <option key={c}>{c}</option>
-                    ))}
-                </SelectField>
-
-                <SelectField
-                    label="Crop Variety"
-                    required
-                    name="cropVariety"
-                    value={formik.values.cropVariety}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.errors.cropVariety}
-                    touched={formik.touched.cropVariety}
-                >
-                    <option value="">Select Crop Variety which is filtered by Crop Name</option>
-                    {varieties.map((v) => (
-                        <option key={v}>{v}</option>
-                    ))}
+                    <option value="">Select Type</option>
+                    <option value="Kg">Kg</option>
+                    <option value="Litre">Litre</option>
+                    <option value="Bag">Bag</option>
                 </SelectField>
 
                 <TextField
-                    label="Production (in Qtl.)"
+                    label="Quantity"
                     required
-                    name="productionInQtl"
+                    name="quantity"
                     placeholder="Enter Value"
-                    value={formik.values.productionInQtl}
+                    value={formik.values.quantity}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.errors.productionInQtl}
-                    touched={formik.touched.productionInQtl}
-                />
-
-                <TextField
-                    label="Estimated/Harvested Marketable Surplus (in Qtl.)"
-                    required
-                    name="estHarMarSupInQtl"
-                    placeholder="Enter Value"
-                    value={formik.values.estHarMarSupInQtl}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.errors.estHarMarSupInQtl}
-                    touched={formik.touched.estHarMarSupInQtl}
-                />
-
-                <TextField
-                    label="Date Of Harvesting"
-                    required
-                    type="date"
-                    name="dateOfHarvesting"
-                    value={formik.values.dateOfHarvesting}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.errors.dateOfHarvesting}
-                    touched={formik.touched.dateOfHarvesting}
-                />
-
-                <TextField
-                    label="Estimated/Harvested"
-                    required
-                    name="estOrHar"
-                    placeholder="Estimated/Harvested"
-                    value={formik.values.estOrHar}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.errors.estOrHar}
-                    touched={formik.touched.estOrHar}
+                    error={formik.errors.quantity}
+                    touched={formik.touched.quantity}
                 />
             </div>
 
@@ -279,17 +227,15 @@ export const CropProduction = () => {
                         />
                     </div>
                 )}
-
             </div>
 
             <hr className="border border-stroke-200 my-4" />
 
-            <div className="my-8 flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-grey-50 rounded-lg">
+            <div className="my-8 flex justify-between items-center p-4 bg-grey-50 rounded-lg">
                 <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium">Want to Publish on e-Mart ?</span>
+                    <span className="text-sm font-medium">Publish on e-Mart?</span>
                     <Toggle checked={publishOnEmart} onChange={setPublishOnEmart} />
                 </div>
-
                 <div className="flex gap-4">
                     <Button
                         type="button"
@@ -299,29 +245,38 @@ export const CropProduction = () => {
                     </Button>
                     <Button
                         type="button"
-                        onClick={handleAddToProductionList}
-                        buttonClassName="px-6 py-2.5 text-sm font-semibold text-white bg-success rounded-md shadow-sm hover:bg-success-600 transition-colors flex items-center gap-2"
+                        onClick={handleAddToList}
+                        buttonClassName="px-6 py-2.5 text-sm font-semibold text-white bg-success rounded-md"
                     >
-                        <span>+</span>
-                        Add to Production List
+                        + Add to Inventory
                     </Button>
                 </div>
             </div>
-
             <hr className="border border-stroke-200 mb-4" />
-            <h3 className="font-bold text-base mb-[27px]">Crop Production Detail view form</h3>
-
-
+            <h3 className="font-bold text-base mb-[27px]">Fertilizer Listing</h3>
             <Table
-                columns={["Season", "Crop Name", "Variety", "Production (in Qtl.)", "Actions"]}
-                data={productionList}
+                columns={[
+                    "Fertilizer Type",
+                    "Fertilizer Name",
+                    "Grade",
+                    "Manufacturer",
+                    "Quantity",
+                    "Actions",
+                ]}
+                data={fertilizerList}
                 renderActions={(row) => (
                     <div className="flex gap-2">
                         <img src={editSvg} className="w-6 cursor-pointer" />
                         <img src={viewSvg} className="w-6 cursor-pointer" />
-                        <span className="text-[10px] px-2 py-1 rounded">
-                            {row["Publish Emart"] ? "✓ Publish" : "Publish"}
-                        </span>
+                        <div
+                            className={`w-[137px] text-[14px] font-normal px-[12px] py-[6px] rounded-lg flex items-center justify-center
+    ${row["Publish Emart"]
+                                    ? "bg-primary-100 text-dark"
+                                    : "bg-danger-50 text-dark"
+                                }`}
+                        >
+                            {row["Publish Emart"] ? "✓ Publish Emart" : "Publish Emart"}
+                        </div>
                     </div>
                 )}
             />
@@ -330,7 +285,7 @@ export const CropProduction = () => {
                 isOpen={isPreviewModalOpen}
                 onClose={() => setIsPreviewModalOpen(false)}
                 onConfirm={handlePreviewConfirm}
-                title="Preview Crop Production"
+                title="Preview Fertilizer Details"
                 image={uploadedImage}
                 data={previewData}
             />
@@ -339,7 +294,7 @@ export const CropProduction = () => {
                 isOpen={isStatusModalOpen}
                 onClose={() => setIsStatusModalOpen(false)}
                 status
-                message="Crop production details have been added successfully."
+                message="Fertilizer details added successfully."
             />
         </div>
     );
