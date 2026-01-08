@@ -127,6 +127,7 @@ export default function MainLayout() {
   const complianceTabs = [
     { title: "Annual Turnover", path: "annual-turnover" },
     { title: "Bank Details", path: "bank-details" },
+	{ title: "LicenseUpdate", path: "license-update" },
   ];
 
   /* ================= ROUTE MATCH ================= */
