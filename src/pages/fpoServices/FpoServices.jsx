@@ -26,8 +26,8 @@ export const FpoServices = () => {
               w-[348px] h-[96px]
               flex
               rounded-2xl
-              shadow-[0px_1px_3px_1px_rgb(var(--stroke-300)/0.1)]
-              hover:shadow-md
+              shadow-md
+              hover:shadow-lg
               transition-shadow duration-200
             "
           >

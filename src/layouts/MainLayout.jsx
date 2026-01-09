@@ -137,22 +137,22 @@ export default function MainLayout() {
   /* ================= ROUTE MATCH ================= */
   let tabsConfig = null;
 
-  if (location.pathname.startsWith("/member-management")) {
+  if (location.pathname.startsWith("/member-management") && location.pathname !== "/member-management" && location.pathname !== "/member-management/") {
     tabsConfig = {
       tabs: memberManagementTabs,
       basePath: "/member-management",
     };
-  } else if (location.pathname.startsWith("/production-details")) {
+  } else if (location.pathname.startsWith("/production-details") && location.pathname !== "/production-details" && location.pathname !== "/production-details/") {
     tabsConfig = {
       tabs: productionDetailsTabs,
       basePath: "/production-details",
     };
-  } else if (location.pathname.startsWith("/fpo-services")) {
+  } else if (location.pathname.startsWith("/fpo-services") && location.pathname !== "/fpo-services" && location.pathname !== "/fpo-services/") {
     tabsConfig = {
       tabs: fpoServicesTabs,
       basePath: "/fpo-services",
     };
-  } else if (location.pathname.startsWith("/compliance")) {
+  } else if (location.pathname.startsWith("/compliance") && location.pathname !== "/compliance" && location.pathname !== "/compliance/") {
     tabsConfig = {
       tabs: complianceTabs,
       basePath: "/compliance",

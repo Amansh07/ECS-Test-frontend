@@ -174,7 +174,7 @@ const UploadDocument = ({ config, onFileSelect, disabled = false }) => {
           <div className="flex flex-col justify-center">
             <p className="font-medium text-sm text-[#121212]">{config.title}</p>
             <p className="font-medium text-[11px] text-[#58595B]">
-              {config.maxSizeMB} MB max
+              {config.maxSizeMB}
             </p>
             <p className="font-medium text-sm text-[#4A6600]">
               {fileName || "Drag & Drop or Browse File"}
