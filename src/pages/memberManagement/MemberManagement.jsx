@@ -11,6 +11,7 @@ const cards = [
   { title: "Board Members (Company Act)", description: "Lorem ipsum dolor sit amet", icon: boardMembers, path: "board-members-company-act" },
   { title: "Resources", description: "Lorem ipsum dolor sit amet", icon: resources, path: "resources" },
   { title: "Mentors", description: "Lorem ipsum dolor sit amet", icon: mentors, path: "mentors" },
+  { title: "FPO Land Details Update/View", description: "Lorem ipsum dolor sit amet", icon: mentors, path: "land-details" },
 ];
 
 export const MemberManagement = () => {

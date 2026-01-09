@@ -4,6 +4,8 @@ import farmers from "../../assets/farmers.svg";
 
 const cards = [
   { title: "Annual Turnover", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "annual-turnover" },
+  { title: "FPO Capital Update/View", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "fpo-capital" },
+  { title: "AGM Meeting Update/View", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "agm-meeting" },
   { title: "Bank Details", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "bank-details" },
   { title: "License Update", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "license-update" },
 ];

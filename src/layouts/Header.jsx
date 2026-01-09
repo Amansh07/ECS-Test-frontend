@@ -8,7 +8,7 @@ export default function Header() {
    const location = useLocation();
 
   const hideBreadcrumb =
-    location.pathname === "/login";
+    location.pathname === "/login" || location.pathname === "/forgot-password";
 
   return (
     <header className="fpo-header" style={{ zIndex: open ? 100 : undefined }}>

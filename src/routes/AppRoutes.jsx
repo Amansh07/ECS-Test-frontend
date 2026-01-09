@@ -9,6 +9,7 @@ import MemberManagementRoutes from "./MemberManagementRoutes";
 import ProductionDetailsRoutes from "./ProductionDetailsRoutes";
 import FpoServicesRoutes from "./FpoServicesRoutes";
 import ComplianceRoutes from "./ComplianceRoutes";
+import ForgotPassword from "../pages/login/ForgotPassword";
 
 // Force HMR update
 const AppRoutes = () => {
@@ -16,6 +17,7 @@ const AppRoutes = () => {
     <Routes>
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Route>
       <Route element={<MainLayout />}>
         <Route path="/" element={<Registration />} />

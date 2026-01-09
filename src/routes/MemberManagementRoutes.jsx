@@ -6,6 +6,7 @@ import { Mentors } from "../pages/memberManagement/mentors/Mentors";
 import MainLayout from "../layouts/MainLayout";
 import { MemberManagement } from "../pages/memberManagement/MemberManagement";
 import { BoardMembersCompanyAct } from "../pages/memberManagement/boardMembers/BoardMembersCompanyAct";
+import { FarmerLandDetails } from "../pages/memberManagement/landDetails/FarmerLandDetails";
 
 const MemberManagementRoutes = () => (
   <Route path="member-management">
@@ -15,6 +16,7 @@ const MemberManagementRoutes = () => (
     <Route path="board-members-company-act" element={<BoardMembersCompanyAct />} />
     <Route path="resources" element={<Resources />} />
     <Route path="mentors" element={<Mentors />} />
+    <Route path="land-details" element={<FarmerLandDetails />} />
   </Route>
 );
 

@@ -17,6 +17,16 @@ export const boardMembersValidationSchema = Yup.object({
   village: Yup.string().required("Village is required"),
 });
 
+export const landDetailsValidationSchema = Yup.object({
+  farmerName: Yup.string().required("Farmer name is required"),
+  fatherOrHusbandName: Yup.string().required("Father's/Husband's name is required"),
+  ownershipType: Yup.string().required("Ownership Type is required"),
+  area: Yup.string().required("Area is required").matches(/^\d*\.?\d*[1-9]\d*$/,'Only Decimal Values Greater than 0'),
+  isOrganic: Yup.string().notRequired(),
+  
+});
+
+
 export const resourceMembersValidationSchema = Yup.object({
   resourceName: Yup.string().required("Resource name is required"),
   resourcefatherName: Yup.string().required("Father's/Husband's name is required"),

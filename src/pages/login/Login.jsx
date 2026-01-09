@@ -7,6 +7,7 @@ import incorrect from "../../assets/incorrect.svg";
 import reload from "../../assets/reload.svg";
 import verify from "../../assets/verify.svg";
 import Captcha from "../../components/Captcha";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [captchaAnswer, setCaptchaAnswer] = useState(null);
@@ -14,6 +15,7 @@ export default function Login() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
   const [captchaError, setCaptchaError] = useState(false);
+  const naviagte = useNavigate();
 
   const verifyCaptcha = () => {
     if (!userValue) return;
@@ -72,7 +74,7 @@ export default function Login() {
         </p>
 
         <p className="text-sm text-success cursor-pointer">
-          Forgot Password
+         <a href="/forgot-password"> Forgot Password </a>
         </p>
       </div>
 

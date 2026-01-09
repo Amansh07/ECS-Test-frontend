@@ -112,6 +112,7 @@ export default function MainLayout() {
     { title: "Board Members (Company Act)", path: "board-members-company-act" },
     { title: "Resources", path: "resources" },
     { title: "Mentors", path: "mentors" },
+    { title: "FPO Land Details Update/View", path: "land-details" },
   ];
 
   const productionDetailsTabs = [
@@ -127,6 +128,8 @@ export default function MainLayout() {
 
   const complianceTabs = [
     { title: "Annual Turnover", path: "annual-turnover" },
+    { title: "FPO Capital Update/View", path: "fpo-capital" },
+    { title: "AGM Meeting Update/View", path: "agm-meeting" },
     { title: "Bank Details", path: "bank-details" },
 	{ title: "LicenseUpdate", path: "license-update" },
   ];
