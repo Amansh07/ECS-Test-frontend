@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { TextField, SelectField, RadioGroup } from '../../../components/FormFields';
+import StateExtension, { getExtensionData } from '../../../components/StateExtension';
 import Table from '../../../components/Table';
 import { Button } from '../../../components/Buttons';
 import OtpModal from '../../../components/OtpModal';
@@ -41,6 +42,7 @@ const initialValues = {
   district: '',
   village: '',
   address: '',
+  stateExtension: {},
 };
 
 export const Farmers = () => {
@@ -61,7 +63,27 @@ export const Farmers = () => {
   const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: (values) => {
+    onSubmit: (values, { setFieldError, setFieldTouched }) => {
+      // Manual Validation for State Extension
+      let isExtensionValid = true;
+      const extensionData = getExtensionData('farmers');
+
+      if (extensionData.extensionEnabled) {
+        const extensionValues = values.stateExtension || {};
+        extensionData.fields.forEach(field => {
+          if (field.isMandatory && !extensionValues[field.fieldName]) {
+            setFieldError(`stateExtension.${field.fieldName}`, `${field.label || field.fieldName} is required`);
+            setFieldTouched(`stateExtension.${field.fieldName}`, true, false);
+            isExtensionValid = false;
+          }
+        });
+      }
+
+      if (!isExtensionValid) {
+        alert("Please fill all mandatory state extension fields.");
+        return;
+      }
+
       setPendingAction(isEditMode ? 'update' : 'add');
       setIsConfirmationOpen(true);
     },
@@ -131,69 +153,30 @@ export const Farmers = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
-            <label className="text-sm font-medium text-grey-700 mb-2 block">
-              Choose one of the options to fetch details from Farmer Registry *
-            </label>
-            <div className="flex flex-col gap-2">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="fetchOption"
-                  checked={fetchOption === 'registry'}
-                  onChange={() => setFetchOption('registry')}
-                  className="accent-primary"
-                />
-                <span className="text-sm text-grey-900">Fetch data from Farmer Registry</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="fetchOption"
-                  checked={fetchOption === 'manual'}
-                  onChange={() => setFetchOption('manual')}
-                  className="accent-primary"
-                />
-                <span className="text-sm text-grey-900">Enter manually</span>
-              </label>
-            </div>
+            <RadioGroup
+              label="Choose one of the options to fetch details from Farmer Registry *"
+              name="fetchOption"
+              value={fetchOption}
+              onChange={(e) => setFetchOption(e.target.value)}
+              options={[
+                { label: 'Fetch data from Farmer Registry', value: 'registry' },
+                { label: 'Enter manually', value: 'manual' }
+              ]}
+            />
           </div>
 
           <div>
-            <label className="text-sm font-medium text-grey-700 mb-2 block">
-              Choose one of the options to fetch details from Farmer Registry *
-            </label>
-            <div className="flex flex-col gap-2">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="registryOption"
-                  checked={registryOption === 'mobile'}
-                  onChange={() => setRegistryOption('mobile')}
-                  className="accent-primary"
-                />
-                <span className="text-sm text-grey-900">Registered mobile number</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="registryOption"
-                  checked={registryOption === 'aadhaar'}
-                  onChange={() => setRegistryOption('aadhaar')}
-                  className="accent-primary"
-                />
-                <span className="text-sm text-grey-900">Aadhaar Number</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="registryOption"
-                  checked={registryOption === 'id'}
-                  onChange={() => setRegistryOption('id')}
-                  className="accent-primary"
-                />
-                <span className="text-sm text-grey-900">Farmer ID</span>
-              </label>
-            </div>
+            <RadioGroup
+              label="Choose one of the options to fetch details from Farmer Registry *"
+              name="registryOption"
+              value={registryOption}
+              onChange={(e) => setRegistryOption(e.target.value)}
+              options={[
+                { label: 'Registered mobile number', value: 'mobile' },
+                { label: 'Aadhaar Number', value: 'aadhaar' },
+                { label: 'Farmer ID', value: 'id' }
+              ]}
+            />
           </div>
         </div>
 
@@ -392,6 +375,8 @@ export const Farmers = () => {
               touched={formik.touched.address}
             />
           </div>
+
+          <StateExtension formik={formik} pageId="farmers" />
 
           <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-stroke-200">
             <Button

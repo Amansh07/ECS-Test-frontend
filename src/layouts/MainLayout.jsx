@@ -122,6 +122,7 @@ export default function MainLayout() {
   const fpoServicesTabs = [
     { title: "Fertilizer Details", path: "fertilizer-details" },
     { title: "Insecticide/Pesticide Details", path: "insecticide-or-pesticide-details" },
+    { title: "Machinery/Equipment Details", path: "machinery" }
   ];
 
   const complianceTabs = [

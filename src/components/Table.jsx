@@ -21,7 +21,7 @@ export default function Table({
                 <th
                   key={col}
                   className={[
-                    "text-center text-[12px] bg-[#F3F3F3] h-[67px] px-4 py-5 text-sm font-[700] whitespace-nowrap",
+                    "text-center text-[12px] bg-grey-50 h-[67px] px-4 py-5 text-sm font-[700] whitespace-nowrap",
                     stickyLastColumn && isLastColumn
                       ? "sticky right-0 z-10 shadow-[-4px_0_8px_rgba(0,0,0,0.05)]"
                       : "",
@@ -43,7 +43,7 @@ export default function Table({
             data.map((row, rowIndex) => (
               <tr
                 key={rowIndex}
-                className="bg-white border-t border-b border-[#F1FFCC]"
+                className="bg-[rgb(var(--white))] border-t border-b border-primary-100"
               >
                 {columns.map((col, colIndex) => {
                   const isLastColumn = colIndex === columns.length - 1;
@@ -54,7 +54,7 @@ export default function Table({
                       <td
                         key={col}
                         className={[
-                          "text-center px-4 py-5 text-[12px] h-[60px] font-normal bg-white whitespace-nowrap",
+                          "text-center px-4 py-5 text-[12px] h-[60px] font-normal bg-[rgb(var(--white))] whitespace-nowrap",
                           stickyLastColumn && isLastColumn
                             ? "sticky right-0 z-10 shadow-[-4px_0_8px_rgba(0,0,0,0.05)]"
                             : "",
@@ -78,7 +78,7 @@ export default function Table({
                       className={[
                         "text-center px-4 py-5 text-sm h-[60px] whitespace-nowrap",
                         stickyLastColumn && isLastColumn
-                          ? "sticky right-0 z-10 bg-white shadow-[-4px_0_8px_rgba(0,0,0,0.05)]"
+                          ? "sticky right-0 z-10 bg-[rgb(var(--white))] shadow-[-4px_0_8px_rgba(0,0,0,0.05)]"
                           : "",
                       ].join(" ")}
                       style={{
@@ -95,7 +95,7 @@ export default function Table({
             <tr>
               <td
                 colSpan={columns.length}
-                className="text-center py-5 text-sm h-[60px] bg-white border-t border-b border-[#F1FFCC]"
+                className="text-center py-5 text-sm h-[60px] bg-[rgb(var(--white))] border-t border-b border-primary-100"
               >
                 No data available
               </td>

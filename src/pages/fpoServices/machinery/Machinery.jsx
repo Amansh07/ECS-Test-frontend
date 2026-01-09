@@ -14,6 +14,7 @@ import editSvg from '../../../assets/edit.svg';
 import viewSvg from '../../../assets/view.svg';
 import deleteSvg from '../../../assets/deleteAction.svg';
 import reloadSvg from '../../../assets/reload.svg';
+import StateExtension, { getExtensionData } from '../../../components/StateExtension';
 
 const validationSchema = Yup.object().shape({
     machineryCategory: Yup.string().required('Machinery Category is required'),
@@ -25,6 +26,7 @@ const validationSchema = Yup.object().shape({
     address: Yup.string().required('Address is required'),
     specifications: Yup.string(),
     manufacturerName: Yup.string(),
+    stateExtension: {},
 });
 
 const initialValues = {
@@ -55,7 +57,28 @@ export const Machinery = () => {
     const formik = useFormik({
         initialValues,
         validationSchema,
-        onSubmit: (values) => {
+        onSubmit: (values, { setFieldError, setFieldTouched }) => {
+            // Manual Validation for State Extension
+            let isExtensionValid = true;
+            const extensionData = getExtensionData('machinery');
+
+            if (extensionData.extensionEnabled) {
+                const extensionValues = values.stateExtension || {};
+                extensionData.fields.forEach(field => {
+                    if (field.isMandatory && !extensionValues[field.fieldName]) {
+                        setFieldError(`stateExtension.${field.fieldName}`, `${field.label || field.fieldName} is required`);
+                        setFieldTouched(`stateExtension.${field.fieldName}`, true, false);
+                        isExtensionValid = false;
+                    }
+                });
+            }
+
+            if (!isExtensionValid) {
+                // Ideally show a toast or alert
+                alert("Please fill all mandatory state extension fields.");
+                return;
+            }
+
             setPendingAction(isEditMode ? 'update' : 'add');
             setIsConfirmationOpen(true);
         },
@@ -270,7 +293,9 @@ export const Machinery = () => {
                             ]}
                         />
                     </div>
-
+                    <div>
+                        <StateExtension formik={formik} pageId="machinery" />
+                    </div>
                     <div className="flex flex-col md:flex-row items-center justify-between mt-8 p-4 bg-grey-50 rounded-lg gap-4 md:gap-0">
                         <div className="flex items-center justify-between w-full md:w-auto gap-6">
                             <span className="text-sm font-medium text-grey-900">Government assistance received?</span>

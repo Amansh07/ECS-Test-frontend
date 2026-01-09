@@ -3,20 +3,22 @@ import { NavLink } from "react-router-dom";
 import { Button } from "../components/Buttons";
 import memberManagement from "../assets/memberManagement.svg";
 import fpograding from "../assets/fpograding.svg";
-import fposervice from "../assets/fposervice.svg";
+import FpoServices from "../assets/FpoServices.svg";
+import complianceMenu from "../assets/ComplianceMenu.svg";
+import ProductionDetailsMenu from "../assets/ProductionDetailsMenu.svg";
 
 const navItems = [
   { to: "/registration", label: "Registration", icon: "📝" },
-  { to: "/production-details", label: "Production Details", icon: "🌾" },
-  { to: "/compliance/annual-turnover", label: "Compliance", icon: "✅" },
-  { to: "/fpo-services", label: "FPO Services", icon: "", src: fposervice },
+  { to: "/production-details", label: "Production Details", icon: "", src: ProductionDetailsMenu },
+  { to: "/compliance/annual-turnover", label: "Compliance", icon: "", src: complianceMenu },
+  { to: "/fpo-services", label: "FPO Services", icon: "", src: FpoServices },
   { to: "/member-management", label: "Member Management", icon: "", src: memberManagement },
   { to: "/fpograding", label: "FPO Grading", icon: "", src: fpograding },
 ];
 
 const linkBase =
   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors";
-const linkActive = "bg-primary-400 text-white shadow-sm font-semibold";
+const linkActive = "bg-primary-300 text-dark shadow-sm font-semibold";
 const linkIdle = "text-gray-200 hover:bg-[#384d00] hover:text-white";
 
 export default function LeftNav({
