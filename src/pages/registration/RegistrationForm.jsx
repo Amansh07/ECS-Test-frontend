@@ -121,101 +121,7 @@ const RegistrationForm = ({ values, handleChange, disabled = false }) => {
           </>
         ),
       },
-      {
-        id: "address",
-        title: "Address Details",
-        isInitiallyOpen: false,
-        content: (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <SelectField
-              label="Address Type"
-              readOnly
-              name="addressType"
-              value={values.addressType}
-              onChange={handleChange}
-              disabled={disabled}>
-              <option value="">Address Type</option>
-              <option value="reg">Registered Office</option>
-              <option value="branch">Branch Office</option>
-            </SelectField>
-            <TextField
-              label="Address Line 1"
-              readOnly
-              name="address1"
-              placeholder="Address Line 1"
-              value={values.address1}
-              onChange={handleChange}
-              disabled={disabled} />
-            <TextField
-              label="Address Line 2"
-              readOnly
-              name="address2"
-              placeholder="Address Line 2"
-              value={values.address2}
-              onChange={handleChange}
-              disabled={disabled} />
-            <TextField
-              label="Area"
-              readOnly
-              name="areea"
-              placeholder="Area"
-              value={values.areea}
-              onChange={handleChange}
-              disabled={disabled} />
-            <SelectField
-              label="City"
-              readOnly
-              name="city"
-              value={values.city}
-              onChange={handleChange}
-              disabled={disabled}>
-              <option value="">City</option>
-              <option value="city1">city1</option>
-              <option value="city2">city2</option>
-            </SelectField>
-            <SelectField
-              label="District"
-              readOnly
-              name="district"
-              value={values.district}
-              onChange={handleChange}
-              disabled={disabled}>
-              <option value="">District</option>
-              <option value="district1">District-1</option>
-              <option value="district2">District-2</option>
-            </SelectField>
-            <TextField
-              label="Pincode"
-              readOnly
-              name="pincode"
-              placeholder="Pincode"
-              value={values.pincode}
-              onChange={handleChange}
-              disabled={disabled} />
-            <SelectField
-              label="State"
-              readOnly
-              name="state"
-              value={values.state}
-              onChange={handleChange}
-              disabled={disabled}>
-              <option value="">State</option>
-              <option value="state1">State-1</option>
-              <option value="state2">State-2</option>
-            </SelectField>
-            <SelectField
-              label="Country"
-              readOnly
-              name="country"
-              value={values.country}
-              onChange={handleChange}
-              disabled={disabled}>
-              <option value="">Country</option>
-              <option value="ind">India</option>
-            </SelectField>
-          </div>
-        ),
-      },
+
       {
         id: "contact",
         title: "Contact Details",
@@ -288,9 +194,21 @@ const RegistrationForm = ({ values, handleChange, disabled = false }) => {
           <option value="bloc-a">Block-A</option>
           <option value="bloc-b">Block-B</option>
         </SelectField>
+        {/* District */}
+        <SelectField
+          label="District"
+          required
+          name="district"
+          value={values.district}
+          onChange={handleChange}
+          disabled={disabled}>
+          <option value="">Select District</option>
+          <option value="district1">District-1</option>
+          <option value="district2">District-2</option>
+        </SelectField>
         {/* Communication Address */}
         <TextField
-          label="Communication Address"
+          label="Address"
           type="text"
           name="communicationAddress"
           placeholder="Enter Communication Address"

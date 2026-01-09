@@ -151,7 +151,7 @@ export const Machinery = () => {
 
     const uploadConfig = {
         title: "Upload Machinery/Equipment Photo",
-        maxSizeMB: "PDF size: Max - 5mb",
+        maxSizeMB: "Size: 5mb",
         allowedTypes: ['image/jpeg', 'image/png'] // Assuming photo only based on current usage
     };
 

@@ -131,7 +131,7 @@ export default function MainLayout() {
     { title: "FPO Capital Update/View", path: "fpo-capital" },
     { title: "AGM Meeting Update/View", path: "agm-meeting" },
     { title: "Bank Details", path: "bank-details" },
-	{ title: "LicenseUpdate", path: "license-update" },
+    { title: "License Update", path: "license-update" },
   ];
 
   /* ================= ROUTE MATCH ================= */

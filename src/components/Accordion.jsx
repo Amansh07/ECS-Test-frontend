@@ -7,7 +7,7 @@ export function AccordionItem({ id, title, children, isInitiallyOpen = false }) 
   const [open, setOpen] = useState(isInitiallyOpen);
 
   return (
-    <section className="border border-gray-200 rounded-lg bg-white mb-3 overflow-hidden">
+    <section className="border border-primary-700 rounded-lg bg-white mb-3 overflow-hidden">
       {/* <button
         type="button"
         className="w-full flex items-center justify-between px-4 py-3 text-left bg-[#fbffe8]"
@@ -21,9 +21,9 @@ export function AccordionItem({ id, title, children, isInitiallyOpen = false }) 
         </span>
       </button> */}
 
-        <Button
+      <Button
         type="button"
-        buttonClassName="w-full flex items-center justify-between px-4 py-3 text-left bg-[#fbffe8]"
+        buttonClassName="w-full flex items-center justify-between px-4 py-3 text-left bg-success-50"
         onClick={() => setOpen((v) => !v)}
       >
         <span className="text-sm font-semibold text-gray-800">

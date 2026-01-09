@@ -110,101 +110,7 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => { }, disabled 
           </>
         ),
       },
-      {
-        id: "address",
-        title: "Address Details",
-        isInitiallyOpen: false,
-        content: (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <SelectField
-              label="Address Type"
-              required
-              name="addressType"
-              value={values.addressType || ""}
-              onChange={handleChange}
-            >
-              <option value="">Address Type</option>
-              <option value="reg">Home Address</option>
-              <option value="branch">Office Address</option>
-            </SelectField>
-            <TextField
-              label="Address Line 1"
-              required
-              name="address1"
-              placeholder="Address Line 1"
-              value={values.address1 || ""}
-              onChange={handleChange}
-            />
-            <TextField
-              label="Address Line 2"
-              required
-              name="address2"
-              placeholder="Address Line 2"
-              value={values.address2 || ""}
-              onChange={handleChange}
-            />
-            <TextField
-              label="Area"
-              required
-              name="area"
-              placeholder="Area"
-              value={values.area || ""}
-              onChange={handleChange}
-            />
-            <SelectField
-              label="City"
-              required
-              name="city"
-              value={values.city || ""}
-              onChange={handleChange}
-            >
-              <option value="">City</option>
-              <option value="city1">city1</option>
-              <option value="city2">city2</option>
-            </SelectField>
-            <SelectField
-              label="District"
-              required
-              name="district"
-              value={values.district || ""}
-              onChange={handleChange}
-            >
-              <option value="">District</option>
-              <option value="district1">District-1</option>
-              <option value="district2">District-2</option>
-            </SelectField>
-            <TextField
-              label="Pincode"
-              required
-              name="pincode"
-              placeholder="Pincode"
-              value={values.pincode || ""}
-              onChange={handleChange}
-            />
-            <SelectField
-              label="State"
-              required
-              name="state"
-              value={values.state || ""}
-              onChange={handleChange}
-            >
-              <option value="">State</option>
-              <option value="state1">State-1</option>
-              <option value="state2">State-2</option>
-            </SelectField>
-            <SelectField
-              label="Country"
-              required
-              name="country"
-              value={values.country || ""}
-              onChange={handleChange}
-            >
-              <option value="">Country</option>
-              <option value="ind">India</option>
-            </SelectField>
-          </div>
-        ),
-      },
+
       {
         id: "contact",
         title: "Contact Details",
@@ -359,13 +265,25 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => { }, disabled 
           onChange={handleChange}
           disabled={disabled}
         >
-          <option value="">Select Block</option>
           <option value="bloc-a">Block-A</option>
           <option value="bloc-b">Block-B</option>
         </SelectField>
 
+        <SelectField
+          label="District"
+          required
+          name="district"
+          value={values.district || ""}
+          onChange={handleChange}
+          disabled={disabled}
+        >
+          <option value="">Select District</option>
+          <option value="district1">District-1</option>
+          <option value="district2">District-2</option>
+        </SelectField>
+
         <TextField
-          label="Communication Address"
+          label="Address"
           name="communicationAddress"
           placeholder="Enter Communication Address"
           value={values.communicationAddress || ""}

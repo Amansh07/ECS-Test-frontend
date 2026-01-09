@@ -6,6 +6,7 @@ import Toggle from '../../../components/Toggle';
 import PreviewModal from '../../../components/PreviewModal';
 import StatusModal from '../../../components/StatusModal';
 import { Button } from '../../../components/Buttons';
+import { AccordionGroup } from '../../../components/Accordion';
 import editSvg from "../../../assets/edit.svg";
 import viewSvg from "../../../assets/view.svg";
 
@@ -49,7 +50,6 @@ export const CommodityProduction = () => {
             'Publish Emart': true
         },
     ]);
-    const [isAddImageExpanded, setIsAddImageExpanded] = useState(false);
 
     const uploadConfig = {
         title: "Add Crop Image *",
@@ -186,13 +186,14 @@ export const CommodityProduction = () => {
                     </SelectField>
 
                     {/* Is Organic Checkbox */}
-                    <CheckboxField
-                        label="Is Organic?"
-                        name="isOrganic"
-                        checked={formData.isOrganic}
-                        onChange={handleInputChange}
-                    />
-
+                    <div className='mt-6'>
+                        <CheckboxField
+                            label="Is Organic?"
+                            name="isOrganic"
+                            checked={formData.isOrganic}
+                            onChange={handleInputChange}
+                        />
+                    </div>
                     {/* Annual Production Capacity */}
                     <TextField
                         label="Annual Production Capacity"
@@ -239,29 +240,23 @@ export const CommodityProduction = () => {
 
                 {/* Add Image Section */}
                 <div className="mb-6">
-                    <div
-                        className="w-full bg-primary-100 rounded-xl p-4 cursor-pointer flex justify-between items-center"
-                        onClick={() => setIsAddImageExpanded(!isAddImageExpanded)}
-                    >
-                        <h3 className="text-base font-medium">Add Image</h3>
-                        <svg
-                            className={`w-5 h-5 transition-transform ${isAddImageExpanded ? 'rotate-180' : ''}`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </div>
-
-                    {isAddImageExpanded && (
-                        <div className="mt-4 p-4 bg-primary-100 rounded-xl">
-                            <UploadDocument
-                                config={uploadConfig}
-                                onFileSelect={handleFileSelect}
-                            />
-                        </div>
-                    )}
+                    <AccordionGroup
+                        items={[
+                            {
+                                id: 'add-image',
+                                title: 'Add Image',
+                                isInitiallyOpen: true,
+                                content: (
+                                    <div className="p-4 bg-primary-50 rounded-lg">
+                                        <UploadDocument
+                                            config={uploadConfig}
+                                            onFileSelect={handleFileSelect}
+                                        />
+                                    </div>
+                                )
+                            }
+                        ]}
+                    />
                 </div>
 
                 {/* Bottom Section: Publish Toggle + Action Buttons */}
