@@ -117,7 +117,7 @@ textarea:disabled {
 /* help text */
 .registration-help-text {
   font-size: 0.75rem;
-  color: #b91c1c;
+  /* color: #b91c1c; */
   margin-bottom: 1rem;
 }
 

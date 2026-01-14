@@ -20,7 +20,7 @@ export const ProductionDetails = () => {
                     <Link
                         key={index}
                         to={`/production-details/${card.path}`}
-                        className="w-[348px] h-[96px] shadow-[0px_1px_3px_1px_rgba(33,33,33,0.1)] flex rounded-2xl hover:shadow-md transition-shadow duration-200"
+                        className="w-[348px] h-[96px] shadow-md flex rounded-2xl hover:shadow-lg transition-shadow duration-200"
                     >
                         <div className="w-[96px] bg-[#F8FFE5] flex items-center justify-center rounded-tl-2xl rounded-bl-2xl">
                             <div className="w-[46px] h-[46px]">

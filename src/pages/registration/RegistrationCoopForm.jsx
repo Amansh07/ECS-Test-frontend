@@ -15,10 +15,10 @@ const RegistrationCoopForm = ({ values = {}, handleChange = () => { }, disabled 
         content: (
           <>
             <p className="registration-help-text">
-              Register FPO into the system and after approval credentials will be
+              Registered FPO into the system and after approval credentials will be
               communicated via mail/SMS.
             </p>
-            <div className="mt-2 pt-2 border-t border-gray-200"></div>
+            {/* <div className="mt-2 pt-2 border-t border-gray-200"></div> */}
 
             <div className="mb-4">
               <p className="registration-label">

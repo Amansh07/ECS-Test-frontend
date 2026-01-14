@@ -2,6 +2,7 @@ import React from "react";
 import { AccordionGroup } from "../../components/Accordion";
 import { TextField, SelectField, RadioGroup } from "../../components/FormFields";
 import FinancialDetailsTable from "../../components/Table";
+import { Button } from "../../components/Buttons";
 import "./Registration.css";
 import RegistrationCoopForm from "./RegistrationCoopForm";
 
@@ -26,8 +27,8 @@ const RegistrationForm = ({ values, handleChange, disabled = false }) => {
         content: (
           <>
             <p className="registration-help-text">
-              Registered FPO into the system and after approval credentials
-              communicate to them via mail/SMS.
+              Registered FPO into the system and after approval credentials will be
+              communicated via mail/SMS.
             </p>
 
             <div className="mb-4">
@@ -71,11 +72,14 @@ const RegistrationForm = ({ values, handleChange, disabled = false }) => {
                   disabled={disabled} />
               </div>
               <div className="pt-6">
-                <button
+                <Button
                   type="button"
-                  className="px-4 py-2 rounded bg-green-600 text-white text-sm font-mediumhover:bg-green-700" /*onClick={handleFetchCinData}*/>
-                  Fetch
-                </button>
+                  disabled={disabled}
+                  buttonClassName={`px-4 py-2 rounded text-white text-sm font-medium ${disabled ? "bg-green-600 opacity-50 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}`}
+                /*onClick={handleFetchCinData}*/
+                >
+                  Fetch Data from MCA
+                </Button>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">

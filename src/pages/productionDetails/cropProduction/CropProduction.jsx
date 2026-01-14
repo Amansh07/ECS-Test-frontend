@@ -196,6 +196,7 @@ export const CropProduction = () => {
                     <TextField
                         label="Production (in Qtl.)"
                         required
+                        type="number"
                         name="productionInQtl"
                         placeholder="Enter Value"
                         value={formik.values.productionInQtl}
@@ -208,6 +209,7 @@ export const CropProduction = () => {
                     <TextField
                         label="Estimated/Harvested Marketable Surplus (in Qtl.)"
                         required
+                        type="number"
                         name="estHarMarSupInQtl"
                         placeholder="Enter Value"
                         value={formik.values.estHarMarSupInQtl}
