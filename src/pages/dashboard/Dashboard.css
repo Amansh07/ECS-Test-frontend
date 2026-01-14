@@ -1,0 +1,120 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+.dashboard {
+  min-height: 100vh;
+}
+
+.header {
+  margin-bottom: 1rem;
+  text-align: left;
+  }
+
+.header h1 {
+  font-size: 1.rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #000, #999);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* LEGENDS */
+.legends-container {
+  display: flex;
+  flex-direction: row;
+  height: 120px;  /* Increased for text */
+  margin-bottom: 2rem;
+  width: 100%;
+  gap: 1rem;
+}
+
+.legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  padding: 1rem;
+}
+
+.legend:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.legend:active { transform: scale(0.98); }
+
+/* ICONS  */
+.legend-icon {
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+  line-height: 1;
+}
+
+/* NUMBER - Large bold */
+.legend-number {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+
+/* TEXT LABEL - Smaller below number */
+.legend-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 90%;
+  opacity: 0.95;
+}
+
+/* APPROVED - Lime/Yellow gradient (first legend) */
+.legend.approved {
+  background: linear-gradient(135deg, #f4ff81 0%, #a3e635 30%, #84cc16 70%, #65a30d 100%);
+  color:#f8fafc;
+}
+
+.legend.approved.active,
+.legend.approved:hover {
+  background: linear-gradient(135deg, #84cc16 0%, #65a30d 60%, #84cc16 100%);
+  box-shadow: 0 20px 50px rgba(163, 230, 53, 0.5);
+  color:#000;
+}
+
+/* PENDING - Light green (second legend) */
+.legend.pending {
+  background: linear-gradient(135deg, #86efac 0%, #22c55e 40%, #16a34a 100%);
+  color:#f8fafc;
+}
+
+.legend.pending.active,
+.legend.pending:hover {
+  background: linear-gradient(135deg, #84cc16 0%, #65a30d 60%, #84cc16 100%);
+  box-shadow: 0 20px 50px rgba(34, 197, 94, 0.5);
+  color:#000;
+}
+
+/* COMPLETED - Dark green (third legend) */
+.legend.completed {
+  background: linear-gradient(135deg, #4ade80 0%, #16a34a 50%, #15803d 100%);
+  color:#f8fafc;
+}
+
+.legend.completed.active,
+.legend.completed:hover {
+  background: linear-gradient(135deg, #84cc16 0%, #65a30d 60%, #84cc16 100%);
+  box-shadow: 0 20px 50px rgba(22, 163, 74, 0.5);
+  color:#000;
+}
+
+.view-form {  }
+@keyframes slideUp {  }
+/* Responsive stays side-by-side */
