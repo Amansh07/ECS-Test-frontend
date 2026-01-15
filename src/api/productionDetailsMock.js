@@ -101,7 +101,7 @@ export const listCropProduction = async (fpoId) => {
           id: 2,
           fpoId,
           seasonId: 2,
-          cropId: 11,
+          cropId: 9,
           cropVarietyId: 4,
           productionQuantity: 700,
           harvestedSurplus: 200,
