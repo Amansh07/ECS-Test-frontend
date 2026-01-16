@@ -1,4 +1,4 @@
-
+// src/pages/production/CropProduction.jsx
 import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import { TextField, SelectField, TextArea } from "../../../components/FormFields";
@@ -9,48 +9,36 @@ import PreviewModal from "../../../components/PreviewModal";
 import StatusModal from "../../../components/StatusModal";
 import { Button } from "../../../components/Buttons";
 import { AccordionGroup } from "../../../components/Accordion";
-
 import editSvg from "../../../assets/edit.svg";
 import viewSvg from "../../../assets/view.svg";
+import { uploadDocument } from "../../../api/uploadMock";
+import { getGeneralMasterByType, getCropsBySeason, getVarietyByCrop } from "../../../api/masterMock";
+import { listCropProduction } from "../../../api/productionDetailsMock";
 import { cropProductionValidationSchema } from "../validation";
 
-import {
-  createCropProduction,
-  listCropProduction,
-  updateCropProduction,
-} from "../../../api/productionDetailsMock";
-
-import { getGeneralMasterByType } from "../../../api/masterMock";
-import { uploadDocument } from "../../../api/uploadMock";
-
-
-const initialValues = {
-  season: "",
-  crop: "",
-  cropVariety: "",
-  productionInQtl: "",
-  estHarMarSupInQtl: "",
+const initialCropProductionValues = {
+  seasonId: "",
+  cropId: "",
+  cropVarietyId: "",
+  productionQuantity: "",
+  harvestedSurplus: "",
   dateOfHarvesting: "",
-  estOrHar: "",
-  cropDescription: "",
+  estimatedOrHarvestedId: "",
+  description: "",
 };
 
 export const CropProduction = () => {
-  const [isPopulatingEditValues, setIsPopulatingEditValues] = useState(false);
-  const [prevSeason, setPrevSeason] = useState("");
-  const [prevCrop, setPrevCrop] = useState("");
+  const [seasons, setSeasons] = useState([]);
+  const [crops, setCrops] = useState([]);
+  const [varieties, setVarieties] = useState([]);
+  const [productionList, setProductionList] = useState([]);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [uploadResetKey, setUploadResetKey] = useState(0);
   const [publishOnEmart, setPublishOnEmart] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-
-  const [productionList, setProductionList] = useState([]);
-  const [seasons, setSeasons] = useState([]);
-  const [crops, setCrops] = useState([]);
-  const [varieties, setVarieties] = useState([]);
-
+  const [statusConfig, setStatusConfig] = useState({ status: true, message: "" });
   const [isUpdateMode, setIsUpdateMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [existingDocId, setExistingDocId] = useState(null);
@@ -62,117 +50,69 @@ export const CropProduction = () => {
   };
 
   const formik = useFormik({
-    initialValues,
+    initialValues: initialCropProductionValues,
     validationSchema: cropProductionValidationSchema,
-    validateOnChange: false,
     validateOnBlur: true,
+    validateOnChange: false,
   });
 
+  // ------------------- LOAD DATA -------------------
   useEffect(() => {
+    const res = getGeneralMasterByType("Season");
+    if (res.success) setSeasons(res.data);
     fetchProductionList();
-    fetchSeasons();
   }, []);
 
-  const fetchSeasons = async () => {
-    const res = await getGeneralMasterByType("Season");
-    if (res.status === 200 && res.data.success) {
-      setSeasons(res.data.data.map((s) => s.name));
-    }
+  const fetchProductionList = () => {
+    const res = listCropProduction();
+    if (res.success) setProductionList(res.data);
   };
 
+  // ------------------- LOAD CROPS & VARIETIES -------------------
   useEffect(() => {
-    if (!formik.values.season) {
+    if (!formik.values.seasonId) {
       setCrops([]);
       setVarieties([]);
-      if (!isPopulatingEditValues) {
-        formik.setFieldValue("crop", "");
-        formik.setFieldValue("cropVariety", "");
+      if (!isUpdateMode) {
+        formik.setFieldValue("cropId", "");
+        formik.setFieldValue("cropVarietyId", "");
       }
-      setPrevSeason("");
       return;
     }
-
-    const fetchCrops = async () => {
-      const res = await getGeneralMasterByType("Crop");
-      if (res.status === 200 && res.data.success) {
-        const cropNames = res.data.data.map(c => c.name);
-        setCrops(cropNames);
-
-        // reset only if user changed season
-        if (!isPopulatingEditValues && formik.values.season !== prevSeason) {
-          formik.setFieldValue("crop", "");
-          formik.setFieldValue("cropVariety", "");
-        }
-        setPrevSeason(formik.values.season);
-      }
-    };
-
-    fetchCrops();
-  }, [formik.values.season, isPopulatingEditValues]);
+    const res = getCropsBySeason(formik.values.seasonId);
+    if (res.success) {
+      setCrops(res.data);
+      if (!isUpdateMode) formik.setFieldValue("cropId", "");
+    }
+  }, [formik.values.seasonId, isUpdateMode]);
 
   useEffect(() => {
-    if (!formik.values.crop) {
+    if (!formik.values.cropId) {
       setVarieties([]);
-      if (!isPopulatingEditValues) {
-        formik.setFieldValue("cropVariety", "");
-      }
-      setPrevCrop("");
+      if (!isUpdateMode) formik.setFieldValue("cropVarietyId", "");
       return;
     }
-
-    const fetchVarieties = async () => {
-      const res = await getGeneralMasterByType("CropVariety");
-      if (res.status === 200 && res.data.success) {
-        const varietyNames = res.data.data.map(v => v.name);
-        setVarieties(varietyNames);
-
-        // reset only if user changed crop
-        if (!isPopulatingEditValues && formik.values.crop !== prevCrop) {
-          formik.setFieldValue("cropVariety", "");
-        }
-
-        setPrevCrop(formik.values.crop);
-      }
-    };
-
-    fetchVarieties();
-  }, [formik.values.crop, isPopulatingEditValues]);
-
-  const fetchProductionList = async () => {
-    const res = await listCropProduction(1);
-    if (res.status === 200 && res.data.success) {
-      const seasonsMaster = await getGeneralMasterByType("Season");
-      const cropsMaster = await getGeneralMasterByType("Crop");
-      const varietiesMaster = await getGeneralMasterByType("CropVariety");
-
-      const mapped = res.data.data.map((item) => ({
-        itemId: item.id,
-        seasonId: item.seasonId,
-        cropId: item.cropId,
-        cropVarietyId: item.cropVarietyId,
-        productionQuantity: item.productionQuantity,
-        harvestedSurplus: item.harvestedSurplus,
-        dateOfHarvesting: item.dateOfHarvesting,
-        estimatedOrHarvestedId: item.estimatedOrHarvestedId,
-        description: item.description,
-        emartPublish: item.emartPublish,
-        docId: item.docId,
-
-        Season:
-          seasonsMaster.data.data.find((s) => s.id === item.seasonId)?.name ||
-          `Season ${item.seasonId}`,
-        "Crop Name":
-          cropsMaster.data.data.find((c) => c.id === item.cropId)?.name ||
-          `Crop ${item.cropId}`,
-        Variety:
-          varietiesMaster.data.data.find((v) => v.id === item.cropVarietyId)?.name ||
-          `Variety ${item.cropVarietyId}`,
-      }));
-
-      setProductionList(mapped);
+    const res = getVarietyByCrop(formik.values.cropId);
+    if (res.success) {
+      setVarieties(res.data);
+      if (!isUpdateMode) formik.setFieldValue("cropVarietyId", "");
     }
-  };
+  }, [formik.values.cropId, isUpdateMode]);
 
+  // ------------------- CLEAR ERRORS ON VALUE CHANGE -------------------
+  useEffect(() => {
+    const newErrors = { ...formik.errors };
+    let hasChanges = false;
+    Object.keys(formik.values).forEach((field) => {
+      if (formik.errors[field] && formik.values[field] !== "" && formik.values[field] != null) {
+        newErrors[field] = undefined;
+        hasChanges = true;
+      }
+    });
+    if (hasChanges) formik.setErrors(newErrors);
+  }, [formik.values]);
+
+  // ------------------- HANDLERS -------------------
   const handleFileSelect = (file) => {
     setUploadedFile(file);
     setPreviewImage(file ? URL.createObjectURL(file) : null);
@@ -182,10 +122,7 @@ export const CropProduction = () => {
     const errors = await formik.validateForm();
     if (Object.keys(errors).length > 0) {
       formik.setTouched(
-        Object.keys(errors).reduce((acc, key) => {
-          acc[key] = true;
-          return acc;
-        }, {})
+        Object.keys(errors).reduce((acc, key) => ({ ...acc, [key]: true }), {})
       );
       return;
     }
@@ -194,47 +131,37 @@ export const CropProduction = () => {
 
   const handlePreviewConfirm = async () => {
     let docId = existingDocId;
-
     if (uploadedFile) {
-      const uploadRes = await uploadDocument({
-        file: uploadedFile,
-        fpoId: 1,
-        docType: 1,
-      });
-
+      const uploadRes = await uploadDocument({ file: uploadedFile, fpoId: 1, docType: 1 });
       if (uploadRes.status === 200 && uploadRes.data.success) {
         docId = uploadRes.data.documentId;
       }
     }
 
     const payload = {
-      seasonId: seasons.indexOf(formik.values.season) + 1,
-      cropId: crops.indexOf(formik.values.crop) + 1,
-      cropVarietyId: varieties.indexOf(formik.values.cropVariety) + 1,
-      productionQuantity: formik.values.productionInQtl,
-      harvestedSurplus: formik.values.estHarMarSupInQtl,
-      dateOfHarvesting: formik.values.dateOfHarvesting,
-      estimatedOrHarvestedId: formik.values.estOrHar,
-      description: formik.values.cropDescription,
+      ...formik.values,
+      seasonId: parseInt(formik.values.seasonId),
+      cropId: parseInt(formik.values.cropId),
+      cropVarietyId: parseInt(formik.values.cropVarietyId),
+      productionQuantity: parseFloat(formik.values.productionQuantity),
+      harvestedSurplus: parseFloat(formik.values.harvestedSurplus),
       emartPublish: publishOnEmart,
       docId,
       fpoId: 1,
     };
+    console.log("Payload:", payload);
 
-    let res;
+    setIsPreviewModalOpen(false);
+    setStatusConfig({
+      status: true,
+      message: isUpdateMode
+        ? "Crop Production Updated Successfully"
+        : "Crop Production Added Successfully",
+    });
+    setIsStatusModalOpen(true);
 
-    if (isUpdateMode) {
-      res = await updateCropProduction(editingId, payload);
-    } else {
-      res = await createCropProduction(payload);
-    }
-
-    if (res.status === 200 && res.data.success) {
-      setIsPreviewModalOpen(false);
-      setIsStatusModalOpen(true);
-      resetAll();
-      fetchProductionList();
-    }
+    resetAll();
+    fetchProductionList();
   };
 
   const resetAll = () => {
@@ -248,55 +175,59 @@ export const CropProduction = () => {
     setUploadResetKey((prev) => prev + 1);
   };
 
-  const handleEdit = async (row) => {
+  // ------------------- EDIT HANDLER -------------------
+  const handleEdit = (row) => {
     setIsUpdateMode(true);
-    setEditingId(row.itemId);
+    setEditingId(row.id);
     setExistingDocId(row.docId);
-    setIsPopulatingEditValues(true);
-
-    setPreviewImage(row.docId ? `/mock/uploads/${row.docId}.jpg` : null);
     setPublishOnEmart(row.emartPublish);
 
-    // 1️⃣ Fetch crops first
-    const cropsRes = await getGeneralMasterByType("Crop");
-    const cropNames = cropsRes.data.data.map(c => c.name);
-    setCrops(cropNames);
+    setCrops(getCropsBySeason(row.seasonId).data);
+    setVarieties(getVarietyByCrop(row.cropId).data);
 
-    // 2️⃣ Fetch varieties first
-    const varietiesRes = await getGeneralMasterByType("CropVariety");
-    const varietyNames = varietiesRes.data.data.map(v => v.name);
-    setVarieties(varietyNames);
-
-    // 3️⃣ Now set Formik values
+    // Populate Formik values
     formik.setValues({
-      season: row.Season,
-      crop: cropNames.includes(row["Crop Name"]) ? row["Crop Name"] : "",
-      cropVariety: varietyNames.includes(row.Variety) ? row.Variety : "",
-      productionInQtl: row.productionQuantity,
-      estHarMarSupInQtl: row.harvestedSurplus,
-      dateOfHarvesting: row.dateOfHarvesting,
-      estOrHar: row.estimatedOrHarvestedId,
-      cropDescription: row.description,
+      seasonId: row.seasonId?.toString() || "",
+      cropId: row.cropId?.toString() || "",
+      cropVarietyId: row.cropVarietyId?.toString() || "",
+      productionQuantity: row.productionQuantity != null ? row.productionQuantity.toString() : "",
+      harvestedSurplus: row.harvestedSurplus != null ? row.harvestedSurplus.toString() : "",
+      dateOfHarvesting: row.dateOfHarvesting || "",
+      estimatedOrHarvestedId: row.estimatedOrHarvestedId || "",
+      description: row.description || "",
     });
 
-    setTimeout(() => setIsPopulatingEditValues(false), 0);
+    setUploadedFile(null);
+    setPreviewImage(row.docId ? `/mock/uploads/${row.docId}.jpg` : null);
   };
 
+  // ------------------- TABLE COLUMNS -------------------
+  const columns = [
+    "Season",
+    "Crop",
+    "Variety",
+    "Production (Qtl.)",
+    "Marketable Surplus",
+    "Publish on e-Mart",
+    "Actions",
+  ];
 
   const previewData = [
-    { label: "Season", value: formik.values.season },
-    { label: "Crop", value: formik.values.crop },
-    { label: "Variety", value: formik.values.cropVariety },
-    { label: "Production (Qtl.)", value: formik.values.productionInQtl },
-    { label: "Marketable Surplus", value: formik.values.estHarMarSupInQtl },
+    { label: "Season", value: seasons.find((s) => s.id == formik.values.seasonId)?.name || "" },
+    { label: "Crop", value: crops.find((c) => c.id == formik.values.cropId)?.name || "" },
+    { label: "Variety", value: varieties.find((v) => v.id == formik.values.cropVarietyId)?.name || "" },
+    { label: "Production (Qtl.)", value: formik.values.productionQuantity },
+    { label: "Marketable Surplus", value: formik.values.harvestedSurplus },
     { label: "Harvest Date", value: formik.values.dateOfHarvesting },
-    { label: "Estimated/Harvested", value: formik.values.estOrHar },
-    { label: "Description", value: formik.values.cropDescription },
+    { label: "Estimated/Harvested", value: formik.values.estimatedOrHarvestedId },
+    { label: "Description", value: formik.values.description },
     { label: "Publish on e-Mart", value: publishOnEmart ? "Yes" : "No" },
   ];
 
+  // ------------------- RENDER -------------------
   return (
     <div>
+      {/* FORM */}
       <div className="border border-stroke-200 rounded-[8px] p-[16px]">
         <h2 className="text-base font-bold mb-6">
           {isUpdateMode ? "Update Crop Production" : "Crop Production Update"}
@@ -306,81 +237,75 @@ export const CropProduction = () => {
           <SelectField
             label="Season"
             required
-            name="season"
-            value={formik.values.season}
-            onChange={formik.handleChange}
+            name="seasonId"
+            value={formik.values.seasonId}
+            onChange={(e) => formik.setFieldValue("seasonId", Number(e.target.value))}
             onBlur={formik.handleBlur}
-            error={formik.errors.season}
-            touched={formik.touched.season}
+            error={formik.errors.seasonId}
+            touched={formik.touched.seasonId}
           >
             <option value="">Select Season</option>
             {seasons.map((s) => (
-              <option key={s} value={s}>{s}</option>
+              <option key={s.id} value={s.id}>{s.name}</option>
             ))}
           </SelectField>
 
           <SelectField
             label="Crop"
             required
-            name="crop"
-            value={formik.values.crop}
-            onChange={formik.handleChange}
+            name="cropId"
+            value={formik.values.cropId}
+            onChange={(e) => formik.setFieldValue("cropId", Number(e.target.value))}
             onBlur={formik.handleBlur}
-            error={formik.errors.crop}
-            touched={formik.touched.crop}
+            error={formik.errors.cropId}
+            touched={formik.touched.cropId}
           >
             <option value="">Select Crop</option>
             {crops.map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </SelectField>
 
           <SelectField
-            label="Crop Variety"
+            label="Variety"
             required
-            name="cropVariety"
-            value={formik.values.cropVariety}
-            onChange={formik.handleChange}
+            name="cropVarietyId"
+            value={formik.values.cropVarietyId}
+            onChange={(e) => formik.setFieldValue("cropVarietyId", Number(e.target.value))}
             onBlur={formik.handleBlur}
-            error={formik.errors.cropVariety}
-            touched={formik.touched.cropVariety}
+            error={formik.errors.cropVarietyId}
+            touched={formik.touched.cropVarietyId}
           >
-            <option value="">Select Crop Variety</option>
+            <option value="">Select Variety</option>
             {varieties.map((v) => (
-              <option key={v} value={v}>{v}</option>
+              <option key={v.id} value={v.id}>{v.name}</option>
             ))}
           </SelectField>
 
-
           <TextField
             label="Production (in Qtl.)"
-            required
-            type="number"
-            name="productionInQtl"
-            placeholder="Enter Value"
-            value={formik.values.productionInQtl}
+            name="productionQuantity"
+            type="text"
+            value={formik.values.productionQuantity}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={formik.errors.productionInQtl}
-            touched={formik.touched.productionInQtl}
+            error={formik.errors.productionQuantity}
+            touched={formik.touched.productionQuantity}
           />
 
           <TextField
-            label="Estimated/Harvested Marketable Surplus"
-            required
-            type="number"
-            name="estHarMarSupInQtl"
-            placeholder="Enter Value"
-            value={formik.values.estHarMarSupInQtl}
+            label="Marketable Surplus"
+            name="harvestedSurplus"
+            type="text"
+            value={formik.values.harvestedSurplus}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={formik.errors.estHarMarSupInQtl}
-            touched={formik.touched.estHarMarSupInQtl}
+            error={formik.errors.harvestedSurplus}
+            touched={formik.touched.harvestedSurplus}
           />
 
           <TextField
             label="Date Of Harvesting"
-            required
             type="date"
             name="dateOfHarvesting"
             value={formik.values.dateOfHarvesting}
@@ -392,25 +317,24 @@ export const CropProduction = () => {
 
           <TextField
             label="Estimated/Harvested"
-            required
-            name="estOrHar"
-            value={formik.values.estOrHar}
+            name="estimatedOrHarvestedId"
+            type="text"
+            value={formik.values.estimatedOrHarvestedId}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={formik.errors.estOrHar}
-            touched={formik.touched.estOrHar}
+            error={formik.errors.estimatedOrHarvestedId}
+            touched={formik.touched.estimatedOrHarvestedId}
           />
         </div>
 
         <TextArea
           label="Crop Description"
-          required
-          name="cropDescription"
-          value={formik.values.cropDescription}
+          name="description"
+          value={formik.values.description}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          error={formik.errors.cropDescription}
-          touched={formik.touched.cropDescription}
+          error={formik.errors.description}
+          touched={formik.touched.description}
         />
 
         <div className="mb-6">
@@ -421,13 +345,11 @@ export const CropProduction = () => {
                 title: "Add Image",
                 isInitiallyOpen: true,
                 content: (
-                  <div className="p-4 bg-primary-50 rounded-lg">
-                    <UploadDocument
-                      key={uploadResetKey}
-                      config={uploadConfig}
-                      onFileSelect={handleFileSelect}
-                    />
-                  </div>
+                  <UploadDocument
+                    key={uploadResetKey}
+                    config={uploadConfig}
+                    onFileSelect={handleFileSelect}
+                  />
                 ),
               },
             ]}
@@ -439,59 +361,56 @@ export const CropProduction = () => {
             <span className="text-sm font-medium">Publish on e-Mart?</span>
             <Toggle checked={publishOnEmart} onChange={setPublishOnEmart} />
           </div>
-
           <div className="flex gap-4">
             <Button type="button">Preview</Button>
-
             <Button
               type="button"
               onClick={handleAddOrUpdateClick}
-              buttonClassName={`px-6 py-2.5 text-sm font-semibold text-white rounded-md shadow-sm bg-success`}
+              buttonClassName="px-6 py-2.5 text-sm font-semibold text-white rounded-md shadow-sm bg-success"
             >
-              {isUpdateMode ? "Update Production List" : "Add to Production List"}
+              {isUpdateMode ? "Update Production List" : "+ Add to Production List"}
             </Button>
           </div>
         </div>
       </div>
 
-      <h3 className="font-bold text-base my-6">Crop Production Detail View</h3>
+      {/* TABLE */}
+      <div className="mt-8">
+        <Table
+          columns={columns}
+          data={productionList.map((row) => ({
+            Season: row.seasonName ?? "-",
+            Crop: row.cropName ?? "-",
+            Variety: row.cropVarietyName ?? "-",
+            "Production (Qtl.)": row.productionQuantity ?? "-",
+            "Marketable Surplus": row.harvestedSurplus ?? "-",
+            "Publish on e-Mart": row.emartPublish ? "Yes" : "No",
+            Actions: "actions",
+            ...row, // includes all necessary fields
+          }))}
+          rowKey="id"
+          renderActions={(row) => (
+            <div className="flex gap-2 items-center">
+              <img src={editSvg} alt="edit" className="w-6 cursor-pointer" onClick={() => handleEdit(row)} />
+              <img
+                src={viewSvg}
+                alt="view"
+                className="w-6 cursor-pointer"
+                onClick={() => {
+                  setPreviewImage(row.docId ? `/mock/uploads/${row.docId}.jpg` : null);
+                  setIsPreviewModalOpen(true);
+                }}
+              />
+              <span className="text-[10px] px-2 py-1 rounded bg-gray-100">
+                {row.emartPublish ? "✓ Publish" : "Publish"}
+              </span>
+            </div>
+          )}
+          stickyLastColumn
+        />
+      </div>
 
-      <Table
-        columns={["Season", "Crop Name", "Variety", "Production (in Qtl.)", "Actions"]}
-        data={productionList.map((row) => ({
-          ...row,
-          Season: row.Season,
-          "Crop Name": row["Crop Name"],
-          Variety: row.Variety,
-          "Production (in Qtl.)": row.productionQuantity, // exact key match
-        }))}
-        renderActions={(row) => (
-          <div className="flex gap-2 items-center">
-            <img
-              src={editSvg}
-              alt="edit"
-              className="w-6 cursor-pointer"
-              onClick={() => handleEdit(row)}
-            />
-            <img
-              src={viewSvg}
-              alt="view"
-              className="w-6 cursor-pointer"
-              onClick={() => {
-                setPreviewImage(row.docId ? `/mock/uploads/${row.docId}.jpg` : null);
-                setIsPreviewModalOpen(true);
-              }}
-            />
-            <span className="text-[10px] px-2 py-1 rounded bg-gray-100">
-              {row.emartPublish ? "✓ Publish" : "Publish"}
-            </span>
-          </div>
-        )}
-      />
-
-
-
-      {/* PREVIEW MODAL */}
+      {/* MODALS */}
       <PreviewModal
         isOpen={isPreviewModalOpen}
         onClose={() => setIsPreviewModalOpen(false)}
@@ -500,14 +419,12 @@ export const CropProduction = () => {
         image={previewImage}
       />
 
-      {/* STATUS MODAL */}
       <StatusModal
         isOpen={isStatusModalOpen}
         onClose={() => setIsStatusModalOpen(false)}
-        statusType="success"
-        message="Crop Production Data Saved Successfully"
+        status={statusConfig.status}
+        message={statusConfig.message}
       />
     </div>
   );
 };
-

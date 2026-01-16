@@ -1,15 +1,22 @@
 import * as Yup from "yup";
 
-export const cropProductionValidationSchema = Yup.object({
-    season: Yup.string().required("Season is required"),
-    crop: Yup.string().required("Crop is required"),
-    cropVariety: Yup.string().required("Crop Variety is required"),
-    productionInQtl: Yup.number().required("Required"),
-    estHarMarSupInQtl: Yup.number().required("Required"),
-    dateOfHarvesting: Yup.string().required("Required"),
-    estOrHar: Yup.string().required("Required"),
-    cropDescription: Yup.string().required("Required"),
+export const cropProductionValidationSchema = Yup.object().shape({
+  seasonId: Yup.number().required("Season is required"),
+  cropId: Yup.number().required("Crop is required"),
+  cropVarietyId: Yup.number().required("Variety is required"),
+  productionQuantity: Yup.number()
+    .typeError("Production quantity must be a number")
+    .required("Production quantity is required")
+    .positive("Production quantity must be greater than zero"),
+  harvestedSurplus: Yup.number()
+    .typeError("Marketable surplus must be a number")
+    .required("Marketable surplus is required")
+    .min(0, "Marketable surplus cannot be negative"),
+  dateOfHarvesting: Yup.date().required("Harvest date is required"),
+  estimatedOrHarvestedId: Yup.string().required("Estimated/Harvested info is required"),
+  description: Yup.string().required("Description is required"),
 });
+
 
 export const commodityProductionValidationSchema = Yup.object({
   productCategoryId: Yup.number()

@@ -1,201 +1,149 @@
-export const getAllVillages = async () => {
+export const getGeneralMasterByType = (type) => {
+  switch (type.toLowerCase()) {
+    case "season":
+      return {
+        data: [
+          { id: 8, name: "Kharif", typeId: 4, parentId: null, displayOrder: null, isActive: true },
+          { id: 9, name: "Rabi", typeId: 4, parentId: null, displayOrder: null, isActive: true },
+          { id: 10, name: "Zayad", typeId: 4, parentId: null, displayOrder: null, isActive: true }
+        ],
+        error: null,
+        message: "Success",
+        metadata: null,
+        pagination: null,
+        success: true
+      };
+
+    case "crop":
+      return {
+        data: [
+          { id: 1, name: "Wheat", typeId: 1, parentId: null, displayOrder: null, isActive: true },
+          { id: 2, name: "Rice", typeId: 1, parentId: null, displayOrder: null, isActive: true },
+          { id: 3, name: "Maize", typeId: 1, parentId: null, displayOrder: null, isActive: true }
+        ],
+        error: null,
+        message: "Success",
+        metadata: null,
+        pagination: null,
+        success: true
+      };
+
+    default:
+      return {
+        data: [],
+        error: `No data found for type: ${type}`,
+        message: "Failed",
+        metadata: null,
+        pagination: null,
+        success: false
+      };
+  }
+};
+
+export const getCropsBySeason = (seasonId) => {
+  // Sample mapping of seasonId -> crop list
+  const cropsBySeason = {
+    8: [ // Kharif
+      { id: 2, name: "Arhar" },
+      { id: 3, name: "Ash Gourd" },
+      { id: 4, name: "Ashwagandha" },
+      { id: 6, name: "Banana" },
+      { id: 9, name: "Bitter Gourd" },
+      { id: 11, name: "Bottle Gourd" },
+      { id: 13, name: "Brinjal" },
+      { id: 16, name: "Capsicum" },
+      { id: 18, name: "Cashewnut" },
+      { id: 24, name: "Coconut" },
+      { id: 27, name: "Cucumber" },
+      { id: 34, name: "Finger Millet" },
+      { id: 36, name: "French Bean" },
+      { id: 44, name: "Guava" },
+      { id: 46, name: "Horse gram" },
+      { id: 48, name: "Kinnow" },
+      { id: 51, name: "Kodo" },
+      { id: 57, name: "Maize" },
+      { id: 59, name: "Mango" },
+      { id: 62, name: "Mint" },
+      { id: 63, name: "Moong" },
+      { id: 65, name: "Moringa" },
+      { id: 68, name: "Moth" },
+      { id: 69, name: "Mushroom" },
+      { id: 72, name: "Musk Melon" },
+      { id: 76, name: "Okra" },
+      { id: 79, name: "Paddy" },
+      { id: 80, name: "Papaya" },
+      { id: 81, name: "Pearl Millet" },
+      { id: 83, name: "Pineapple" },
+      { id: 84, name: "Pointed Gourd" },
+      { id: 87, name: "Ridge Gourd" },
+      { id: 89, name: "Sanva" },
+      { id: 90, name: "Sarpagandha" },
+      { id: 91, name: "Snake  Gourd" },
+      { id: 92, name: "Sorghum" },
+      { id: 93, name: "Soyabean" },
+      { id: 94, name: "Spine Gourd" },
+      { id: 95, name: "Sponge  Gourd" },
+      { id: 97, name: "Sugarcane" },
+      { id: 100, name: "Til" },
+      { id: 101, name: "Tomato" },
+      { id: 104, name: "Tulasi" },
+      { id: 106, name: "Urad" },
+      { id: 109, name: "Water Melon" }
+    ],
+    9: [ // Rabi
+      { id: 110, name: "Wheat" },
+      { id: 111, name: "Barley" },
+      { id: 112, name: "Mustard" }
+    ],
+    10: [ // Zayad
+      { id: 120, name: "Cotton" },
+      { id: 121, name: "Sugarcane" },
+      { id: 122, name: "Sesame" }
+    ]
+  };
+
+  const crops = cropsBySeason[seasonId] || [];
+
   return {
-    status: 200,
-    data: {
-      success: true,
-      data: [
-        { id: 1, name: "Village A", panchayatId: 10 },
-        { id: 2, name: "Village B", panchayatId: 10 },
-        { id: 3, name: "Village C", panchayatId: 11 },
-        { id: 4, name: "Village D", panchayatId: 11 },
-        { id: 5, name: "Village E", panchayatId: 12 },
-        { id: 6, name: "Village F", panchayatId: 12 },
-        { id: 7, name: "Village G", panchayatId: 13 },
-        { id: 8, name: "Village H", panchayatId: 13 },
-        { id: 9, name: "Village I", panchayatId: 14 },
-        { id: 10, name: "Village J", panchayatId: 14 }
-      ]
-    }
+    data: crops,
+    error: null,
+    message: "Success",
+    metadata: null,
+    pagination: null,
+    success: true
   };
 };
 
-export const getVillageById = async (id) => {
-  return {
-    status: 200,
-    data: {
-      success: true,
-      data: { id, name: `Village ${String.fromCharCode(64 + id)}`, panchayatId: 10 + (id % 5) }
-    }
+
+export const getVarietyByCrop = (cropId) => {
+  // Sample mapping of cropId -> variety list
+  const varietiesByCrop = {
+    2: [ // Arhar
+      { id: 152, name: "Other" },
+      { id: 205, name: "UPF-203" },
+      { id: 222, name: "Pusa Parvaty" },
+      { id: 240, name: "KFPD 1" },
+      { id: 340, name: "Contender" }
+    ],
+    3: [ // Ash Gourd
+      { id: 400, name: "White Ash" },
+      { id: 401, name: "Round Ash" }
+    ],
+    4: [ // Ashwagandha
+      { id: 410, name: "Jawahar" },
+      { id: 411, name: "Prashant" }
+    ]
+    // Add more crops as needed
   };
-};
 
-export const getVillageByPanchayatId = async (panchayatId) => {
-  let villages = [];
-  for (let i = 1; i <= 10; i++) {
-    villages.push({ id: i, name: `Village ${String.fromCharCode(64 + i)}`, panchayatId });
-  }
-  return { status: 200, data: { success: true, data: villages } };
-};
+  const varieties = varietiesByCrop[cropId] || [];
 
-export const getAllStates = async () => {
   return {
-    status: 200,
-    data: {
-      success: true,
-      data: [
-        { id: 1, name: "Karnataka", countryId: 1 },
-        { id: 2, name: "Kerala", countryId: 1 },
-        { id: 3, name: "Tamil Nadu", countryId: 1 },
-        { id: 4, name: "Andhra Pradesh", countryId: 1 },
-        { id: 5, name: "Maharashtra", countryId: 1 },
-        { id: 6, name: "Gujarat", countryId: 1 },
-        { id: 7, name: "Rajasthan", countryId: 1 },
-        { id: 8, name: "West Bengal", countryId: 1 },
-        { id: 9, name: "Odisha", countryId: 1 },
-        { id: 10, name: "Punjab", countryId: 1 }
-      ]
-    }
+    data: varieties,
+    error: null,
+    message: "Success",
+    metadata: null,
+    pagination: null,
+    success: true
   };
-};
-
-export const getStateById = async (id) => {
-  return {
-    status: 200,
-    data: { success: true, data: { id, name: `State ${id}`, countryId: 1 } }
-  };
-};
-
-export const getStatesByCountryId = async (countryId) => {
-  let states = [];
-  for (let i = 1; i <= 10; i++) {
-    states.push({ id: i, name: `State ${i}`, countryId });
-  }
-  return { status: 200, data: { success: true, data: states } };
-};
-
-export const getAllProductCategories = async () => {
-  return {
-    status: 200,
-    data: {
-      success: true,
-      data: [
-        { id: 1, name: "Cereals" },
-        { id: 2, name: "Spices" },
-        { id: 3, name: "Vegetables" },
-        { id: 4, name: "Fruits" },
-        { id: 5, name: "Pulses" },
-        { id: 6, name: "Oilseeds" },
-        { id: 7, name: "Flowers" },
-        { id: 8, name: "Herbs" },
-        { id: 9, name: "Fibers" },
-        { id: 10, name: "Cash Crops" }
-      ]
-    }
-  };
-};
-
-export const getProductCategoryById = async (productCategoryId) => {
-  return {
-    status: 200,
-    data: { success: true, data: { id: productCategoryId, name: `Category ${productCategoryId}` } }
-  };
-};
-
-export const getSubcategoriesByCategoryId = async (productCategoryId) => {
-  let subcategories = [];
-  for (let i = 1; i <= 10; i++) {
-    subcategories.push({ id: i + 10, name: `Subcategory ${i}`, productCategoryId });
-  }
-  return { status: 200, data: { success: true, data: subcategories } };
-};
-
-export const getProductSubcategoryById = async (productSubcategoryId) => {
-  return {
-    status: 200,
-    data: { success: true, data: { id: productSubcategoryId, name: `Subcategory ${productSubcategoryId}`, productCategoryId: 1 } }
-  };
-};
-
-export const getAllGramPanchayat = async () => {
-  let panchayats = [];
-  for (let i = 1; i <= 10; i++) {
-    panchayats.push({ id: i + 10, name: `Panchayat ${i}`, blockId: 100 + i });
-  }
-  return { status: 200, data: { success: true, data: panchayats } };
-};
-
-export const getGramPanchayatById = async (id) => {
-  return { status: 200, data: { success: true, data: { id, name: `Panchayat ${id}`, blockId: 100 + id } } };
-};
-
-export const getGramPanchayatByBlock = async (blockId) => {
-  let panchayats = [];
-  for (let i = 1; i <= 10; i++) {
-    panchayats.push({ id: i + 10, name: `Panchayat ${i}`, blockId });
-  }
-  return { status: 200, data: { success: true, data: panchayats } };
-};
-
-export const getGeneralMasterByType = async (type) => {
-  let masters = [];
-  for (let i = 1; i <= 10; i++) {
-    masters.push({ id: i, type, name: `${type} Option ${i}` });
-  }
-  return { status: 200, data: { success: true, data: masters } };
-};
-
-export const getAllGeneralAgencies = async () => {
-  let agencies = [];
-  for (let i = 1; i <= 10; i++) {
-    agencies.push({ id: i, name: `Agency ${i}` });
-  }
-  return { status: 200, data: { success: true, data: agencies } };
-};
-
-export const getGeneralMasterById = async (id) => {
-  return { status: 200, data: { success: true, data: { id, name: `General Master ${id}`, type: "GENERIC" } } };
-};
-
-export const getAllDistricts = async () => {
-  let districts = [];
-  for (let i = 1; i <= 10; i++) {
-    districts.push({ id: 100 + i, name: `District ${i}`, stateId: 1 });
-  }
-  return { status: 200, data: districts };
-};
-
-export const getDistrictById = async (id) => {
-  return { status: 200, data: { id, name: `District ${id}`, stateId: 1 } };
-};
-
-export const getAllCountries = async () => {
-  let countries = [];
-  for (let i = 1; i <= 10; i++) {
-    countries.push({ id: i, name: `Country ${i}` });
-  }
-  return { status: 200, data: countries };
-};
-
-export const getCountryById = async (id) => {
-  return { status: 200, data: { id, name: `Country ${id}` } };
-};
-
-export const getAllBlocks = async () => {
-  let blocks = [];
-  for (let i = 1; i <= 10; i++) {
-    blocks.push({ id: 100 + i, name: `Block ${i}`, districtId: 100 + i });
-  }
-  return { status: 200, data: blocks };
-};
-
-export const getBlockById = async (id) => {
-  return { status: 200, data: { id, name: `Block ${id}`, districtId: 100 + id } };
-};
-
-export const getBlocksByDistrictId = async (districtId) => {
-  let blocks = [];
-  for (let i = 1; i <= 10; i++) {
-    blocks.push({ id: 100 + i, name: `Block ${i}`, districtId });
-  }
-  return { status: 200, data: blocks };
 };
