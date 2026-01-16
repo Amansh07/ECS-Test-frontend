@@ -1,3 +1,6 @@
+
+import { getGeneralMasterByType } from "./masterMock";
+
 export const createCropProduction = async (payload) => {
   console.log("Mock createCropProduction called:", payload);
   return {
@@ -18,8 +21,6 @@ export const createCropProduction = async (payload) => {
         description: payload.description,
         emartPublish: payload.emartPublish ?? false,
         docId: payload.docId || "DOC-MOCK-0001",
-        isActive: true,
-        createdOn: new Date().toISOString()
       }
     }
   };
@@ -78,40 +79,131 @@ export const deleteCropProduction = async (id) => {
   };
 };
 
-export const listCropProduction = async (fpoId) => {
-  console.log("Mock listCropProduction called for FPO:", fpoId);
+// masterMock.js (or wherever your API mocks are)
+
+export const listCropProduction = () => {
   return {
-    status: 200,
-    data: {
-      success: true,
-      data: [
-        {
-          id: 1,
-          fpoId,
-          seasonId: 1,
-          cropId: 10,
-          cropVarietyId: 2,
-          productionQuantity: 900,
-          harvestedSurplus: 300,
-          estimatedOrHarvestedId: 2,
-          dateOfHarvesting: "2025-01-15",
-          emartPublish: false
-        },
-        {
-          id: 2,
-          fpoId,
-          seasonId: 2,
-          cropId: 9,
-          cropVarietyId: 4,
-          productionQuantity: 700,
-          harvestedSurplus: 200,
-          estimatedOrHarvestedId: 1,
-          dateOfHarvesting: "2025-03-20",
-          emartPublish: true
-        }
-      ]
-    }
-  };
+    "data": [
+      {
+        "createdOn": null,
+        "cropId": 2,
+        "cropName": "Arhar",
+        "cropVarietyId": 222,
+        "cropVarietyName": "Pusa Parvaty",
+        "dateOfHarvesting": "2025-01-10",
+        "description": "hello",
+        "docId": null,
+        "emartPublish": true,
+        "estimatedOrHarvestedId": 788,
+        "harvestedSurplus": 25.75,
+        "id": 2,
+        "isActive": true,
+        "productionQuantity": 1500.5,
+        "seasonId": 8,
+        "seasonName": "Kharif"
+      },
+      {
+        "createdOn": null,
+        "cropId": 12,
+        "cropName": "Bougainvillea",
+        "cropVarietyId": 3,
+        "cropVarietyName": "Avon",
+        "dateOfHarvesting": "2025-01-10",
+        "description": null,
+        "docId": null,
+        "emartPublish": true,
+        "estimatedOrHarvestedId": null,
+        "harvestedSurplus": 25.75,
+        "id": 3,
+        "isActive": true,
+        "productionQuantity": 1500.5,
+        "seasonId": 8,
+        "seasonName": "Kharif"
+      },
+      {
+        "createdOn": null,
+        "cropId": 12,
+        "cropName": "Bougainvillea",
+        "cropVarietyId": 3,
+        "cropVarietyName": "Avon",
+        "dateOfHarvesting": "2025-01-10",
+        "description": null,
+        "docId": null,
+        "emartPublish": true,
+        "estimatedOrHarvestedId": null,
+        "harvestedSurplus": 25.75,
+        "id": 4,
+        "isActive": true,
+        "productionQuantity": 1500.5,
+        "seasonId": 8,
+        "seasonName": "Kharif"
+      },
+      {
+        "createdOn": null,
+        "cropId": 12,
+        "cropName": "Bougainvillea",
+        "cropVarietyId": 3,
+        "cropVarietyName": "Avon",
+        "dateOfHarvesting": "2025-01-10",
+        "description": null,
+        "docId": null,
+        "emartPublish": true,
+        "estimatedOrHarvestedId": null,
+        "harvestedSurplus": 25.75,
+        "id": 5,
+        "isActive": true,
+        "productionQuantity": 1500.5,
+        "seasonId": 8,
+        "seasonName": "Kharif"
+      },
+      {
+        "createdOn": null,
+        "cropId": 12,
+        "cropName": "Bougainvillea",
+        "cropVarietyId": 3,
+        "cropVarietyName": "Avon",
+        "dateOfHarvesting": "2025-01-10",
+        "description": "Rabi wheat production",
+        "docId": "5",
+        "emartPublish": true,
+        "estimatedOrHarvestedId": 950,
+        "harvestedSurplus": 26.75,
+        "id": 7,
+        "isActive": true,
+        "productionQuantity": 1500.5,
+        "seasonId": 8,
+        "seasonName": "Kharif"
+      },
+      {
+        "createdOn": null,
+        "cropId": 12,
+        "cropName": "Bougainvillea",
+        "cropVarietyId": 3,
+        "cropVarietyName": "Avon",
+        "dateOfHarvesting": "2025-01-10",
+        "description": "Rabi wheat production",
+        "docId": "5",
+        "emartPublish": true,
+        "estimatedOrHarvestedId": 950,
+        "harvestedSurplus": 26.75,
+        "id": 6,
+        "isActive": true,
+        "productionQuantity": 1500.5,
+        "seasonId": 8,
+        "seasonName": "Kharif"
+      }
+    ],
+    "error": null,
+    "message": null,
+    "metadata": null,
+    "pagination": {
+      "page": 0,
+      "size": 10,
+      "totalElements": 6,
+      "totalPages": 1
+    },
+    "success": true
+  }
 };
 
 export const createCommodityProduction = async (payload) => {
@@ -267,3 +359,5 @@ export const getCommodityProductionByFpo = async (fpoId) => {
     }
   };
 };
+
+
