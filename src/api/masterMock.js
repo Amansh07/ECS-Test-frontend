@@ -114,7 +114,6 @@ export const getCropsBySeason = (seasonId) => {
   };
 };
 
-
 export const getVarietyByCrop = (cropId) => {
   // Sample mapping of cropId -> variety list
   const varietiesByCrop = {
@@ -145,5 +144,185 @@ export const getVarietyByCrop = (cropId) => {
     metadata: null,
     pagination: null,
     success: true
+  };
+};
+
+export const getProductCategories = () => {
+  return {
+    success: true,
+    message: "Success",
+    data: [
+      {
+        productCategoryId: 1,
+        productCategoryName: "Dairy",
+        isActive: true,
+        crtOn: "2025-12-23T08:35:13.714358",
+      },
+      {
+        productCategoryId: 2,
+        productCategoryName: "Artisans/Handicrafts",
+        isActive: true,
+        crtOn: "2025-12-23T08:35:13.714358",
+      },
+      {
+        productCategoryId: 3,
+        productCategoryName: "Poultry",
+        isActive: true,
+        crtOn: "2025-12-23T08:35:13.714358",
+      },
+      {
+        productCategoryId: 4,
+        productCategoryName: "Gotary",
+        isActive: true,
+        crtOn: "2025-12-23T08:35:13.714358",
+      },
+      {
+        productCategoryId: 5,
+        productCategoryName: "Superfood",
+        isActive: true,
+        crtOn: "2025-12-23T08:35:13.714358",
+      },
+      {
+        productCategoryId: 6,
+        productCategoryName: "Inputs",
+        isActive: true,
+        crtOn: "2025-12-23T08:35:13.714358",
+      },
+      {
+        productCategoryId: 7,
+        productCategoryName: "Medicinal and Aromatic Plants",
+        isActive: true,
+        crtOn: "2025-12-23T08:35:13.714358",
+      },
+      {
+        productCategoryId: 8,
+        productCategoryName: "Fishery",
+        isActive: true,
+        crtOn: "2025-12-23T08:35:13.714358",
+      },
+      {
+        productCategoryId: 9,
+        productCategoryName: "Processed/value added products",
+        isActive: true,
+        crtOn: "2025-12-23T08:35:13.714358",
+      },
+      {
+        productCategoryId: 10,
+        productCategoryName: "Honey",
+        isActive: true,
+        crtOn: "2025-12-23T08:35:13.714358",
+      },
+    ],
+    error: null,
+    metadata: null,
+    pagination: null,
+  };
+};
+
+export const getSubCategoriesById = (productCategoryId) => {
+  const allSubcategories = [
+    {
+      productSubcategoryId: 2,
+      productCategoryId: 1,
+      subcategoryName: "Khoya",
+      unitId: null,
+      isActive: true,
+      crtOn: "2025-12-23T08:35:30.72792",
+    },
+    {
+      productSubcategoryId: 19,
+      productCategoryId: 1,
+      subcategoryName: "Others",
+      unitId: null,
+      isActive: true,
+      crtOn: "2025-12-23T08:35:30.72792",
+    },
+    {
+      productSubcategoryId: 24,
+      productCategoryId: 1,
+      subcategoryName: "Ghee",
+      unitId: null,
+      isActive: true,
+      crtOn: "2025-12-23T08:35:30.72792",
+    },
+    {
+      productSubcategoryId: 29,
+      productCategoryId: 1,
+      subcategoryName: "Milk",
+      unitId: null,
+      isActive: true,
+      crtOn: "2025-12-23T08:35:30.72792",
+    },
+    {
+      productSubcategoryId: 36,
+      productCategoryId: 1,
+      subcategoryName: "Curd",
+      unitId: null,
+      isActive: true,
+      crtOn: "2025-12-23T08:35:30.72792",
+    },
+    {
+      productSubcategoryId: 52,
+      productCategoryId: 1,
+      subcategoryName: "Paneer",
+      unitId: null,
+      isActive: true,
+      crtOn: "2025-12-23T08:35:30.72792",
+    },
+  ];
+
+  const filtered = allSubcategories.filter(
+    (x) => x.productCategoryId === productCategoryId
+  );
+
+  return {
+    success: true,
+    message: "Success",
+    data: filtered,
+    error: null,
+    metadata: null,
+    pagination: null,
+  };
+};
+
+export const getProductsBySubCategoryId = (subCategoryId) => {
+  const allProducts = [
+    {
+      id: 23,
+      productName: "Terracotta Pots",
+      productSubcategoryId: 1,
+      isActive: true,
+    },
+    {
+      id: 24,
+      productName: "Terracotta Diyas",
+      productSubcategoryId: 2,
+      isActive: true,
+    },
+    {
+      id: 25,
+      productName: "Terracotta Showpieces",
+      productSubcategoryId: 1,
+      isActive: true,
+    },
+    {
+      id: 26,
+      productName: "Terracotta Kulhad",
+      productSubcategoryId: 1,
+      isActive: true,
+    },
+  ];
+
+  const filtered = allProducts.filter(
+    (p) => p.productSubcategoryId === subCategoryId
+  );
+
+  return {
+    success: true,
+    message: "Success",
+    data: filtered,
+    error: null,
+    metadata: null,
+    pagination: null,
   };
 };

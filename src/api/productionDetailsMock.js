@@ -208,32 +208,40 @@ export const listCropProduction = () => {
 
 export const createCommodityProduction = async (payload) => {
   console.log("Mock createCommodityProduction called:", payload);
+
   return {
     status: 200,
     data: {
       success: true,
-      message: "Commodity Production created successfully (mock)",
+      message: "Commodity production created successfully",
       data: {
-        id: 101,
+        id: payload.id ?? 5, // mock assigned ID
         fpoId: payload.fpoId,
         productCategoryId: payload.productCategoryId,
         productSubcategoryId: payload.productSubcategoryId,
         productName: payload.productName,
         annualProductionCap: payload.annualProductionCap,
-        inProduction: payload.inProduction,
         availableStock: payload.availableStock,
         dateOfAvailability: payload.dateOfAvailability,
+        inProduction: payload.inProduction,
         isOrganic: payload.isOrganic,
         emartPublish: payload.emartPublish ?? false,
-        docId: payload.docId || "DOC-MOCK-COM-01",
-        crtBy: 1,
+        docId: payload.docId ?? "5",
+        isActive: true,
+
+        // mimic backend timestamps
+        crtBy: null,
         crtOn: new Date().toISOString(),
-        updBy: 1,
-        updOn: new Date().toISOString()
-      }
+        updBy: null,
+        updOn: null
+      },
+      error: null,
+      metadata: null,
+      pagination: null
     }
   };
 };
+
 
 export const getCommodityProductionById = async (id) => {
   console.log("Mock getCommodityProductionById called:", id);
@@ -263,74 +271,124 @@ export const getCommodityProductionById = async (id) => {
   };
 };
 
-export const updateCommodityProduction = async (id, payload) => {
-  console.log("Mock updateCommodityProduction called:", id, payload);
+export const updateCommodityProduction = async (payload) => {
+  console.log("Mock updateCommodityProduction called:", payload);
+
   return {
     status: 200,
     data: {
       success: true,
-      message: "Commodity Production updated (mock)",
+      message: "Commodity production updated successfully",
       data: {
-        id,
-        ...payload,
-        updOn: new Date().toISOString()
-      }
+        id: payload.id ?? 5, // mock assigned ID
+        fpoId: payload.fpoId,
+        productCategoryId: payload.productCategoryId,
+        productSubcategoryId: payload.productSubcategoryId,
+        productName: payload.productName,
+        annualProductionCap: payload.annualProductionCap,
+        availableStock: payload.availableStock,
+        dateOfAvailability: payload.dateOfAvailability,
+        inProduction: payload.inProduction,
+        isOrganic: payload.isOrganic,
+        emartPublish: payload.emartPublish ?? false,
+        docId: payload.docId ?? "5",
+        isActive: true,
+
+        // mimic backend timestamps
+        crtBy: null,
+        crtOn: new Date().toISOString(),
+        updBy: null,
+        updOn: null
+      },
+      error: null,
+      metadata: null,
+      pagination: null
     }
   };
 };
 
-export const listCommodityProduction = async (fpoId) => {
+
+export const listCommodityProduction = (fpoId) => {
   console.log("Mock listCommodityProduction called for FPO:", fpoId);
   return {
-    status: 200,
-    data: {
-      success: true,
-      data: [
-        {
-          id: 101,
-          fpoId,
-          productCategoryId: 1,
-          productSubcategoryId: 11,
-          productId: 1,
-          isOrganic: true,
-          annualProductionCap: 2000,
-          inProduction: true,
-          availableStock: 1200,
-          dateOfAvailability: "2025-01-15",
-          emartPublish: true,
-          docId: "DOC-COM-001",
-        },
-        {
-          id: 102,
-          fpoId,
-          productCategoryId: 1,
-          productSubcategoryId: 12,
-          productId: 3,
-          isOrganic: false,
-          annualProductionCap: 1000,
-          inProduction: false,
-          availableStock: 800,
-          dateOfAvailability: "2025-02-20",
-          emartPublish: false,
-          docId: "DOC-COM-002",
-        },
-        {
-          id: 103,
-          fpoId,
-          productCategoryId: 2,
-          productSubcategoryId: 21,
-          productId: 4,
-          isOrganic: true,
-          annualProductionCap: 500,
-          inProduction: true,
-          availableStock: 350,
-          dateOfAvailability: "2025-03-10",
-          emartPublish: true,
-          docId: "DOC-COM-003",
-        },
-      ],
+    "data": [
+      {
+        "annualProductionCap": 100,
+        "availableStock": 10,
+        "dateOfAvailability": "2026-01-15",
+        "emartPublish": true,
+        "fpoId": 1,
+        "id": 2,
+        "inProduction": true,
+        "isActive": true,
+        "isOrganic": true,
+        "productCategoryId": 1,
+        "productCategoryName": "Dairy",
+        "productId": 24,
+        "productName": "Terracotta Diyas",
+        "productSubcategoryId": 2,
+        "productSubcategoryName": "Khoya"
+      },
+      {
+        "annualProductionCap": 100,
+        "availableStock": 10,
+        "dateOfAvailability": "2024-01-15",
+        "emartPublish": true,
+        "fpoId": 1,
+        "id": 3,
+        "inProduction": true,
+        "isActive": true,
+        "isOrganic": true,
+        "productCategoryId": 1,
+        "productCategoryName": "Dairy",
+        "productName": null,
+        "productSubcategoryId": 1,
+        "productSubcategoryName": "Terracotta"
+      },
+      {
+        "annualProductionCap": 100,
+        "availableStock": 10,
+        "dateOfAvailability": "2024-01-15",
+        "emartPublish": true,
+        "fpoId": 1,
+        "id": 4,
+        "inProduction": true,
+        "isActive": true,
+        "isOrganic": true,
+        "productCategoryId": 1,
+        "productCategoryName": "Dairy",
+        "productName": null,
+        "productSubcategoryId": 1,
+        "productSubcategoryName": "Terracotta"
+      },
+      {
+        "annualProductionCap": 100,
+        "availableStock": 10,
+        "dateOfAvailability": "2024-01-15",
+        "emartPublish": true,
+        "fpoId": 1,
+        "id": 5,
+        "inProduction": true,
+        "isActive": true,
+        "isOrganic": true,
+        "productCategoryId": 1,
+        "productCategoryName": "Dairy",
+        "productName": "MILK",
+        "productSubcategoryId": 1,
+        "productSubcategoryName": "Terracotta"
+      }
+    ],
+    "error": null,
+    "message": null,
+    "metadata": null,
+    "pagination": {
+      "page": 0,
+      "size": 10,
+      "totalElements": 4,
+      "totalPages": 1
     },
-  };
+    "success": true
+  }
 };
 
 
