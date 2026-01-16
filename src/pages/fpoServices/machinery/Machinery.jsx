@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
 import { TextField, SelectField, TextArea } from '../../../components/FormFields';
 import Table from '../../../components/Table';
 import { Button } from '../../../components/Buttons';
@@ -15,19 +14,7 @@ import viewSvg from '../../../assets/view.svg';
 import deleteSvg from '../../../assets/deleteAction.svg';
 import reloadSvg from '../../../assets/reload.svg';
 import StateExtension, { getExtensionData } from '../../../components/StateExtension';
-
-const validationSchema = Yup.object().shape({
-    machineryCategory: Yup.string().required('Machinery Category is required'),
-    machineryName: Yup.string().required('Machinery Name is required'),
-    brandName: Yup.string().required('Brand Name is required'),
-    unit: Yup.string().required('Unit is required'),
-    rentAmount: Yup.number().required('Rent Amount is required').positive('Must be positive'),
-    quantity: Yup.number().required('Quantity is required').positive('Must be positive').integer('Must be an integer'),
-    address: Yup.string().required('Address is required'),
-    specifications: Yup.string(),
-    manufacturerName: Yup.string(),
-    stateExtension: {},
-});
+import { machineryValidationSchema } from '../validation';
 
 const initialValues = {
     machineryCategory: '',
@@ -56,7 +43,9 @@ export const Machinery = () => {
 
     const formik = useFormik({
         initialValues,
-        validationSchema,
+        validationSchema: machineryValidationSchema,
+        validateOnBlur: true,
+        validateOnChange: true,
         onSubmit: (values, { setFieldError, setFieldTouched }) => {
             // Manual Validation for State Extension
             let isExtensionValid = true;
@@ -165,7 +154,7 @@ export const Machinery = () => {
                 <form onSubmit={formik.handleSubmit}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                         <SelectField
-                            label="Machinery/Equipment Category"
+                            label="Machinerysss/Equipment Category"
                             required
                             name="machineryCategory"
                             value={formik.values.machineryCategory}

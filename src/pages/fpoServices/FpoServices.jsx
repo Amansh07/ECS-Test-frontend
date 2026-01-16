@@ -6,6 +6,7 @@ const cards = [
   { title: "Fertilizer Details", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "fertilizer-details" },
   { title: "Insecticide/Pesticide Details", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "insecticide-or-pesticide-details" },
   { title: "Machinery/Equipment Details", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "machinery" },
+  {title: "Infrastructure Details", description: "Lorem ipsum dolor sit amet",path:"infrastructure-form"}
   { title: "Storage/Infrastructure", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "infrastructure" },
 ];
 

@@ -61,3 +61,23 @@ export const insecticideOrPesticideDetailsValidationSchema = Yup.object({
   insecticideOrPesticideDescription: Yup.string()
     .required("Description is required"),
 });
+
+export const annualTurnoverValidationSchema = Yup.object({
+  financialYear: Yup.string()
+    .required("Financial Year is required"),
+
+  annualTurnover: Yup.number()
+    .typeError("Annual Turnover must be a number")
+    .positive("Annual Turnover must be greater than zero")
+    .required("Annual Turnover is required"),
+
+  totalAnnualProfit: Yup.number()
+    .typeError("Total Annual Profit must be a number")
+    .positive("Total Annual Profit must be greater than zero")
+    .required("Total Annual Profit is required"),
+
+  totalDividendPaid: Yup.number()
+    .typeError("Total Dividend Paid must be a number")
+    .min(0, "Total Dividend Paid cannot be negative")
+    .nullable(),
+});

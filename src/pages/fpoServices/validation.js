@@ -25,6 +25,35 @@ export const fertilizerDetailsValidationSchema = Yup.object({
     .required("Crop description is required"),
 });
 
+export const infraDetailsValidationSchema = Yup.object({
+  category: Yup.string()
+    .required("Infrastructure Category is required"),
+  subCategory: Yup.string()
+    .required("Sub Infrastructure Category is required"),
+
+    other: Yup.string()
+  .when('subCategory', {
+        is: "Others",
+        then: (schema) => schema.required("Other Facilities field is Required"), // Rules if 'hasDiscount' is true
+        otherwise: (schema) => schema.notRequired(), // Rules if 'hasDiscount' is false
+      }),
+  unit: Yup.string().required("Unit is required!"),
+
+  capacity: Yup.number()
+  .typeError("Quantity must be a number")
+    .positive("Quantity must be greater than zero")
+    .test(
+      "is-decimal",
+      "Must have at most 20 decimal places",
+      (value) => (value + "").match(/^\d+(\.\d{0,20})?$/) // Convert to string for regex
+    )
+    // .matches(/^\d{0,50}$/, "Amount allowed only up to 50 digits")
+    .required("Capacity is required"),
+     
+
+});
+
+
 export const insecticideOrPesticideDetailsValidationSchema = Yup.object({
   insecticideOrPesticideType: Yup.string()
     .required("Insecticide / Pesticide type is required"),
@@ -51,4 +80,24 @@ export const insecticideOrPesticideDetailsValidationSchema = Yup.object({
 
   insecticideOrPesticideDescription: Yup.string()
     .required("Description is required"),
+});
+
+export const machineryValidationSchema = Yup.object().shape({
+  machineryCategory: Yup.string().required('Machinery Category is required'),
+  machineryName: Yup.string().required('Machinery Name is required'),
+  brandName: Yup.string().required('Brand Name is required'),
+  unit: Yup.string().required('Unit is required'),
+  rentAmount: Yup.number()
+    .typeError('Rent Amount must be a number')
+    .required('Rent Amount is required')
+    .positive('Rent Amount must be positive'),
+  quantity: Yup.number()
+    .typeError('Quantity must be a number')
+    .required('Quantity is required')
+    .positive('Quantity must be positive')
+    .integer('Quantity must be an integer'),
+  address: Yup.string().required('Address is required'),
+  specifications: Yup.string(),
+  manufacturerName: Yup.string(),
+  stateExtension: Yup.object(),
 });
