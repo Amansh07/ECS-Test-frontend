@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useFormik } from 'formik';
 import { TextField, SelectField } from '../../../components/FormFields';
 import Table from '../../../components/Table';
 import UploadDocument from '../../../components/UploadDocument';
@@ -9,14 +10,16 @@ import editSvg from "../../../assets/edit.svg";
 import viewSvg from "../../../assets/view.svg";
 import deleteSvg from "../../../assets/deleteAction.svg";
 import { AccordionGroup } from '../../../components/Accordion';
+import { annualTurnoverValidationSchema } from '../validation';
+
+const initialValues = {
+    financialYear: '',
+    annualTurnover: '',
+    totalAnnualProfit: '',
+    totalDividendPaid: ''
+};
 
 export const AnnualTurnover = () => {
-    const [formData, setFormData] = useState({
-        financialYear: '',
-        annualTurnover: '',
-        totalAnnualProfit: '',
-        totalDividendPaid: '0'
-    });
     const [uploadedFile, setUploadedFile] = useState(null);
     const [turnoverList, setTurnoverList] = useState([
         {
@@ -44,16 +47,30 @@ export const AnnualTurnover = () => {
     const [statusConfig, setStatusConfig] = useState({ success: true, message: '' });
     const [pendingAction, setPendingAction] = useState(null);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
+    const formik = useFormik({
+        initialValues,
+        validationSchema: annualTurnoverValidationSchema,
+        validateOnBlur: true,
+        validateOnChange: false,
+    });
 
     const handleFileSelect = (file) => {
         setUploadedFile(file);
     };
 
-    const handleAddOrUpdate = () => {
+    const handleAddOrUpdate = async () => {
+        const errors = await formik.validateForm();
+
+        if (Object.keys(errors).length > 0) {
+            formik.setTouched(
+                Object.keys(errors).reduce((acc, key) => {
+                    acc[key] = true;
+                    return acc;
+                }, {})
+            );
+            return;
+        }
+
         setPendingAction(isEditMode ? 'update' : 'add');
         setIsConfirmationOpen(true);
     };
@@ -63,10 +80,10 @@ export const AnnualTurnover = () => {
         if (pendingAction === 'add') {
             const newItem = {
                 id: Date.now(),
-                'Financial Year': formData.financialYear,
-                'Annual Turnover': formData.annualTurnover,
-                'Annual Profit': formData.totalAnnualProfit,
-                'Total Dividend Paid': formData.totalDividendPaid,
+                'Financial Year': formik.values.financialYear,
+                'Annual Turnover': formik.values.annualTurnover,
+                'Annual Profit': formik.values.totalAnnualProfit,
+                'Total Dividend Paid': formik.values.totalDividendPaid,
                 'Balance Sheet': !!uploadedFile
             };
             setTurnoverList(prev => [...prev, newItem]);
@@ -76,10 +93,10 @@ export const AnnualTurnover = () => {
                 item.id === editingId
                     ? {
                         ...item,
-                        'Financial Year': formData.financialYear,
-                        'Annual Turnover': formData.annualTurnover,
-                        'Annual Profit': formData.totalAnnualProfit,
-                        'Total Dividend Paid': formData.totalDividendPaid,
+                        'Financial Year': formik.values.financialYear,
+                        'Annual Turnover': formik.values.annualTurnover,
+                        'Annual Profit': formik.values.totalAnnualProfit,
+                        'Total Dividend Paid': formik.values.totalDividendPaid,
                         'Balance Sheet': !!uploadedFile || item['Balance Sheet']
                     }
                     : item
@@ -94,19 +111,14 @@ export const AnnualTurnover = () => {
     };
 
     const resetForm = () => {
-        setFormData({
-            financialYear: '',
-            annualTurnover: '',
-            totalAnnualProfit: '',
-            totalDividendPaid: '0'
-        });
+        formik.resetForm();
         setUploadedFile(null);
         setIsEditMode(false);
         setEditingId(null);
     };
 
     const handleEdit = (row) => {
-        setFormData({
+        formik.setValues({
             financialYear: row['Financial Year'],
             annualTurnover: row['Annual Turnover'],
             totalAnnualProfit: row['Annual Profit'],
@@ -133,8 +145,11 @@ export const AnnualTurnover = () => {
                         label="Financial Year"
                         name="financialYear"
                         required
-                        value={formData.financialYear}
-                        onChange={handleInputChange}
+                        value={formik.values.financialYear}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.errors.financialYear}
+                        touched={formik.touched.financialYear}
                     >
                         <option value="">Financial Year</option>
                         <option value="2024-25">2024-25</option>
@@ -147,8 +162,11 @@ export const AnnualTurnover = () => {
                         name="annualTurnover"
                         placeholder="Enter Value"
                         required
-                        value={formData.annualTurnover}
-                        onChange={handleInputChange}
+                        value={formik.values.annualTurnover}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.errors.annualTurnover}
+                        touched={formik.touched.annualTurnover}
                     />
 
                     <TextField
@@ -156,15 +174,22 @@ export const AnnualTurnover = () => {
                         name="totalAnnualProfit"
                         placeholder="Enter Value"
                         required
-                        value={formData.totalAnnualProfit}
-                        onChange={handleInputChange}
+                        value={formik.values.totalAnnualProfit}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.errors.totalAnnualProfit}
+                        touched={formik.touched.totalAnnualProfit}
                     />
 
                     <TextField
                         label="Total Dividend Paid (in Rupees)"
                         name="totalDividendPaid"
-                        value={formData.totalDividendPaid}
-                        onChange={handleInputChange}
+                        placeholder="Enter Value"
+                        value={formik.values.totalDividendPaid}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.errors.totalDividendPaid}
+                        touched={formik.touched.totalDividendPaid}
                     />
                 </div>
 

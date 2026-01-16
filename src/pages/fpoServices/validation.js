@@ -81,3 +81,23 @@ export const insecticideOrPesticideDetailsValidationSchema = Yup.object({
   insecticideOrPesticideDescription: Yup.string()
     .required("Description is required"),
 });
+
+export const machineryValidationSchema = Yup.object().shape({
+  machineryCategory: Yup.string().required('Machinery Category is required'),
+  machineryName: Yup.string().required('Machinery Name is required'),
+  brandName: Yup.string().required('Brand Name is required'),
+  unit: Yup.string().required('Unit is required'),
+  rentAmount: Yup.number()
+    .typeError('Rent Amount must be a number')
+    .required('Rent Amount is required')
+    .positive('Rent Amount must be positive'),
+  quantity: Yup.number()
+    .typeError('Quantity must be a number')
+    .required('Quantity is required')
+    .positive('Quantity must be positive')
+    .integer('Quantity must be an integer'),
+  address: Yup.string().required('Address is required'),
+  specifications: Yup.string(),
+  manufacturerName: Yup.string(),
+  stateExtension: Yup.object(),
+});
