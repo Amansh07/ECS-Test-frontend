@@ -13,10 +13,15 @@ import viewSvg from "../../../assets/view.svg";
 import Toggle from "../../../components/Toggle";
 import { uploadDocument } from "../../../api/uploadMock";
 import { getProductCategories, getSubCategoriesById, getProductsBySubCategoryId } from "../../../api/masterMock";
-import { listCommodityProduction, createCommodityProduction, updateCommodityProduction } from "../../../api/productionDetailsMock";
-import * as Yup from "yup";
+import { 
+  listCommodityProduction, 
+  createCommodityProduction, 
+  updateCommodityProduction, 
+  getCommodityProductionById 
+} from "../../../api/productionDetailsMock";
+import { commodityProductionValidationSchema } from "../validation";
 
-// ------------------- INITIAL VALUES & VALIDATION -------------------
+// ------------------- INITIAL VALUES -------------------
 const initialCommodityValues = {
   productCategoryId: "",
   productSubcategoryId: "",
@@ -27,21 +32,6 @@ const initialCommodityValues = {
   dateOfAvailability: "",
   isOrganic: false,
 };
-
-const commodityProductionValidationSchema = Yup.object({
-  productCategoryId: Yup.string().required("Category is required"),
-  productSubcategoryId: Yup.string().required("Subcategory is required"),
-  productId: Yup.string().required("Product is required"),
-  annualProductionCap: Yup.number().typeError("Must be a number").required("Annual Production Cap is required"),
-  availableStock: Yup.number().typeError("Must be a number").required("Available Stock is required"),
-  dateOfAvailability: Yup.string().required("Date of Availability is required"),
-  // inProduction: Yup.boolean()
-  //   .oneOf([true], "Must be in production")
-  //   .required("In Production selection is required"),
-  // isOrganic: Yup.boolean()
-  //   .oneOf([true], "Must be organic")
-  //   .required("Organic selection is required"),
-});
 
 // ------------------- COMPONENT -------------------
 export const CommodityProduction = () => {
@@ -130,14 +120,11 @@ export const CommodityProduction = () => {
   }, [formik.values]);
 
   // ------------------- HANDLERS -------------------
-const handleFileSelect = (file) => {
-  setUploadedFile(file);
-  setPreviewImage(file ? URL.createObjectURL(file) : null);
-
-  // Reset docId when a new file is selected
-  setExistingDocId(null);
-};
-
+  const handleFileSelect = (file) => {
+    setUploadedFile(file);
+    setPreviewImage(file ? URL.createObjectURL(file) : null);
+    setExistingDocId(null); // reset docId when selecting new file
+  };
 
   const handleAddOrUpdateClick = async () => {
     const errors = await formik.validateForm();
@@ -150,48 +137,48 @@ const handleFileSelect = (file) => {
     setIsPreviewModalOpen(true);
   };
 
-const handlePreviewConfirm = async () => {
-  // Close preview modal first
-  setIsPreviewModalOpen(false);
+  const handlePreviewConfirm = async () => {
+    setIsPreviewModalOpen(false);
 
-  let docId = existingDocId;
+    let docId = existingDocId;
 
-  if (uploadedFile) {
-    const uploadRes = await uploadDocument({ file: uploadedFile, fpoId: 1, docType: 1 });
-    if (uploadRes.status === 200 && uploadRes.data?.documentId) {
-      docId = uploadRes.data.documentId;
-      setExistingDocId(docId);
+    if (uploadedFile) {
+      const uploadRes = await uploadDocument({ file: uploadedFile, fpoId: 1, docType: 1 });
+      if (uploadRes.status === 200 && uploadRes.data?.documentId) {
+        docId = uploadRes.data.documentId;
+        setExistingDocId(docId);
+      }
     }
-  }
 
-  const payload = {
-    ...formik.values,
-    productCategoryId: Number(formik.values.productCategoryId),
-    productSubcategoryId: Number(formik.values.productSubcategoryId),
-    productId: Number(formik.values.productId),
-    annualProductionCap: Number(formik.values.annualProductionCap),
-    availableStock: Number(formik.values.availableStock),
-    inProduction: formik.values.inProduction,
-    dateOfAvailability: formik.values.dateOfAvailability,
-    isOrganic: formik.values.isOrganic,
-    emartPublish: publishOnEmart,
-    docId,
-    fpoId: 1,
+    const payload = {
+      ...formik.values,
+      productCategoryId: Number(formik.values.productCategoryId),
+      productSubcategoryId: Number(formik.values.productSubcategoryId),
+      productId: Number(formik.values.productId),
+      annualProductionCap: Number(formik.values.annualProductionCap),
+      availableStock: Number(formik.values.availableStock),
+      inProduction: formik.values.inProduction,
+      dateOfAvailability: formik.values.dateOfAvailability,
+      isOrganic: formik.values.isOrganic,
+      emartPublish: publishOnEmart,
+      docId,
+      fpoId: 1,
+    };
+
+    if (isUpdateMode && editingId) {
+      console.log("update payload :",payload);
+      await updateCommodityProduction(editingId, payload);
+      setStatusConfig({ status: true, message: "Commodity Production Updated Successfully" });
+    } else {
+      console.log("create payload :",payload);
+      await createCommodityProduction(payload);
+      setStatusConfig({ status: true, message: "Commodity Production Added Successfully" });
+    }
+
+    setIsStatusModalOpen(true);
+    resetAll();
+    fetchCommodityList();
   };
-
-  if (isUpdateMode) {
-    await updateCommodityProduction(payload);
-    setStatusConfig({ status: true, message: "Commodity Production Updated Successfully" });
-  } else {
-    await createCommodityProduction(payload);
-    setStatusConfig({ status: true, message: "Commodity Production Added Successfully" });
-  }
-
-  setIsStatusModalOpen(true);
-  resetAll();
-  fetchCommodityList();
-};
-
 
   const resetAll = () => {
     setIsUpdateMode(false);
@@ -204,31 +191,40 @@ const handlePreviewConfirm = async () => {
     setUploadResetKey((prev) => prev + 1);
   };
 
-  const handleEdit = (row) => {
+  // ------------------- EDIT HANDLER -------------------
+  const handleEdit = async (row) => {
     setIsUpdateMode(true);
     setEditingId(row.id);
-    setExistingDocId(row.docId);
-    setPublishOnEmart(row.emartPublish);
 
-    setSubcategories(getSubCategoriesById(row.productCategoryId).data);
-    setProducts(getProductsBySubCategoryId(row.productSubcategoryId).data);
+    // Fetch by ID
+    const res = await getCommodityProductionById(row.id);
+    if (res.status === 200 && res.data.success && res.data.data) {
+      const data = res.data.data;
 
-    formik.setValues({
-      productCategoryId: row.productCategoryId?.toString() || "",
-      productSubcategoryId: row.productSubcategoryId?.toString() || "",
-      productId: row.productId?.toString() || "",
-      annualProductionCap: row.annualProductionCap?.toString() || "",
-      availableStock: row.availableStock?.toString() || "",
-      inProduction: row.inProduction || false,
-      dateOfAvailability: row.dateOfAvailability || "",
-      isOrganic: row.isOrganic || false,
-    });
+      setExistingDocId(data.docId || null);
+      setPublishOnEmart(data.emartPublish || false);
 
-    setUploadedFile(null);
-    setPreviewImage(row.docId ? `/mock/uploads/${row.docId}.jpg` : null);
+      // Load subcategories & products
+      setSubcategories(getSubCategoriesById(data.productCategoryId).data);
+      setProducts(getProductsBySubCategoryId(data.productSubcategoryId).data);
+
+      formik.setValues({
+        productCategoryId: data.productCategoryId?.toString() || "",
+        productSubcategoryId: data.productSubcategoryId?.toString() || "",
+        productId: data.productId?.toString() || "",
+        annualProductionCap: data.annualProductionCap?.toString() || "",
+        availableStock: data.availableStock?.toString() || "",
+        inProduction: data.inProduction || false,
+        dateOfAvailability: data.dateOfAvailability || "",
+        isOrganic: data.isOrganic || false,
+      });
+
+      setUploadedFile(null);
+      setPreviewImage(data.docId ? `/mock/uploads/${data.docId}.jpg` : null);
+    }
   };
 
-  // ------------------- TABLE -------------------
+  // ------------------- TABLE & PREVIEW -------------------
   const columns = [
     "Category",
     "Subcategory",
@@ -241,9 +237,9 @@ const handlePreviewConfirm = async () => {
   ];
 
   const previewData = [
-    { label: "Category", value: categories.find((c) => c.productCategoryId == formik.values.productCategoryId)?.productCategoryName || "" },
-    { label: "Subcategory", value: subcategories.find((s) => s.productSubcategoryId == formik.values.productSubcategoryId)?.subcategoryName || "" },
-    { label: "Product", value: products.find((p) => p.id == formik.values.productId)?.productName || "" },
+    { label: "Category", value: categories.find(c => c.productCategoryId == formik.values.productCategoryId)?.productCategoryName || "" },
+    { label: "Subcategory", value: subcategories.find(s => s.productSubcategoryId == formik.values.productSubcategoryId)?.subcategoryName || "" },
+    { label: "Product", value: products.find(p => p.id == formik.values.productId)?.productName || "" },
     { label: "Annual Production Cap", value: formik.values.annualProductionCap },
     { label: "Available Stock", value: formik.values.availableStock },
     { label: "In Production", value: formik.values.inProduction ? "Yes" : "No" },
@@ -255,10 +251,9 @@ const handlePreviewConfirm = async () => {
   // ------------------- RENDER -------------------
   return (
     <div>
+      {/* FORM */}
       <div className="border border-stroke-200 rounded-[8px] p-[16px]">
-        <h2 className="text-base font-bold mb-6">
-          {isUpdateMode ? "Update Commodity Production" : "Add Commodity Production"}
-        </h2>
+        <h2 className="text-base font-bold mb-6">{isUpdateMode ? "Update Commodity Production" : "Add Commodity Production"}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <SelectField
@@ -272,9 +267,7 @@ const handlePreviewConfirm = async () => {
             touched={formik.touched.productCategoryId}
           >
             <option value="">Select Category</option>
-            {categories.map((c) => (
-              <option key={c.productCategoryId} value={c.productCategoryId}>{c.productCategoryName}</option>
-            ))}
+            {categories.map(c => <option key={c.productCategoryId} value={c.productCategoryId}>{c.productCategoryName}</option>)}
           </SelectField>
 
           <SelectField
@@ -288,9 +281,7 @@ const handlePreviewConfirm = async () => {
             touched={formik.touched.productSubcategoryId}
           >
             <option value="">Select Subcategory</option>
-            {subcategories.map((s) => (
-              <option key={s.productSubcategoryId} value={s.productSubcategoryId}>{s.subcategoryName}</option>
-            ))}
+            {subcategories.map(s => <option key={s.productSubcategoryId} value={s.productSubcategoryId}>{s.subcategoryName}</option>)}
           </SelectField>
 
           <SelectField
@@ -304,9 +295,7 @@ const handlePreviewConfirm = async () => {
             touched={formik.touched.productId}
           >
             <option value="">Select Product</option>
-            {products.map((p) => (
-              <option key={p.id} value={p.id}>{p.productName}</option>
-            ))}
+            {products.map(p => <option key={p.id} value={p.id}>{p.productName}</option>)}
           </SelectField>
 
           <TextField
@@ -331,20 +320,14 @@ const handlePreviewConfirm = async () => {
             touched={formik.touched.availableStock}
           />
 
-
-
           <CheckboxField
             label="Organic"
             name="isOrganic"
             checked={formik.values.isOrganic}
-            onChange={() => {
-              formik.setFieldValue("isOrganic", !formik.values.isOrganic);
-              formik.setFieldTouched("isOrganic", true);
-            }}
+            onChange={() => formik.setFieldValue("isOrganic", !formik.values.isOrganic)}
             error={formik.errors.isOrganic}
             touched={formik.touched.isOrganic}
           />
-
 
           <TextField
             label="Date of Availability"
@@ -361,10 +344,7 @@ const handlePreviewConfirm = async () => {
             label="In Production"
             name="inProduction"
             checked={formik.values.inProduction}
-            onChange={() => {
-              formik.setFieldValue("inProduction", !formik.values.inProduction);
-              formik.setFieldTouched("inProduction", true);
-            }}
+            onChange={() => formik.setFieldValue("inProduction", !formik.values.inProduction)}
             error={formik.errors.inProduction}
             touched={formik.touched.inProduction}
           />
@@ -379,43 +359,29 @@ const handlePreviewConfirm = async () => {
           }]}
         />
 
-        {/* <div className="my-8 flex flex-col md:flex-row justify-between gap-4 p-4 bg-grey-50 rounded-lg">
+        <div className="my-8 flex flex-col md:flex-row justify-between gap-4 p-4 bg-grey-50 rounded-lg">
           <div className="flex items-center gap-4">
             <span className="text-sm font-medium">Publish on e-Mart?</span>
-            <CheckboxField
-              checked={publishOnEmart}
-              onChange={() => setPublishOnEmart(!publishOnEmart)}
-            />
+            <Toggle checked={publishOnEmart} onChange={setPublishOnEmart} />
           </div>
           <div className="flex gap-4">
-            <Button type="button" onClick={handleAddOrUpdateClick}>
-              {isUpdateMode ? "Update" : "+ Add"}
+            <Button type="button">Preview</Button>
+            <Button
+              type="button"
+              onClick={handleAddOrUpdateClick}
+              buttonClassName="px-6 py-2.5 text-sm font-semibold text-white rounded-md shadow-sm bg-success"
+            >
+              {isUpdateMode ? "Update Production List" : "+ Add to Production List"}
             </Button>
           </div>
-        </div> */}
-
-          <div className="my-8 flex flex-col md:flex-row justify-between gap-4 p-4 bg-grey-50 rounded-lg">
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium">Publish on e-Mart?</span>
-                    <Toggle checked={publishOnEmart} onChange={setPublishOnEmart} />
-                  </div>
-                  <div className="flex gap-4">
-                    <Button type="button">Preview</Button>
-                    <Button
-                      type="button"
-                      onClick={handleAddOrUpdateClick}
-                      buttonClassName="px-6 py-2.5 text-sm font-semibold text-white rounded-md shadow-sm bg-success"
-                    >
-                      {isUpdateMode ? "Update Production List" : "+ Add to Production List"}
-                    </Button>
-                  </div>
-                </div>
+        </div>
       </div>
 
+      {/* TABLE */}
       <div className="mt-8">
         <Table
           columns={columns}
-          data={commodityList.map((row) => ({
+          data={commodityList.map(row => ({
             Category: row.productCategoryName || "-",
             Subcategory: row.productSubcategoryName || "-",
             Product: row.productName || "-",
@@ -426,7 +392,7 @@ const handlePreviewConfirm = async () => {
             ...row,
           }))}
           rowKey="id"
-          renderActions={(row) => (
+          renderActions={row => (
             <div className="flex gap-2 items-center">
               <img src={editSvg} alt="edit" className="w-6 cursor-pointer" onClick={() => handleEdit(row)} />
               <img src={viewSvg} alt="view" className="w-6 cursor-pointer" onClick={() => {
@@ -438,6 +404,7 @@ const handlePreviewConfirm = async () => {
               </span>
             </div>
           )}
+          stickyLastColumn
         />
       </div>
 

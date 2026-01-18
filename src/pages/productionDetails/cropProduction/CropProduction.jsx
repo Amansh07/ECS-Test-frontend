@@ -13,7 +13,7 @@ import editSvg from "../../../assets/edit.svg";
 import viewSvg from "../../../assets/view.svg";
 import { uploadDocument } from "../../../api/uploadMock";
 import { getGeneralMasterByType, getCropsBySeason, getVarietyByCrop } from "../../../api/masterMock";
-import { listCropProduction } from "../../../api/productionDetailsMock";
+import { listCropProduction, createCropProduction, updateCropProduction, getCropProductionById } from "../../../api/productionDetailsMock";
 import { cropProductionValidationSchema } from "../validation";
 
 const initialCropProductionValues = {
@@ -149,7 +149,12 @@ export const CropProduction = () => {
       docId,
       fpoId: 1,
     };
-    console.log("Payload:", payload);
+
+    if (isUpdateMode && editingId) {
+      await updateCropProduction(editingId, payload); // ✅ update
+    } else {
+      await createCropProduction(payload); // ✅ create
+    }
 
     setIsPreviewModalOpen(false);
     setStatusConfig({
@@ -176,29 +181,33 @@ export const CropProduction = () => {
   };
 
   // ------------------- EDIT HANDLER -------------------
-  const handleEdit = (row) => {
+  const handleEdit = async (row) => {
     setIsUpdateMode(true);
     setEditingId(row.id);
-    setExistingDocId(row.docId);
-    setPublishOnEmart(row.emartPublish);
 
-    setCrops(getCropsBySeason(row.seasonId).data);
-    setVarieties(getVarietyByCrop(row.cropId).data);
+    const res = await getCropProductionById(row.id); // ✅ getById
+    if (res.status === 200 && res.data.success && res.data.data) {
+      const data = res.data.data;
+      setExistingDocId(data.docId || null);
+      setPublishOnEmart(data.emartPublish || false);
 
-    // Populate Formik values
-    formik.setValues({
-      seasonId: row.seasonId?.toString() || "",
-      cropId: row.cropId?.toString() || "",
-      cropVarietyId: row.cropVarietyId?.toString() || "",
-      productionQuantity: row.productionQuantity != null ? row.productionQuantity.toString() : "",
-      harvestedSurplus: row.harvestedSurplus != null ? row.harvestedSurplus.toString() : "",
-      dateOfHarvesting: row.dateOfHarvesting || "",
-      estimatedOrHarvestedId: row.estimatedOrHarvestedId || "",
-      description: row.description || "",
-    });
+      setCrops(getCropsBySeason(data.seasonId).data);
+      setVarieties(getVarietyByCrop(data.cropId).data);
 
-    setUploadedFile(null);
-    setPreviewImage(row.docId ? `/mock/uploads/${row.docId}.jpg` : null);
+      formik.setValues({
+        seasonId: data.seasonId?.toString() || "",
+        cropId: data.cropId?.toString() || "",
+        cropVarietyId: data.cropVarietyId?.toString() || "",
+        productionQuantity: data.productionQuantity != null ? data.productionQuantity.toString() : "",
+        harvestedSurplus: data.harvestedSurplus != null ? data.harvestedSurplus.toString() : "",
+        dateOfHarvesting: data.dateOfHarvesting || "",
+        estimatedOrHarvestedId: data.estimatedOrHarvestedId || "",
+        description: data.description || "",
+      });
+
+      setUploadedFile(null);
+      setPreviewImage(data.docId ? `/mock/uploads/${data.docId}.jpg` : null);
+    }
   };
 
   // ------------------- TABLE COLUMNS -------------------
@@ -386,7 +395,7 @@ export const CropProduction = () => {
             "Marketable Surplus": row.harvestedSurplus ?? "-",
             "Publish on e-Mart": row.emartPublish ? "Yes" : "No",
             Actions: "actions",
-            ...row, // includes all necessary fields
+            ...row,
           }))}
           rowKey="id"
           renderActions={(row) => (

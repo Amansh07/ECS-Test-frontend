@@ -27,7 +27,7 @@ export const createCropProduction = async (payload) => {
 };
 
 export const getCropProductionById = async (id) => {
-  console.log("Mock getCropProductionById called:", id);
+  console.log("Mock getCropProductionById :", id);
   return {
     status: 200,
     data: {
@@ -35,16 +35,16 @@ export const getCropProductionById = async (id) => {
       data: {
         id,
         fpoId: 12,
-        seasonId: 1,
-        cropId: 10,
-        cropVarietyId: 3,
-        productionQuantity: 1200,
-        harvestedSurplus: 450,
+        seasonId: 8,
+        cropId: 2,
+        cropVarietyId: 222,
+        productionQuantity: 1500.5,
+        harvestedSurplus: 25.75,
         estimatedOrHarvestedId: 2,
         dateOfHarvesting: "2025-02-18",
-        description: "Mocked sample data",
+        description: "Mocked samplee data",
         emartPublish: true,
-        docId: "DOC-MOCK-1234",
+        docId: null,
         isActive: true,
         createdOn: "2025-01-10T10:00:00Z"
       }
@@ -252,8 +252,9 @@ export const getCommodityProductionById = async (id) => {
       data: {
         id,
         fpoId: 12,
-        productCategoryId: 4,
-        productSubcategoryId: 7,
+        productCategoryId: 1,
+        productSubcategoryId: 2,
+        productId: 24,
         productName: "Mock Commodity",
         annualProductionCap: 5000,
         inProduction: true,
@@ -261,7 +262,7 @@ export const getCommodityProductionById = async (id) => {
         dateOfAvailability: "2025-03-01",
         isOrganic: false,
         emartPublish: true,
-        docId: "DOC-MOCK-5678",
+        docId: null,
         crtBy: 1,
         crtOn: "2025-01-10T10:00:00Z",
         updBy: 1,

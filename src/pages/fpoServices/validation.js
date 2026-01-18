@@ -21,8 +21,24 @@ export const fertilizerDetailsValidationSchema = Yup.object({
     .positive("Quantity must be greater than zero")
     .required("Quantity is required"),
 
-  cropDescription: Yup.string()
-    .required("Crop description is required"),
+  purchaseDate: Yup.date()
+    .required("Purchase date is required")
+    .max(new Date(), "Purchase date cannot be in the future"),
+
+  expiryDate: Yup.date()
+    .required("Expiry date is required")
+    .min(
+      Yup.ref("purchaseDate"),
+      "Expiry date should be greater than purchase date"
+    ),
+
+  batchNo: Yup.string()
+    .required("Batch number is required")
+    .matches(/^[A-Za-z0-9\-]+$/, "Only letters, numbers and hyphens allowed"),
+
+  remarks: Yup.string()
+    .max(200, "Remarks cannot exceed 200 characters")
+    .nullable(),
 });
 
 export const infraDetailsValidationSchema = Yup.object({
@@ -53,22 +69,15 @@ export const infraDetailsValidationSchema = Yup.object({
 
 });
 
-
 export const insecticideOrPesticideDetailsValidationSchema = Yup.object({
-  insecticideOrPesticideType: Yup.string()
+  insecticideType: Yup.string()
     .required("Insecticide / Pesticide type is required"),
 
-  insecticideOrPesticideName: Yup.string()
+  insecticideName: Yup.string()
     .required("Insecticide / Pesticide name is required"),
 
-  nameOfManufacturer: Yup.string()
+  manufacturerName: Yup.string()
     .required("Name of manufacturer is required"),
-
-  cibRcNumber: Yup.string()
-    .required("CIB & RC number is required"),
-
-  cibRcIssueDate: Yup.string()
-    .required("CIB & RC issue date is required"),
 
   quantityType: Yup.string()
     .required("Quantity type is required"),
@@ -78,9 +87,19 @@ export const insecticideOrPesticideDetailsValidationSchema = Yup.object({
     .positive("Quantity must be greater than zero")
     .required("Quantity is required"),
 
-  insecticideOrPesticideDescription: Yup.string()
-    .required("Description is required"),
+  purchaseDate: Yup.string()
+    .required("Purchase date is required"),
+
+  expiryDate: Yup.string()
+    .required("Expiry date is required"),
+
+  batchNo: Yup.string()
+    .required("Batch number is required"),
+
+  // remarks: Yup.string()
+  //   .required("Remarks are required"),
 });
+
 
 export const machineryValidationSchema = Yup.object().shape({
   machineryCategory: Yup.string().required('Machinery Category is required'),

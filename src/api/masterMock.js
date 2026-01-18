@@ -1,5 +1,6 @@
 export const getGeneralMasterByType = (type) => {
   switch (type.toLowerCase()) {
+
     case "season":
       return {
         data: [
@@ -28,6 +29,80 @@ export const getGeneralMasterByType = (type) => {
         success: true
       };
 
+    // -----------------------------------
+    // NEW: Fertilizer Type
+    // -----------------------------------
+    case "fertilizertype":
+      return {
+        data: [
+          { id: 1, name: "Organic", typeId: 5, parentId: null, displayOrder: null, isActive: true },
+          { id: 2, name: "Inorganic", typeId: 5, parentId: null, displayOrder: null, isActive: true },
+          { id: 3, name: "Bio-Fertilizer", typeId: 5, parentId: null, displayOrder: null, isActive: true }
+        ],
+        error: null,
+        message: "Success",
+        metadata: null,
+        pagination: null,
+        success: true
+      };
+
+    // -----------------------------------
+    // NEW: Fertilizer Grade
+    // -----------------------------------
+    case "fertilizergrade":
+      return {
+        data: [
+          { id: 101, name: "NPK 10:26:26", typeId: 6, parentId: 2, displayOrder: null, isActive: true },
+          { id: 102, name: "NPK 12:32:16", typeId: 6, parentId: 2, displayOrder: null, isActive: true },
+          { id: 103, name: "Urea (46% N)", typeId: 6, parentId: 2, displayOrder: null, isActive: true },
+          { id: 104, name: "DAP (18-46-0)", typeId: 6, parentId: 2, displayOrder: null, isActive: true },
+          { id: 105, name: "Compost", typeId: 6, parentId: 1, displayOrder: null, isActive: true }
+        ],
+        error: null,
+        message: "Success",
+        metadata: null,
+        pagination: null,
+        success: true
+      };
+
+
+    // -----------------------------------
+    // Insecticide / Pesticide Type
+    // -----------------------------------
+    case "insecticidetype":
+      return {
+        data: [
+          { id: 1, name: "Insecticide", typeId: 8, parentId: null, displayOrder: null, isActive: true },
+          { id: 2, name: "Pesticide", typeId: 8, parentId: null, displayOrder: null, isActive: true }
+        ],
+        error: null,
+        message: "Success",
+        metadata: null,
+        pagination: null,
+        success: true
+      };
+
+    // -----------------------------------
+    // NEW: Quantity Type
+    // -----------------------------------
+    case "quantitytype":
+      return {
+        data: [
+          { id: 201, name: "Kg", typeId: 7, parentId: null, displayOrder: null, isActive: true },
+          { id: 202, name: "Ton", typeId: 7, parentId: null, displayOrder: null, isActive: true },
+          { id: 203, name: "Liters", typeId: 7, parentId: null, displayOrder: null, isActive: true },
+          { id: 204, name: "Packets", typeId: 7, parentId: null, displayOrder: null, isActive: true }
+        ],
+        error: null,
+        message: "Success",
+        metadata: null,
+        pagination: null,
+        success: true
+      };
+
+    // -----------------------------------
+    // DEFAULT
+    // -----------------------------------
     default:
       return {
         data: [],
@@ -39,6 +114,7 @@ export const getGeneralMasterByType = (type) => {
       };
   }
 };
+
 
 export const getCropsBySeason = (seasonId) => {
   // Sample mapping of seasonId -> crop list
