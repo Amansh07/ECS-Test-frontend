@@ -6,6 +6,8 @@ export default function PreviewModal({
     onConfirm,
     title = "Preview",
     image,
+    actionButton,
+    isDescriptionAvailable = true,
     data = [],
 }) {
     if (!isOpen) return null;
@@ -98,23 +100,23 @@ export default function PreviewModal({
                         </div>
                     </div>
 
-                    <hr className="border-stroke-100" />
+                    {isDescriptionAvailable && <><hr className="border-stroke-100" />
 
-                    {/* Description Section */}
-                    <div className="space-y-2">
-                        <label className="block font-semibold text-gray-900 text-sm md:text-base">
-                            Crop Description :
-                        </label>
+                        {/* Description Section */}
+                        <div className="space-y-2">
+                            <label className="block font-semibold text-gray-900 text-sm md:text-base">
+                                Description :
+                            </label>
 
-                        {/* Read-only description text */}
-                        <div className="p-3 rounded-md border border-stroke-300 bg-gray-50 text-gray-700 text-sm md:text-base leading-relaxed whitespace-pre-line">
-                            {descriptionText}
-                        </div>
-                    </div>
+                            {/* Read-only description text */}
+                            <div className="p-3 rounded-md border border-stroke-300 bg-gray-50 text-gray-700 text-sm md:text-base leading-relaxed whitespace-pre-line">
+                                {descriptionText}
+                            </div>
+                        </div></>}
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 md:p-6 border-t border-stroke-100 flex flex-col sm:flex-row justify-end gap-3 bg-gray-50 rounded-b-lg">
+                {actionButton && <div className="p-4 md:p-6 border-t border-stroke-100 flex flex-col sm:flex-row justify-end gap-3 bg-gray-50 rounded-b-lg">
                     <button
                         onClick={onClose}
                         className="w-full sm:w-auto px-6 py-2 rounded-md border border-danger-600 text-danger-600 font-medium hover:bg-danger-50 transition-colors"
@@ -127,7 +129,7 @@ export default function PreviewModal({
                     >
                         Add to Production List
                     </button>
-                </div>
+                </div>}
 
             </div>
         </div>

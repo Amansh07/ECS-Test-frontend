@@ -13,13 +13,14 @@ import viewSvg from "../../../assets/view.svg";
 import Toggle from "../../../components/Toggle";
 import { uploadDocument } from "../../../api/uploadMock";
 import { getProductCategories, getSubCategoriesById, getProductsBySubCategoryId } from "../../../api/masterMock";
-import { 
-  listCommodityProduction, 
-  createCommodityProduction, 
-  updateCommodityProduction, 
-  getCommodityProductionById 
+import {
+  listCommodityProduction,
+  createCommodityProduction,
+  updateCommodityProduction,
+  getCommodityProductionById
 } from "../../../api/productionDetailsMock";
 import { commodityProductionValidationSchema } from "../validation";
+import ValidationModal from "../../../components/ValidationModal";
 
 // ------------------- INITIAL VALUES -------------------
 const initialCommodityValues = {
@@ -43,16 +44,22 @@ export const CommodityProduction = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [uploadResetKey, setUploadResetKey] = useState(0);
   const [publishOnEmart, setPublishOnEmart] = useState(false);
+  const [rowPreviewData, setRowPreviewData] = useState(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [statusConfig, setStatusConfig] = useState({ status: true, message: "" });
   const [isUpdateMode, setIsUpdateMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [existingDocId, setExistingDocId] = useState(null);
+  const [previewTitle, setPreviewTitle] = useState("Preview");
+
+  const [showValidationModal, setShowValidationModal] = useState(false);
+  const [validationTitle, setValidationTitle] = useState("");
+  const [validationMessage, setValidationMessage] = useState("");
 
   const uploadConfig = {
-    title: "Upload Product Document *",
-    maxSizeMB: "Max - 5mb",
+    title: "Select Poster Image",
+    maxSizeMB: "Max - 2mb",
     allowedTypes: ["image/jpeg", "image/png", "image/jpg"],
   };
 
@@ -132,13 +139,35 @@ export const CommodityProduction = () => {
       formik.setTouched(
         Object.keys(errors).reduce((acc, key) => ({ ...acc, [key]: true }), {})
       );
+
+      // SHOW VALIDATION MODAL
+      setValidationTitle("Validation Required");
+      setValidationMessage("Please complete all required fields before proceeding.");
+      setShowValidationModal(true);
+
       return;
     }
+    setPreviewTitle("Preview");
     setIsPreviewModalOpen(true);
   };
 
   const handlePreviewConfirm = async () => {
-    setIsPreviewModalOpen(false);
+
+    // ----------------- VALIDATION -----------------
+    const errors = await formik.validateForm();
+    if (Object.keys(errors).length > 0) {
+      setIsPreviewModalOpen(false);
+      // Highlight the invalid fields
+      formik.setTouched(
+        Object.keys(errors).reduce((acc, key) => ({ ...acc, [key]: true }), {})
+      );
+
+      // Show validation modal
+      setValidationTitle("Validation Required");
+      setValidationMessage("Please complete all required fields before submitting.");
+      setShowValidationModal(true);
+      return; // stop execution if errors exist
+    }
 
     let docId = existingDocId;
 
@@ -155,8 +184,8 @@ export const CommodityProduction = () => {
       productCategoryId: Number(formik.values.productCategoryId),
       productSubcategoryId: Number(formik.values.productSubcategoryId),
       productId: Number(formik.values.productId),
-      annualProductionCap: Number(formik.values.annualProductionCap),
-      availableStock: Number(formik.values.availableStock),
+      annualProductionCap: ParseFloat(formik.values.annualProductionCap),
+      availableStock: ParseFloat(formik.values.availableStock),
       inProduction: formik.values.inProduction,
       dateOfAvailability: formik.values.dateOfAvailability,
       isOrganic: formik.values.isOrganic,
@@ -166,15 +195,15 @@ export const CommodityProduction = () => {
     };
 
     if (isUpdateMode && editingId) {
-      console.log("update payload :",payload);
+      console.log("update payload :", payload);
       await updateCommodityProduction(editingId, payload);
       setStatusConfig({ status: true, message: "Commodity Production Updated Successfully" });
     } else {
-      console.log("create payload :",payload);
+      console.log("create payload :", payload);
       await createCommodityProduction(payload);
       setStatusConfig({ status: true, message: "Commodity Production Added Successfully" });
     }
-
+    setIsPreviewModalOpen(false);
     setIsStatusModalOpen(true);
     resetAll();
     fetchCommodityList();
@@ -226,27 +255,65 @@ export const CommodityProduction = () => {
 
   // ------------------- TABLE & PREVIEW -------------------
   const columns = [
-    "Category",
+    "Product Category",
     "Subcategory",
-    "Product",
-    "Annual Production Cap",
-    "Available Stock",
+    "Product Name",
+    "Annual Production Capacity",
+    "Available Stock for Sale",
     "In Production",
-    "Publish on e-Mart",
     "Actions",
   ];
 
   const previewData = [
-    { label: "Category", value: categories.find(c => c.productCategoryId == formik.values.productCategoryId)?.productCategoryName || "" },
+    { label: "Product Category", value: categories.find(c => c.productCategoryId == formik.values.productCategoryId)?.productCategoryName || "" },
     { label: "Subcategory", value: subcategories.find(s => s.productSubcategoryId == formik.values.productSubcategoryId)?.subcategoryName || "" },
-    { label: "Product", value: products.find(p => p.id == formik.values.productId)?.productName || "" },
-    { label: "Annual Production Cap", value: formik.values.annualProductionCap },
-    { label: "Available Stock", value: formik.values.availableStock },
+    { label: "Product Name", value: products.find(p => p.id == formik.values.productId)?.productName || "" },
+    { label: "Annual Production Capacity", value: formik.values.annualProductionCap },
+    { label: "Available Stock for Sale", value: formik.values.availableStock },
     { label: "In Production", value: formik.values.inProduction ? "Yes" : "No" },
     { label: "Date of Availability", value: formik.values.dateOfAvailability },
-    { label: "Organic", value: formik.values.isOrganic ? "Yes" : "No" },
+    { label: "Is Organic", value: formik.values.isOrganic ? "Yes" : "No" },
     { label: "Publish on e-Mart", value: publishOnEmart ? "Yes" : "No" },
   ];
+
+  const mapRowToPreview = (row) => {
+    // 1️⃣ Fetch category name
+    let categoryName = "";
+    const catRes = getProductCategories();
+    if (catRes.success) {
+      const cat = catRes.data.find(c => c.productCategoryId === Number(row.productCategoryId));
+      if (cat) categoryName = cat.productCategoryName;
+    }
+
+    // 2️⃣ Fetch subcategory name
+    let subcategoryName = "";
+    const subRes = getSubCategoriesById(Number(row.productCategoryId));
+    if (subRes.success) {
+      const sub = subRes.data.find(s => s.productSubcategoryId === Number(row.productSubcategoryId));
+      if (sub) subcategoryName = sub.subcategoryName;
+    }
+
+    // 3️⃣ Fetch product name
+    let productName = "";
+    const prodRes = getProductsBySubCategoryId(Number(row.productSubcategoryId));
+    if (prodRes.success) {
+      const prod = prodRes.data.find(p => p.id === Number(row.productId));
+      if (prod) productName = prod.productName;
+    }
+
+    return [
+      { label: "Product Category", value: categoryName },
+      { label: "Subcategory", value: subcategoryName },
+      { label: "Product Name", value: productName },
+      { label: "Annual Production Capacity", value: row.annualProductionCap ?? "-" },
+      { label: "Available Stock for Sale", value: row.availableStock ?? "-" },
+      { label: "In Production", value: row.inProduction ? "Yes" : "No" },
+      { label: "Date of Availability", value: row.dateOfAvailability || "-" },
+      { label: "Is Organic", value: row.isOrganic ? "Yes" : "No" },
+      { label: "Publish on e-Mart", value: row.emartPublish ? "Yes" : "No" },
+      { label: "Document", value: row.docId ? `/mock/uploads/${row.docId}.jpg` : "No File" },
+    ];
+  };
 
   // ------------------- RENDER -------------------
   return (
@@ -257,7 +324,7 @@ export const CommodityProduction = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <SelectField
-            label="Category"
+            label="Product Category"
             required
             name="productCategoryId"
             value={formik.values.productCategoryId}
@@ -266,7 +333,7 @@ export const CommodityProduction = () => {
             error={formik.errors.productCategoryId}
             touched={formik.touched.productCategoryId}
           >
-            <option value="">Select Category</option>
+            <option value="">Select Product Category</option>
             {categories.map(c => <option key={c.productCategoryId} value={c.productCategoryId}>{c.productCategoryName}</option>)}
           </SelectField>
 
@@ -285,7 +352,7 @@ export const CommodityProduction = () => {
           </SelectField>
 
           <SelectField
-            label="Product"
+            label="Product Name"
             required
             name="productId"
             value={formik.values.productId}
@@ -294,12 +361,21 @@ export const CommodityProduction = () => {
             error={formik.errors.productId}
             touched={formik.touched.productId}
           >
-            <option value="">Select Product</option>
+            <option value="">Select Product Name</option>
             {products.map(p => <option key={p.id} value={p.id}>{p.productName}</option>)}
           </SelectField>
 
+                <CheckboxField
+            label="Is Organic"
+            name="isOrganic"
+            checked={formik.values.isOrganic}
+            onChange={() => formik.setFieldValue("isOrganic", !formik.values.isOrganic)}
+            error={formik.errors.isOrganic}
+            touched={formik.touched.isOrganic}
+          />
+
           <TextField
-            label="Annual Production Cap"
+            label="Annual Production Capacity"
             name="annualProductionCap"
             type="text"
             value={formik.values.annualProductionCap}
@@ -309,8 +385,17 @@ export const CommodityProduction = () => {
             touched={formik.touched.annualProductionCap}
           />
 
+          <CheckboxField
+            label="In Production"
+            name="inProduction"
+            checked={formik.values.inProduction}
+            onChange={() => formik.setFieldValue("inProduction", !formik.values.inProduction)}
+            error={formik.errors.inProduction}
+            touched={formik.touched.inProduction}
+          />
+
           <TextField
-            label="Available Stock"
+            label="Available Stock for Sale"
             name="availableStock"
             type="text"
             value={formik.values.availableStock}
@@ -318,15 +403,6 @@ export const CommodityProduction = () => {
             onBlur={formik.handleBlur}
             error={formik.errors.availableStock}
             touched={formik.touched.availableStock}
-          />
-
-          <CheckboxField
-            label="Organic"
-            name="isOrganic"
-            checked={formik.values.isOrganic}
-            onChange={() => formik.setFieldValue("isOrganic", !formik.values.isOrganic)}
-            error={formik.errors.isOrganic}
-            touched={formik.touched.isOrganic}
           />
 
           <TextField
@@ -340,20 +416,12 @@ export const CommodityProduction = () => {
             touched={formik.touched.dateOfAvailability}
           />
 
-          <CheckboxField
-            label="In Production"
-            name="inProduction"
-            checked={formik.values.inProduction}
-            onChange={() => formik.setFieldValue("inProduction", !formik.values.inProduction)}
-            error={formik.errors.inProduction}
-            touched={formik.touched.inProduction}
-          />
         </div>
 
         <AccordionGroup
           items={[{
             id: "add-doc",
-            title: "Upload Document",
+            title: "Add Image",
             isInitiallyOpen: true,
             content: <UploadDocument key={uploadResetKey} config={uploadConfig} onFileSelect={handleFileSelect} />,
           }]}
@@ -365,7 +433,15 @@ export const CommodityProduction = () => {
             <Toggle checked={publishOnEmart} onChange={setPublishOnEmart} />
           </div>
           <div className="flex gap-4">
-            <Button type="button">Preview</Button>
+            <Button
+              buttonClassName="p-[10px] text-[14px] text-primary-900 font-medium border border-primary-900 rounded-[8px] bg-white"
+              onClick={() => {
+                setPreviewTitle("Preview");
+                setIsPreviewModalOpen(true)
+              }}
+            >
+              Preview
+            </Button>
             <Button
               type="button"
               onClick={handleAddOrUpdateClick}
@@ -382,38 +458,64 @@ export const CommodityProduction = () => {
         <Table
           columns={columns}
           data={commodityList.map(row => ({
-            Category: row.productCategoryName || "-",
+            "Product Category": row.productCategoryName || "-",
             Subcategory: row.productSubcategoryName || "-",
-            Product: row.productName || "-",
-            "Annual Production Cap": row.annualProductionCap ?? "-",
-            "Available Stock": row.availableStock ?? "-",
+            "Product Name": row.productName || "-",
+            "Annual Production Capacity": row.annualProductionCap ?? "-",
+            "Available Stock for Sale": row.availableStock ?? "-",
             "In Production": row.inProduction ? "Yes" : "No",
-            "Publish on e-Mart": row.emartPublish ? "Yes" : "No",
             ...row,
           }))}
           rowKey="id"
           renderActions={row => (
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-2 items-center justify-center">
               <img src={editSvg} alt="edit" className="w-6 cursor-pointer" onClick={() => handleEdit(row)} />
-              <img src={viewSvg} alt="view" className="w-6 cursor-pointer" onClick={() => {
+              {/* <img src={viewSvg} alt="view" className="w-6 cursor-pointer" onClick={() => {
                 setPreviewImage(row.docId ? `/mock/uploads/${row.docId}.jpg` : null);
                 setIsPreviewModalOpen(true);
-              }} />
-              <span className="text-[10px] px-2 py-1 rounded bg-gray-100">
-                {row.emartPublish ? "✓ Publish" : "Publish"}
-              </span>
+              }} /> */}
+              <img
+                src={viewSvg}
+                alt="view"
+                className="w-6 cursor-pointer"
+                onClick={() => {
+                  setRowPreviewData(row);   // <-- store row data
+                  setPreviewTitle("View");
+                  setIsPreviewModalOpen(true);
+                }}
+              />
+              <div
+                className={`w-[137px] text-[14px] font-normal px-[12px] py-[6px] rounded-lg flex items-center justify-center
+                ${row.emartPublish ? "bg-primary-100 text-dark" : "bg-danger-50 text-dark"}
+              `}
+              >
+                {row.emartPublish ? "✓ Publish Emart" : "Publish Emart"}
+              </div>
             </div>
           )}
           stickyLastColumn
         />
       </div>
 
-      <PreviewModal
+      {/* <PreviewModal
         isOpen={isPreviewModalOpen}
         onClose={() => setIsPreviewModalOpen(false)}
         onConfirm={handlePreviewConfirm}
         data={previewData}
         image={previewImage}
+      /> */}
+
+      <PreviewModal
+        isOpen={isPreviewModalOpen}
+        title={previewTitle}
+        data={rowPreviewData ? mapRowToPreview(rowPreviewData) : previewData}
+        onConfirm={rowPreviewData ? null : handlePreviewConfirm}
+        actionButton={rowPreviewData ? false : true}
+        isDescriptionAvailable={false}
+        onClose={() => {
+          setRowPreviewData(null); // reset after closing
+          setIsPreviewModalOpen(false);
+        }}
       />
 
       <StatusModal
@@ -422,6 +524,14 @@ export const CommodityProduction = () => {
         status={statusConfig.status}
         message={statusConfig.message}
       />
+
+      <ValidationModal
+        isOpen={showValidationModal}
+        title={validationTitle}
+        message={validationMessage}
+        onClose={() => setShowValidationModal(false)}
+      />
+
     </div>
   );
 };

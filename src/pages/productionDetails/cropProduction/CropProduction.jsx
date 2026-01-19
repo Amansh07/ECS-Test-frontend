@@ -44,6 +44,7 @@ export const CropProduction = () => {
   const [isUpdateMode, setIsUpdateMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [existingDocId, setExistingDocId] = useState(null);
+  const [previewTitle, setPreviewTitle] = useState("Preview");
 
   const [showValidationModal, setShowValidationModal] = useState(false);
   const [validationTitle, setValidationTitle] = useState("");
@@ -139,6 +140,7 @@ export const CropProduction = () => {
 
       return;
     }
+    setPreviewTitle("Preview");
     setIsPreviewModalOpen(true);
   };
 
@@ -186,13 +188,13 @@ export const CropProduction = () => {
       await createCropProduction(payload); // ✅ create
     }
 
-    setIsPreviewModalOpen(false);
     setStatusConfig({
       status: true,
       message: isUpdateMode
         ? "Crop Production Updated Successfully"
         : "Crop Production Added Successfully",
     });
+    setIsPreviewModalOpen(false);
     setIsStatusModalOpen(true);
 
     resetAll();
@@ -425,8 +427,8 @@ export const CropProduction = () => {
           </div>
           <div className="flex gap-4">
             <Button
-              buttonClassName="p-[10px] text-[14px] text-[#253300] font-medium border border-[#253300] rounded-[8px] bg-white"
-              onClick={() => setIsPreviewModalOpen(true)}
+              buttonClassName="p-[10px] text-[14px] text-primary-900 font-medium border border-primary-900 rounded-[8px] bg-white"
+              onClick={() => { setPreviewTitle("Preview"); setIsPreviewModalOpen(true) }}
             >
               Preview
             </Button>
@@ -477,6 +479,7 @@ export const CropProduction = () => {
                 className="w-6 cursor-pointer"
                 onClick={() => {
                   setRowPreviewData(row);   // <-- store row data
+                  setPreviewTitle("View");
                   setIsPreviewModalOpen(true);
                 }}
               />
@@ -504,14 +507,15 @@ export const CropProduction = () => {
 
       <PreviewModal
         isOpen={isPreviewModalOpen}
+        title={previewTitle}
         data={rowPreviewData ? mapRowToPreview(rowPreviewData) : previewData}
         onConfirm={rowPreviewData ? null : handlePreviewConfirm}
+        actionButton={rowPreviewData ? false : true}
         onClose={() => {
           setRowPreviewData(null); // reset after closing
           setIsPreviewModalOpen(false);
         }}
       />
-
 
       <StatusModal
         isOpen={isStatusModalOpen}
