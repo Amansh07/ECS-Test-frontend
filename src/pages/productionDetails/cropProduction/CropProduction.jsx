@@ -15,6 +15,7 @@ import { uploadDocument } from "../../../api/uploadMock";
 import { getGeneralMasterByType, getCropsBySeason, getVarietyByCrop } from "../../../api/masterMock";
 import { listCropProduction, createCropProduction, updateCropProduction, getCropProductionById } from "../../../api/productionDetailsMock";
 import { cropProductionValidationSchema } from "../validation";
+import ValidationModal from "../../../components/ValidationModal";
 
 const initialCropProductionValues = {
   seasonId: "",
@@ -36,6 +37,7 @@ export const CropProduction = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [uploadResetKey, setUploadResetKey] = useState(0);
   const [publishOnEmart, setPublishOnEmart] = useState(false);
+  const [rowPreviewData, setRowPreviewData] = useState(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [statusConfig, setStatusConfig] = useState({ status: true, message: "" });
@@ -43,9 +45,14 @@ export const CropProduction = () => {
   const [editingId, setEditingId] = useState(null);
   const [existingDocId, setExistingDocId] = useState(null);
 
+  const [showValidationModal, setShowValidationModal] = useState(false);
+  const [validationTitle, setValidationTitle] = useState("");
+  const [validationMessage, setValidationMessage] = useState("");
+
+
   const uploadConfig = {
-    title: "Add Crop Image *",
-    maxSizeMB: "Max - 5mb",
+    title: "Upload Crop Image",
+    maxSizeMB: "Max - 2mb",
     allowedTypes: ["image/jpeg", "image/png", "image/jpg"],
   };
 
@@ -124,12 +131,35 @@ export const CropProduction = () => {
       formik.setTouched(
         Object.keys(errors).reduce((acc, key) => ({ ...acc, [key]: true }), {})
       );
+
+      // SHOW VALIDATION MODAL
+      setValidationTitle("Validation Required");
+      setValidationMessage("Please complete all required fields before proceeding.");
+      setShowValidationModal(true);
+
       return;
     }
     setIsPreviewModalOpen(true);
   };
 
   const handlePreviewConfirm = async () => {
+
+    // ----------------- VALIDATION -----------------
+    const errors = await formik.validateForm();
+    if (Object.keys(errors).length > 0) {
+      setIsPreviewModalOpen(false);
+      // Highlight the invalid fields
+      formik.setTouched(
+        Object.keys(errors).reduce((acc, key) => ({ ...acc, [key]: true }), {})
+      );
+
+      // Show validation modal
+      setValidationTitle("Validation Required");
+      setValidationMessage("Please complete all required fields before submitting.");
+      setShowValidationModal(true);
+      return; // stop execution if errors exist
+    }
+
     let docId = existingDocId;
     if (uploadedFile) {
       const uploadRes = await uploadDocument({ file: uploadedFile, fpoId: 1, docType: 1 });
@@ -214,24 +244,44 @@ export const CropProduction = () => {
   const columns = [
     "Season",
     "Crop",
-    "Variety",
-    "Production (Qtl.)",
+    "Crop Variety",
+    "Production (in Qtl.)",
     "Marketable Surplus",
-    "Publish on e-Mart",
+    "Date Of Harvesting",
+    "Estimated/Harvested",
+    "Description",
     "Actions",
   ];
 
   const previewData = [
     { label: "Season", value: seasons.find((s) => s.id == formik.values.seasonId)?.name || "" },
     { label: "Crop", value: crops.find((c) => c.id == formik.values.cropId)?.name || "" },
-    { label: "Variety", value: varieties.find((v) => v.id == formik.values.cropVarietyId)?.name || "" },
+    { label: "Crop Variety", value: varieties.find((v) => v.id == formik.values.cropVarietyId)?.name || "" },
     { label: "Production (Qtl.)", value: formik.values.productionQuantity },
     { label: "Marketable Surplus", value: formik.values.harvestedSurplus },
-    { label: "Harvest Date", value: formik.values.dateOfHarvesting },
+    { label: "Date Of Harvesting", value: formik.values.dateOfHarvesting },
     { label: "Estimated/Harvested", value: formik.values.estimatedOrHarvestedId },
     { label: "Description", value: formik.values.description },
     { label: "Publish on e-Mart", value: publishOnEmart ? "Yes" : "No" },
   ];
+
+  const mapRowToPreview = (row) => {
+    const seasonName = seasons.find((s) => s.id === row.seasonId)?.name || "";
+    const cropName = getCropsBySeason(row.seasonId).data.find((c) => c.id === row.cropId)?.name || "";
+    const varietyName = getVarietyByCrop(row.cropId).data.find((v) => v.id === row.cropVarietyId)?.name || "";
+
+    return [
+      { label: "Season", value: seasonName },
+      { label: "Crop", value: cropName },
+      { label: "Crop Variety", value: varietyName },
+      { label: "Production (Qtl.)", value: row.productionQuantity },
+      { label: "Marketable Surplus", value: row.harvestedSurplus },
+      { label: "Date Of Harvesting", value: row.dateOfHarvesting },
+      { label: "Estimated/Harvested", value: row.estimatedOrHarvestedId },
+      { label: "Description", value: row.description },
+      { label: "Publish on e-Mart", value: row.emartPublish ? "Yes" : "No" },
+    ];
+  };
 
   // ------------------- RENDER -------------------
   return (
@@ -276,7 +326,7 @@ export const CropProduction = () => {
           </SelectField>
 
           <SelectField
-            label="Variety"
+            label="Crop Variety"
             required
             name="cropVarietyId"
             value={formik.values.cropVarietyId}
@@ -285,7 +335,7 @@ export const CropProduction = () => {
             error={formik.errors.cropVarietyId}
             touched={formik.touched.cropVarietyId}
           >
-            <option value="">Select Variety</option>
+            <option value="">Select Crop Variety</option>
             {varieties.map((v) => (
               <option key={v.id} value={v.id}>{v.name}</option>
             ))}
@@ -293,6 +343,7 @@ export const CropProduction = () => {
 
           <TextField
             label="Production (in Qtl.)"
+            required
             name="productionQuantity"
             type="text"
             value={formik.values.productionQuantity}
@@ -304,6 +355,7 @@ export const CropProduction = () => {
 
           <TextField
             label="Marketable Surplus"
+            required
             name="harvestedSurplus"
             type="text"
             value={formik.values.harvestedSurplus}
@@ -315,6 +367,7 @@ export const CropProduction = () => {
 
           <TextField
             label="Date Of Harvesting"
+            required
             type="date"
             name="dateOfHarvesting"
             value={formik.values.dateOfHarvesting}
@@ -337,7 +390,7 @@ export const CropProduction = () => {
         </div>
 
         <TextArea
-          label="Crop Description"
+          label="Description"
           name="description"
           value={formik.values.description}
           onChange={formik.handleChange}
@@ -371,7 +424,13 @@ export const CropProduction = () => {
             <Toggle checked={publishOnEmart} onChange={setPublishOnEmart} />
           </div>
           <div className="flex gap-4">
-            <Button type="button">Preview</Button>
+            <Button
+              buttonClassName="p-[10px] text-[14px] text-[#253300] font-medium border border-[#253300] rounded-[8px] bg-white"
+              onClick={() => setIsPreviewModalOpen(true)}
+            >
+              Preview
+            </Button>
+
             <Button
               type="button"
               onClick={handleAddOrUpdateClick}
@@ -390,18 +449,20 @@ export const CropProduction = () => {
           data={productionList.map((row) => ({
             Season: row.seasonName ?? "-",
             Crop: row.cropName ?? "-",
-            Variety: row.cropVarietyName ?? "-",
-            "Production (Qtl.)": row.productionQuantity ?? "-",
+            "Crop Variety": row.cropVarietyName ?? "-",
+            "Production (in Qtl.)": row.productionQuantity ?? "-",
             "Marketable Surplus": row.harvestedSurplus ?? "-",
-            "Publish on e-Mart": row.emartPublish ? "Yes" : "No",
+            "Date Of Harvesting": row.dateOfHarvesting ?? "-",
+            "Estimated/Harvested": row.estimatedOrHarvestedId ?? "-",
+            "Description": row.description ?? "-",
             Actions: "actions",
             ...row,
           }))}
           rowKey="id"
           renderActions={(row) => (
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-2 items-center justify-center">
               <img src={editSvg} alt="edit" className="w-6 cursor-pointer" onClick={() => handleEdit(row)} />
-              <img
+              {/* <img
                 src={viewSvg}
                 alt="view"
                 className="w-6 cursor-pointer"
@@ -409,10 +470,23 @@ export const CropProduction = () => {
                   setPreviewImage(row.docId ? `/mock/uploads/${row.docId}.jpg` : null);
                   setIsPreviewModalOpen(true);
                 }}
+              /> */}
+              <img
+                src={viewSvg}
+                alt="view"
+                className="w-6 cursor-pointer"
+                onClick={() => {
+                  setRowPreviewData(row);   // <-- store row data
+                  setIsPreviewModalOpen(true);
+                }}
               />
-              <span className="text-[10px] px-2 py-1 rounded bg-gray-100">
-                {row.emartPublish ? "✓ Publish" : "Publish"}
-              </span>
+              <div
+                className={`w-[137px] text-[14px] font-normal px-[12px] py-[6px] rounded-lg flex items-center justify-center
+                ${row.emartPublish ? "bg-primary-100 text-dark" : "bg-danger-50 text-dark"}
+              `}
+              >
+                {row.emartPublish ? "✓ Publish Emart" : "Publish Emart"}
+              </div>
             </div>
           )}
           stickyLastColumn
@@ -420,13 +494,24 @@ export const CropProduction = () => {
       </div>
 
       {/* MODALS */}
-      <PreviewModal
+      {/* <PreviewModal
         isOpen={isPreviewModalOpen}
         onClose={() => setIsPreviewModalOpen(false)}
         onConfirm={handlePreviewConfirm}
         data={previewData}
         image={previewImage}
+      /> */}
+
+      <PreviewModal
+        isOpen={isPreviewModalOpen}
+        data={rowPreviewData ? mapRowToPreview(rowPreviewData) : previewData}
+        onConfirm={rowPreviewData ? null : handlePreviewConfirm}
+        onClose={() => {
+          setRowPreviewData(null); // reset after closing
+          setIsPreviewModalOpen(false);
+        }}
       />
+
 
       <StatusModal
         isOpen={isStatusModalOpen}
@@ -434,6 +519,14 @@ export const CropProduction = () => {
         status={statusConfig.status}
         message={statusConfig.message}
       />
+
+      <ValidationModal
+        isOpen={showValidationModal}
+        title={validationTitle}
+        message={validationMessage}
+        onClose={() => setShowValidationModal(false)}
+      />
+
     </div>
   );
 };

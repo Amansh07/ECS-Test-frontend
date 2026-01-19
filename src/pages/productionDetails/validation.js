@@ -13,7 +13,7 @@ export const cropProductionValidationSchema = Yup.object().shape({
     .required("Marketable surplus is required")
     .min(0, "Marketable surplus cannot be negative"),
   dateOfHarvesting: Yup.date().required("Harvest date is required"),
-  estimatedOrHarvestedId: Yup.string().required("Estimated/Harvested info is required"),
+  // estimatedOrHarvestedId: Yup.string().required("Estimated/Harvested info is required"),
   // description: Yup.string().required("Description is required"),
 });
 
