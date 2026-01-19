@@ -2,13 +2,14 @@ import React from 'react';
 
 const ThemeContext = React.createContext({
   theme: 'default',
-  setTheme: () => {},
-  toggleTheme: () => {},
+  setTheme: () => { },
+  toggleTheme: () => { },
 });
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = React.useState(() => {
-    return localStorage.getItem('theme') || 'default';
+    localStorage.removeItem('theme');
+    return document.documentElement.getAttribute('data-theme') || 'alt';
   });
 
   React.useEffect(() => {
