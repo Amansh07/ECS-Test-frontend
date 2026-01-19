@@ -32,16 +32,16 @@ export const infraDetailsValidationSchema = Yup.object({
   subCategory: Yup.string()
     .required("Sub Infrastructure Category is required"),
 
-    other: Yup.string()
-  .when('subCategory', {
-        is: "Others",
-        then: (schema) => schema.required("Other Facilities field is Required"), // Rules if 'hasDiscount' is true
-        otherwise: (schema) => schema.notRequired(), // Rules if 'hasDiscount' is false
-      }),
+  other: Yup.string()
+    .when('subCategory', {
+      is: "Others",
+      then: (schema) => schema.required("Other Facilities field is Required"), // Rules if 'hasDiscount' is true
+      otherwise: (schema) => schema.notRequired(), // Rules if 'hasDiscount' is false
+    }),
   unit: Yup.string().required("Unit is required!"),
 
   capacity: Yup.number()
-  .typeError("Quantity must be a number")
+    .typeError("Quantity must be a number")
     .positive("Quantity must be greater than zero")
     .test(
       "is-decimal",
@@ -50,7 +50,7 @@ export const infraDetailsValidationSchema = Yup.object({
     )
     // .matches(/^\d{0,50}$/, "Amount allowed only up to 50 digits")
     .required("Capacity is required"),
-     
+
 
 });
 
@@ -67,19 +67,16 @@ export const insecticideOrPesticideDetailsValidationSchema = Yup.object({
   quantityType: Yup.string()
     .required("Quantity type is required"),
 
+  // cibRcNumber: Yup.string()
+  //   .required("CIB & RC Number is required"),
+
   quantity: Yup.number()
     .typeError("Quantity must be a number")
     .positive("Quantity must be greater than zero")
     .required("Quantity is required"),
 
-  purchaseDate: Yup.string()
-    .required("Purchase date is required"),
-
-  expiryDate: Yup.string()
-    .required("Expiry date is required"),
-
-  batchNo: Yup.string()
-    .required("Batch number is required"),
+  // cibRcIssueDate: Yup.string()
+  //   .required("CIB & RC Issue date is required"),
 
   // remarks: Yup.string()
   //   .required("Remarks are required"),

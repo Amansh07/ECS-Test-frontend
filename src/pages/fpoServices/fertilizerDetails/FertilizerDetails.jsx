@@ -70,10 +70,9 @@ export const FertilizerDetails = () => {
     setUploadedImage(file ? URL.createObjectURL(file) : null); // preview only
   };
 
-
   const uploadConfig = {
-    title: "Upload Fertilizer Photo *",
-    maxSizeMB: "Max - 5mb",
+    title: "Upload Fertilizer Photo",
+    maxSizeMB: "Max - 2mb",
     allowedTypes: ["image/jpeg", "image/png", "image/jpg"],
   };
 

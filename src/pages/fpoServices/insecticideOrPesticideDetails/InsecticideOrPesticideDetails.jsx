@@ -13,7 +13,7 @@ import PreviewModal from "../../../components/PreviewModal";
 import StatusModal from "../../../components/StatusModal";
 import { Button } from "../../../components/Buttons";
 import { AccordionGroup } from "../../../components/Accordion";
-
+import ValidationModal from "../../../components/ValidationModal";
 import editSvg from "../../../assets/edit.svg";
 import viewSvg from "../../../assets/view.svg";
 
@@ -48,14 +48,20 @@ export const InsecticideOrPesticideDetails = () => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [uploadResetKey, setUploadResetKey] = useState(0);
   const [publishOnEmart, setPublishOnEmart] = useState(false);
-
+  const [rowPreviewData, setRowPreviewData] = useState(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
-
+  const [previewTitle, setPreviewTitle] = useState("Preview");
   const [insecticideList, setInsecticideList] = useState([]);
   const [editId, setEditId] = useState(null);
   const [uploadedFile, setUploadedFile] = useState(null);
+
+
+  const [showValidationModal, setShowValidationModal] = useState(false);
+  const [validationTitle, setValidationTitle] = useState("");
+  const [validationMessage, setValidationMessage] = useState("");
+
 
   // ================= HANDLE FILE =================
   const handleFileSelect = (file) => {
@@ -64,8 +70,8 @@ export const InsecticideOrPesticideDetails = () => {
   };
 
   const uploadConfig = {
-    title: "Upload Insecticide / Pesticide Photo *",
-    maxSizeMB: "Max - 5mb",
+    title: "Upload Insecticide / Pesticide Photo",
+    maxSizeMB: "Max - 2mb",
     allowedTypes: ["image/jpeg", "image/png", "image/jpg"],
   };
 
@@ -105,56 +111,81 @@ export const InsecticideOrPesticideDetails = () => {
           return acc;
         }, {})
       );
+
+      // SHOW VALIDATION MODAL
+      setValidationTitle("Validation Required");
+      setValidationMessage("Please complete all required fields before proceeding.");
+      setShowValidationModal(true);
+
       return;
     }
+    setPreviewTitle("Preview");
     setIsPreviewModalOpen(true);
   };
 
   // ================= SAVE AFTER PREVIEW =================
-const handlePreviewConfirm = async () => {
-  let docId = null;
+  const handlePreviewConfirm = async () => {
 
-  // Upload file if selected
-  if (uploadedFile) {
-    const uploadRes = await uploadDocument({ file: uploadedFile, fpoId: 1, docType: 1 });
-    if (uploadRes.status === 200 && uploadRes.data.success) {
-      docId = uploadRes.data.documentId;
+    // ----------------- VALIDATION -----------------
+    const errors = await formik.validateForm();
+    if (Object.keys(errors).length > 0) {
+      setIsPreviewModalOpen(false);
+      // Highlight the invalid fields
+      formik.setTouched(
+        Object.keys(errors).reduce((acc, key) => ({ ...acc, [key]: true }), {})
+      );
+
+      // Show validation modal
+      setValidationTitle("Validation Required");
+      setValidationMessage("Please complete all required fields before submitting.");
+      setShowValidationModal(true);
+      return; // stop execution if errors exist
     }
-  }
 
-  // =================== CONVERT NUMERIC FIELDS ===================
-  const payload = {
-    fpoId: 1, // always integer
-    insecticideType: parseInt(formik.values.insecticideType),
-    insecticideName: formik.values.insecticideName,
-    manufacturerName: formik.values.manufacturerName,
-    quantityType: parseInt(formik.values.quantityType),
-    quantity: parseFloat(formik.values.quantity),
-    purchaseDate: formik.values.purchaseDate,
-    expiryDate: formik.values.expiryDate,
-    batchNo: formik.values.batchNo,
-    remarks: formik.values.remarks,
-    emartPublish: publishOnEmart,
-    docId: docId, // only if uploaded
+
+    let docId = null;
+
+    // Upload file if selected
+    if (uploadedFile) {
+      const uploadRes = await uploadDocument({ file: uploadedFile, fpoId: 1, docType: 1 });
+      if (uploadRes.status === 200 && uploadRes.data.success) {
+        docId = uploadRes.data.documentId;
+      }
+    }
+
+    // =================== CONVERT NUMERIC FIELDS ===================
+    const payload = {
+      fpoId: 1, // always integer
+      insecticideType: parseInt(formik.values.insecticideType),
+      insecticideName: formik.values.insecticideName,
+      manufacturerName: formik.values.manufacturerName,
+      quantityType: parseInt(formik.values.quantityType),
+      quantity: parseFloat(formik.values.quantity),
+      purchaseDate: formik.values.purchaseDate,
+      expiryDate: formik.values.expiryDate,
+      batchNo: formik.values.batchNo,
+      remarks: formik.values.remarks,
+      emartPublish: publishOnEmart,
+      docId: docId, // only if uploaded
+    };
+
+    let response;
+    if (editId) {
+      response = await updateInsecticide(editId, payload);
+      setStatusMessage("Insecticide details updated successfully!");
+    } else {
+      response = await createInsecticide(payload);
+      setStatusMessage("Insecticide added successfully!");
+    }
+
+    if (response.data.success) {
+      loadInsecticideList();
+      resetFormFields();
+      setIsStatusModalOpen(true);
+    }
+
+    setIsPreviewModalOpen(false);
   };
-
-  let response;
-  if (editId) {
-    response = await updateInsecticide(editId, payload);
-    setStatusMessage("Insecticide details updated successfully!");
-  } else {
-    response = await createInsecticide(payload);
-    setStatusMessage("Insecticide added successfully!");
-  }
-
-  if (response.data.success) {
-    loadInsecticideList();
-    resetFormFields();
-    setIsStatusModalOpen(true);
-  }
-
-  setIsPreviewModalOpen(false);
-};
 
 
   // ================= EDIT =================
@@ -168,6 +199,8 @@ const handlePreviewConfirm = async () => {
         manufacturerName: data.manufacturerName,
         quantityType: data.quantityType,
         quantity: data.quantity,
+        cibRcNumber: data.cibRcNumber,
+        cibRcIssueDate: data.cibRcIssueDate,
         purchaseDate: data.purchaseDate,
         expiryDate: data.expiryDate,
         batchNo: data.batchNo,
@@ -192,17 +225,34 @@ const handlePreviewConfirm = async () => {
 
   // ================= PREVIEW DATA =================
   const previewData = [
-    { label: "Type", value: formik.values.insecticideType },
-    { label: "Name", value: formik.values.insecticideName },
-    { label: "Manufacturer", value: formik.values.manufacturerName },
-    { label: "Quantity Type", value: formik.values.quantityType },
+    { label: "Insecticide/Pesticide Type", value: insecticideTypes.find((i) => i.id == formik.values.insecticideType)?.name || "" },
+    { label: "Insecticide/Pesticide Name", value: formik.values.insecticideName },
+    { label: "Name of Manufacturer", value: formik.values.manufacturerName },
+    { label: "Quantity Type", value: quantityTypes.find((q) => q.id == formik.values.quantityType)?.name || "" },
     { label: "Quantity", value: formik.values.quantity },
-    { label: "Purchase Date", value: formik.values.purchaseDate },
-    { label: "Expiry Date", value: formik.values.expiryDate },
-    { label: "Batch No", value: formik.values.batchNo },
-    { label: "Remarks", value: formik.values.remarks },
+    { label: "CIB & RC Number", value: formik.values.cibRcNumber },
+    { label: "CIB & RC Issue Date", value: formik.values.cibRcIssueDate },
+    { label: "Description", value: formik.values.remarks },
     { label: "Publish on e-Mart", value: publishOnEmart ? "Yes" : "No" },
   ];
+
+  // ================= MAP ROW TO PREVIEW =================
+  const mapRowToPreview = (row) => {
+    const typeName = insecticideTypes.find((t) => t.id === row.insecticideType)?.name || "";
+    const qtyTypeName = quantityTypes.find((q) => q.id === row.quantityType)?.name || "";
+
+    return [
+      { label: "Insecticide/Pesticide Type", value: typeName },
+      { label: "Insecticide/Pesticide Name", value: row.insecticideName },
+      { label: "Name of Manufacturer", value: row.manufacturerName },
+      { label: "Quantity Type", value: qtyTypeName },
+      { label: "Quantity", value: row.quantity },
+      { label: "CIB & RC Number", value: row.cibRcNumber },
+      { label: "CIB & RC Issue Date", value: row.cibRcIssueDate },
+      { label: "Description", value: row.remarks },
+      { label: "Publish on e-Mart", value: row.emartPublish ? "Yes" : "No" },
+    ];
+  };
 
   // ================= UI =================
   return (
@@ -212,7 +262,7 @@ const handlePreviewConfirm = async () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <SelectField
-            label="Type"
+            label="Insecticide/Pesticide Type"
             required
             name="insecticideType"
             value={formik.values.insecticideType}
@@ -221,7 +271,7 @@ const handlePreviewConfirm = async () => {
             error={formik.errors.insecticideType}
             touched={formik.touched.insecticideType}
           >
-            <option value="">Select Type</option>
+            <option value="">Select Insecticide/Pesticide Type</option>
             {insecticideTypes.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.name}
@@ -230,10 +280,10 @@ const handlePreviewConfirm = async () => {
           </SelectField>
 
           <TextField
-            label="Name"
+            label="Insecticide/Pesticide Name"
             required
             name="insecticideName"
-            placeholder="Enter Name"
+            placeholder="Enter Insecticide/Pesticide Name"
             value={formik.values.insecticideName}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -242,10 +292,10 @@ const handlePreviewConfirm = async () => {
           />
 
           <TextField
-            label="Manufacturer Name"
+            label="Name of Manufacturer"
             required
             name="manufacturerName"
-            placeholder="Enter Manufacturer"
+            placeholder="Enter Name of Manufacturer"
             value={formik.values.manufacturerName}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -263,7 +313,7 @@ const handlePreviewConfirm = async () => {
             error={formik.errors.quantityType}
             touched={formik.touched.quantityType}
           >
-            <option value="">Select Unit</option>
+            <option value="">Select Quantity Type</option>
             {quantityTypes.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.name}
@@ -284,46 +334,32 @@ const handlePreviewConfirm = async () => {
           />
 
           <TextField
-            label="Purchase Date"
-            required
-            name="purchaseDate"
-            type="date"
-            value={formik.values.purchaseDate}
+            label="CIB & RC Number"
+            name="cibRcNumber"
+            placeholder="Enter CIB & RC Number"
+            value={formik.values.cibRcNumber}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={formik.errors.purchaseDate}
-            touched={formik.touched.purchaseDate}
+            error={formik.errors.cibRcNumber}
+            touched={formik.touched.cibRcNumber}
           />
 
           <TextField
-            label="Expiry Date"
-            required
-            name="expiryDate"
+            label="CIB & RC Issue Date"
+            name="cibRcIssueDate"
             type="date"
-            value={formik.values.expiryDate}
+            value={formik.values.cibRcIssueDate}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={formik.errors.expiryDate}
-            touched={formik.touched.expiryDate}
-          />
-
-          <TextField
-            label="Batch No"
-            required
-            name="batchNo"
-            placeholder="Enter Batch No"
-            value={formik.values.batchNo}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.errors.batchNo}
-            touched={formik.touched.batchNo}
+            error={formik.errors.cibRcIssueDate}
+            touched={formik.touched.cibRcIssueDate}
           />
         </div>
 
         <TextArea
-          label="Remarks"
+          label="Insecticide/Pesticide Description"
           name="remarks"
-          placeholder="Enter Remarks"
+          placeholder="Enter Insecticide/Pesticide Description"
           value={formik.values.remarks}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
@@ -356,13 +392,21 @@ const handlePreviewConfirm = async () => {
             <Toggle checked={publishOnEmart} onChange={setPublishOnEmart} />
           </div>
 
-          <Button
-            type="button"
-            onClick={handleAddOrEdit}
-            buttonClassName="px-6 py-2.5 text-sm font-semibold text-white bg-success rounded-md"
-          >
-            {editId ? "Update Insecticide" : "+ Add to Inventory"}
-          </Button>
+          <div className="flex gap-4">
+            <Button
+              buttonClassName="p-[10px] text-[14px] text-primary-900 font-medium border border-primary-900 rounded-[8px] bg-white"
+              onClick={() => { setPreviewTitle("Preview"); setIsPreviewModalOpen(true) }}
+            >
+              Preview
+            </Button>
+            <Button
+              type="button"
+              onClick={handleAddOrEdit}
+              buttonClassName="px-6 py-2.5 text-sm font-semibold text-white bg-success rounded-md"
+            >
+              {editId ? "Update Insecticide" : "+ Add to Inventory"}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -370,13 +414,27 @@ const handlePreviewConfirm = async () => {
 
       <Table
         columns={[
-          "insecticideType",
-          "insecticideName",
-          "manufacturerName",
-          "quantity",
+          "Insecticide/Pesticide Type",
+          "Insecticide/Pesticide Name",
+          "Name of Manufacturer",
+          "Quantity Type",
+          "Quantity",
+          "CIB & RC Number",
+          "CIB & RC Issue Date",
+          "Insecticide/Pesticide Description",
           "Actions",
         ]}
-        data={insecticideList}
+        data={insecticideList.map(row => ({
+          "Insecticide/Pesticide Type": row.insecticideTypeName || "-",
+          "Insecticide/Pesticide Name": row.insecticideName || "-",
+          "Name of Manufacturer": row.manufacturerName || "-",
+          "Quantity Type": row.quantityTypeName || "-",
+          "Quantity": row.quantity || "-",
+          "CIB & RC Number": row.cibRcNumber || "-",
+          "CIB & RC Issue Date": row.cibRcIssueDate || "-",
+          "Insecticide/Pesticide Description": row.remarks || "-",
+          ...row,
+        }))}
         renderActions={(row) => (
           <div className="flex gap-2 items-center">
             <img
@@ -384,11 +442,23 @@ const handlePreviewConfirm = async () => {
               className="w-6 cursor-pointer"
               onClick={() => handleEdit(row.id)}
             />
-            <img
+            {/* <img
               src={viewSvg}
               className="w-6 cursor-pointer"
               onClick={() => alert("View functionality coming soon")}
+            /> */}
+
+            <img
+              src={viewSvg}
+              alt="view"
+              className="w-6 cursor-pointer"
+              onClick={() => {
+                setRowPreviewData(row);   // <-- store row data
+                setPreviewTitle("View");
+                setIsPreviewModalOpen(true);
+              }}
             />
+
             <div
               className={`w-[137px] text-[14px] font-normal px-[12px] py-[6px] rounded-lg flex items-center justify-center
                 ${row.publishEmart ? "bg-primary-100 text-dark" : "bg-danger-50 text-dark"}
@@ -401,13 +471,25 @@ const handlePreviewConfirm = async () => {
         stickyLastColumn
       />
 
-      <PreviewModal
+      {/* <PreviewModal
         isOpen={isPreviewModalOpen}
         onClose={() => setIsPreviewModalOpen(false)}
         onConfirm={handlePreviewConfirm}
         title={editId ? "Preview - Update Insecticide" : "Preview - Add Insecticide"}
         image={uploadedImage}
         data={previewData}
+      /> */}
+
+      <PreviewModal
+        isOpen={isPreviewModalOpen}
+        title={previewTitle}
+        data={rowPreviewData ? mapRowToPreview(rowPreviewData) : previewData}
+        onConfirm={rowPreviewData ? null : handlePreviewConfirm}
+        actionButton={rowPreviewData ? false : true}
+        onClose={() => {
+          setRowPreviewData(null); // reset after closing
+          setIsPreviewModalOpen(false);
+        }}
       />
 
       <StatusModal
@@ -415,6 +497,13 @@ const handlePreviewConfirm = async () => {
         onClose={() => setIsStatusModalOpen(false)}
         status
         message={statusMessage}
+      />
+
+      <ValidationModal
+        isOpen={showValidationModal}
+        title={validationTitle}
+        message={validationMessage}
+        onClose={() => setShowValidationModal(false)}
       />
     </div>
   );
