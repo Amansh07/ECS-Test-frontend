@@ -19,7 +19,7 @@ const navItems = [
 const linkBase =
   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors";
 const linkActive = "bg-primary-300 text-dark shadow-sm font-semibold";
-const linkIdle = "text-gray-200 hover:bg-[#384d00] hover:text-white";
+const linkIdle = "text-gray-200 hover:bg-primary-800 hover:text-white";
 
 export default function LeftNav({
   mobileOpen,
@@ -54,7 +54,7 @@ export default function LeftNav({
         ].join(" ")}
       >
         {/* Header row inside sidebar */}
-        <div className="flex items-center justify-between px-3 py-3 border-b border-[#384d00]">
+        <div className="flex items-center justify-between px-3 py-3 border-b border-primary-800">
           <div className="flex items-center gap-2 min-w-0">
             {/* <div className="h-10 w-10 rounded-xl bg-primary-100 flex items-center justify-center shrink-0">
               <span className="text-primary-900 font-semibold">◻◻</span>
@@ -101,7 +101,7 @@ export default function LeftNav({
       {/* ---------- Mobile drawer (full width, with X close) ---------- */}
       <aside
         className={[
-          "lg:hidden fixed inset-0 z-[60] w-full bg-[#253300]",
+          "lg:hidden fixed inset-0 z-[60] w-full bg-primary-900",
           "h-full", // Full screen height
           "overflow-y-auto",
           "transform transition-transform duration-300 ease-in-out", // slide [web:111][web:123]
@@ -112,7 +112,7 @@ export default function LeftNav({
         aria-label="Sidebar"
       >
         {/* Mobile top row with close button */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#384d00]">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-primary-800">
           <div className="flex items-center gap-2">
             <div className="h-10 w-10 rounded-xl bg-primary-100 flex items-center justify-center">
               <span className="text-primary-900 font-semibold">◻◻</span>
@@ -124,7 +124,7 @@ export default function LeftNav({
           <Button
             type="button"
             onClick={onCloseMobile}
-            buttonClassName="h-10 w-10 rounded-md text-gray-200 hover:bg-[#384d00] hover:text-white flex items-center justify-center"
+            buttonClassName="h-10 w-10 rounded-md text-gray-200 hover:bg-primary-800 hover:text-white flex items-center justify-center"
             aria-label="Close menu"
             title="Close"
           >
