@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useFormik } from 'formik';
 import { TextField, SelectField, CheckboxField } from '../../../components/FormFields';
 import Table from '../../../components/Table';
 import UploadDocument from '../../../components/UploadDocument';
@@ -9,18 +10,19 @@ import editSvg from "../../../assets/edit.svg";
 import viewSvg from "../../../assets/view.svg";
 import deleteSvg from "../../../assets/deleteAction.svg";
 import { AccordionGroup } from '../../../components/Accordion';
+import { licenseUpdateValidationSchema } from '../validation';
+
+const initialValues = {
+    licenseName: '',
+    otherLicense: '',
+    issuedBy: '',
+    issuedDate: '',
+    validDate: '',
+    licenseNumber: '',
+    isUnlimited: false,
+};
 
 export const LicenseUpdate = () => {
-    // Form state
-    const [formData, setFormData] = useState({
-        licenseName: '',
-        otherLicense: '',
-        issuedBy: '',
-        issuedDate: '',
-		validDate: '',
-		licenseNumber: '',
-		isUnlimited: '',
-    });
 
     const [uploadedImage, setUploadedFile] = useState(null);
     const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
@@ -42,20 +44,19 @@ export const LicenseUpdate = () => {
     const [isStatusOpen, setIsStatusOpen] = useState(false);
     const [statusConfig, setStatusConfig] = useState({ success: true, message: '' });
     const [pendingAction, setPendingAction] = useState(null);
-	const [isUploadLicense, setisUploadLicense] = useState(false);
+    const [isUploadLicense, setisUploadLicense] = useState(false);
+
+    const formik = useFormik({
+        initialValues,
+        validationSchema: licenseUpdateValidationSchema,
+        validateOnBlur: true,
+        validateOnChange: false,
+    });
 
     const uploadConfig = {
         title: "Upload License *",
         maxSizeMB: "PDF size: 5",
         allowedTypes: ["file/pdf"],
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
     };
 
     const handlePreviewConfirm = () => {
@@ -66,19 +67,11 @@ export const LicenseUpdate = () => {
         setIsStatusModalOpen(true);
 
         // Reset form
-        setFormData({
-            licenseName: '',
-            otherLicense: '',
-            issuedBy: '',
-            issuedDate: '',
-			validDate: '',
-			licenseNumber: '',
-            isUnlimited: false,
-        });
+        formik.resetForm();
         setUploadedFile(null);
     };
 	
-	const handleFileSelect = (file) => {
+    const handleFileSelect = (file) => {
         if (file) {
             setUploadedFile(URL.createObjectURL(file));
         } else {
@@ -86,23 +79,35 @@ export const LicenseUpdate = () => {
         }
     };
 	
-	const save = () => {
+    const save = async () => {
+        const errors = await formik.validateForm();
+
+        if (Object.keys(errors).length > 0) {
+            formik.setTouched(
+                Object.keys(errors).reduce((acc, key) => {
+                    acc[key] = true;
+                    return acc;
+                }, {})
+            );
+            return;
+        }
+
         setPendingAction(isEditMode ? 'update' : 'add');
         setIsConfirmationOpen(true);
     };
 	
-	const handleConfirm = () => {
+    const handleConfirm = () => {
         setIsConfirmationOpen(false);
         if (pendingAction === 'add') {
             const newItem = {
                 id: Date.now(),
-                licenseName: '',
-				otherLicense: '',
-				issuedBy: '',
-				issuedDate: '',
-				validDate: '',
-				licenseNumber: '',
-				isUnlimited: false
+                licenseName: formik.values.licenseName,
+                otherLicense: formik.values.otherLicense,
+                issuedBy: formik.values.issuedBy,
+                issuedDate: formik.values.issuedDate,
+                validDate: formik.values.validDate,
+                licenseNumber: formik.values.licenseNumber,
+                isUnlimited: formik.values.isUnlimited
             };
             setTurnoverList(prev => [...prev, newItem]);
             setStatusConfig({ success: true, message: 'FPO License details added successfully.' });
@@ -111,13 +116,13 @@ export const LicenseUpdate = () => {
                 item.id === editingId
                     ? {
                         ...item,
-                        licenseName: '',
-						otherLicense: '',
-						issuedBy: '',
-						issuedDate: '',
-						validDate: '',
-						licenseNumber: '',
-						isUnlimited: false,
+                        licenseName: formik.values.licenseName,
+                        otherLicense: formik.values.otherLicense,
+                        issuedBy: formik.values.issuedBy,
+                        issuedDate: formik.values.issuedDate,
+                        validDate: formik.values.validDate,
+                        licenseNumber: formik.values.licenseNumber,
+                        isUnlimited: formik.values.isUnlimited,
                     }
                     : item
             ));
@@ -131,29 +136,21 @@ export const LicenseUpdate = () => {
     };
 
     const resetForm = () => {
-        setFormData({
-            licenseName: '',
-            otherLicense: '',
-            issuedBy: '',
-            issuedDate: '',
-			validDate: '',
-			licenseNumber: '',
-            isUnlimited: false,
-        });
+        formik.resetForm();
         setUploadedFile(null);
         setIsEditMode(false);
         setEditingId(null);
     };
 
     const handleEdit = (row) => {
-        setFormData({
-            licenseName: '',
-            otherLicense: '',
-            issuedBy: '',
-            issuedDate: '',
-			validDate: '',
-			licenseNumber: '',
-            isUnlimited: false,
+        formik.setValues({
+            licenseName: row['License Name'] || '',
+            otherLicense: row['Other License'] || '',
+            issuedBy: row['Issued By'] || '',
+            issuedDate: row['Issued Date'] || '',
+            validDate: row['Valid Till '] || '',
+            licenseNumber: row['License Number'] || '',
+            isUnlimited: row['Unlimited Validity of License?'] === 'Yes' || false,
         });
         setIsEditMode(true);
         setEditingId(row.id);
@@ -180,12 +177,12 @@ export const LicenseUpdate = () => {
 
     // Prepare preview data
     const previewData = [
-        { label: 'License Name', value: formData.licenseName || '-' },
-		{ label: 'Other License', value: formData.otherLicense || '-' },
-        { label: 'Issued By', value: formData.issuedBy || '-' },
-        { label: 'Issue Date', value: formData.issuedDate || '-' },
-        { label: 'License Valid Till', value: formData.validDate || '-' },
-        { label: 'Unlimited Validity of License', value: formData.isUnlimited ? 'Yes' : 'No' },
+        { label: 'License Name', value: formik.values.licenseName || '-' },
+        { label: 'Other License', value: formik.values.otherLicense || '-' },
+        { label: 'Issued By', value: formik.values.issuedBy || '-' },
+        { label: 'Issue Date', value: formik.values.issuedDate || '-' },
+        { label: 'License Valid Till', value: formik.values.validDate || '-' },
+        { label: 'Unlimited Validity of License', value: formik.values.isUnlimited ? 'Yes' : 'No' },
     ];
 
     return (
@@ -199,74 +196,100 @@ export const LicenseUpdate = () => {
                         label="License Name"
                         required
                         name="licenseName"
-                        value={formData.licenseName}
-                        onChange={handleInputChange}
+                        value={formik.values.licenseName}
+                        onChange={(e) => {
+                            formik.handleChange(e);
+                            if (e.target.value !== 'other') {
+                                formik.setFieldValue('otherLicense', '');
+                            }
+                        }}
+                        onBlur={formik.handleBlur}
+                        error={formik.errors.licenseName}
+                        touched={formik.touched.licenseName}
                     >
                         <option value="">Select License Type</option>
                         <option value="organic">Organic Certificate </option>
                         <option value="seeddelareship">State Seed Dealership License</option>
                         <option value="eNAM">eNAM</option>
                         <option value="fertilizerDealership">Fertilizer Dealership</option>
-						<option value="other">Other</option>
+                        <option value="other">Other</option>
                     </SelectField>
 
                     <TextField
                         label="Other License Name"
-                        name="otherLicenseotherLicense"
+                        name="otherLicense"
                         placeholder="Enter License Name"
-                        value={formData.otherLicense}
-                        onChange={handleInputChange}
-						disabled
+                        value={formik.values.otherLicense}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.errors.otherLicense}
+                        touched={formik.touched.otherLicense}
+                        disabled={formik.values.licenseName !== 'other'}
                         inputClassName="bg-grey-50"
                     />
 					
                     <TextField
                         label="Issued By"
                         required
-						name="issuedBy"
+                        name="issuedBy"
                         placeholder="Enter the license issue authority name"
-                        value={formData.issuedBy}
-                        onChange={handleInputChange}
+                        value={formik.values.issuedBy}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.errors.issuedBy}
+                        touched={formik.touched.issuedBy}
                     />
-					</div>
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <TextField
                         label="Issue Date"
                         required
                         type="date"
                         name="issuedDate"
                         placeholder="dd/mm/yyyy"
-                        value={formData.issuedDate}
-                        onChange={handleInputChange}
+                        value={formik.values.issuedDate}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.errors.issuedDate}
+                        touched={formik.touched.issuedDate}
                     />
 					
-					<TextField
+                    <TextField
                         label="License Valid Till"
                         required
                         type="date"
                         name="validDate"
                         placeholder="dd/mm/yyyy"
-                        value={formData.validDate}
-                        onChange={handleInputChange}
+                        value={formik.values.validDate}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.errors.validDate}
+                        touched={formik.touched.validDate}
                     />
 					
-					<TextField
+                    <TextField
                         label="License Number"
                         required
                         type="text"
                         name="licenseNumber"
                         placeholder="Enter License Number"
-                        value={formData.licenseNumber}
-                        onChange={handleInputChange}
+                        value={formik.values.licenseNumber}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.errors.licenseNumber}
+                        touched={formik.touched.licenseNumber}
                     />
-					<div className="mt-8">
-					<CheckboxField 
-                        label="Unlimited Validity of License?"
-                        name="isUnlimited"
-                        checked={formData.isUnlimited}
-                        onChange={handleInputChange}
-                    />
-					</div>
+                    <div className="mt-8">
+                        <CheckboxField 
+                            label="Unlimited Validity of License?"
+                            name="isUnlimited"
+                            checked={formik.values.isUnlimited}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.errors.isUnlimited}
+                            touched={formik.touched.isUnlimited}
+                        />
+                    </div>
                 </div>
 
                 {/* Add Image Section */}
