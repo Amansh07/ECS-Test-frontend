@@ -258,9 +258,11 @@ export const CommodityProduction = () => {
     "Product Category",
     "Subcategory",
     "Product Name",
+    "Is Organic",
     "Annual Production Capacity",
-    "Available Stock for Sale",
     "In Production",
+    "Available Stock for Sale",
+    "Date of Availability",
     "Actions",
   ];
 
@@ -268,16 +270,16 @@ export const CommodityProduction = () => {
     { label: "Product Category", value: categories.find(c => c.productCategoryId == formik.values.productCategoryId)?.productCategoryName || "" },
     { label: "Subcategory", value: subcategories.find(s => s.productSubcategoryId == formik.values.productSubcategoryId)?.subcategoryName || "" },
     { label: "Product Name", value: products.find(p => p.id == formik.values.productId)?.productName || "" },
-    { label: "Annual Production Capacity", value: formik.values.annualProductionCap },
-    { label: "Available Stock for Sale", value: formik.values.availableStock },
-    { label: "In Production", value: formik.values.inProduction ? "Yes" : "No" },
-    { label: "Date of Availability", value: formik.values.dateOfAvailability },
     { label: "Is Organic", value: formik.values.isOrganic ? "Yes" : "No" },
+    { label: "Annual Production Capacity", value: formik.values.annualProductionCap },
+    { label: "In Production", value: formik.values.inProduction ? "Yes" : "No" },
+    { label: "Available Stock for Sale", value: formik.values.availableStock },
+    { label: "Date of Availability", value: formik.values.dateOfAvailability },
     { label: "Publish on e-Mart", value: publishOnEmart ? "Yes" : "No" },
   ];
 
   const mapRowToPreview = (row) => {
-    // 1️⃣ Fetch category name
+    // Fetch category name
     let categoryName = "";
     const catRes = getProductCategories();
     if (catRes.success) {
@@ -285,7 +287,7 @@ export const CommodityProduction = () => {
       if (cat) categoryName = cat.productCategoryName;
     }
 
-    // 2️⃣ Fetch subcategory name
+    // Fetch subcategory name
     let subcategoryName = "";
     const subRes = getSubCategoriesById(Number(row.productCategoryId));
     if (subRes.success) {
@@ -293,7 +295,7 @@ export const CommodityProduction = () => {
       if (sub) subcategoryName = sub.subcategoryName;
     }
 
-    // 3️⃣ Fetch product name
+    // Fetch product name
     let productName = "";
     const prodRes = getProductsBySubCategoryId(Number(row.productSubcategoryId));
     if (prodRes.success) {
@@ -305,13 +307,13 @@ export const CommodityProduction = () => {
       { label: "Product Category", value: categoryName },
       { label: "Subcategory", value: subcategoryName },
       { label: "Product Name", value: productName },
-      { label: "Annual Production Capacity", value: row.annualProductionCap ?? "-" },
-      { label: "Available Stock for Sale", value: row.availableStock ?? "-" },
-      { label: "In Production", value: row.inProduction ? "Yes" : "No" },
-      { label: "Date of Availability", value: row.dateOfAvailability || "-" },
       { label: "Is Organic", value: row.isOrganic ? "Yes" : "No" },
+      { label: "Annual Production Capacity", value: row.annualProductionCap ?? "-" },
+      { label: "In Production", value: row.inProduction ? "Yes" : "No" },
+      { label: "Available Stock for Sale", value: row.availableStock ?? "-" },
+      { label: "Date of Availability", value: row.dateOfAvailability || "-" },
       { label: "Publish on e-Mart", value: row.emartPublish ? "Yes" : "No" },
-      { label: "Document", value: row.docId ? `/mock/uploads/${row.docId}.jpg` : "No File" },
+      // { label: "Document", value: row.docId ? `/mock/uploads/${row.docId}.jpg` : "No File" },
     ];
   };
 
@@ -365,7 +367,7 @@ export const CommodityProduction = () => {
             {products.map(p => <option key={p.id} value={p.id}>{p.productName}</option>)}
           </SelectField>
 
-                <CheckboxField
+          <CheckboxField
             label="Is Organic"
             name="isOrganic"
             checked={formik.values.isOrganic}
@@ -376,6 +378,7 @@ export const CommodityProduction = () => {
 
           <TextField
             label="Annual Production Capacity"
+            required
             name="annualProductionCap"
             type="text"
             value={formik.values.annualProductionCap}
@@ -396,6 +399,7 @@ export const CommodityProduction = () => {
 
           <TextField
             label="Available Stock for Sale"
+            required
             name="availableStock"
             type="text"
             value={formik.values.availableStock}
@@ -407,6 +411,7 @@ export const CommodityProduction = () => {
 
           <TextField
             label="Date of Availability"
+            required
             type="date"
             name="dateOfAvailability"
             value={formik.values.dateOfAvailability}
@@ -461,9 +466,11 @@ export const CommodityProduction = () => {
             "Product Category": row.productCategoryName || "-",
             Subcategory: row.productSubcategoryName || "-",
             "Product Name": row.productName || "-",
+            "Is Organic": row.isOrganic ? "Yes" : "No",
             "Annual Production Capacity": row.annualProductionCap ?? "-",
-            "Available Stock for Sale": row.availableStock ?? "-",
             "In Production": row.inProduction ? "Yes" : "No",
+            "Available Stock for Sale": row.availableStock ?? "-",
+            "Date of Availability": row.dateOfAvailability ?? "-",
             ...row,
           }))}
           rowKey="id"

@@ -4,37 +4,22 @@ export const fertilizerDetailsValidationSchema = Yup.object({
   fertilizerType: Yup.string()
     .required("Fertilizer type is required"),
 
-  fertilizerName: Yup.string()
-    .required("Fertilizer name is required"),
+  // fertilizerName: Yup.string()
+  //   .required("Fertilizer name is required"),
 
-  fertilizerGrade: Yup.string()
-    .required("Fertilizer grade is required"),
+  // fertilizerGrade: Yup.string()
+  //   .required("Fertilizer grade is required"),
 
-  nameOfManufacturer: Yup.string()
+  manufacturerName: Yup.string()
     .required("Name of manufacturer is required"),
 
   quantityType: Yup.string()
     .required("Quantity type is required"),
 
-  quantity: Yup.number()
-    .typeError("Quantity must be a number")
-    .positive("Quantity must be greater than zero")
-    .required("Quantity is required"),
-
-  purchaseDate: Yup.date()
-    .required("Purchase date is required")
-    .max(new Date(), "Purchase date cannot be in the future"),
-
-  expiryDate: Yup.date()
-    .required("Expiry date is required")
-    .min(
-      Yup.ref("purchaseDate"),
-      "Expiry date should be greater than purchase date"
-    ),
-
-  batchNo: Yup.string()
-    .required("Batch number is required")
-    .matches(/^[A-Za-z0-9\-]+$/, "Only letters, numbers and hyphens allowed"),
+  // quantity: Yup.number()
+  //   .typeError("Quantity must be a number")
+  //   .positive("Quantity must be greater than zero")
+  //   .required("Quantity is required"),
 
   remarks: Yup.string()
     .max(200, "Remarks cannot exceed 200 characters")

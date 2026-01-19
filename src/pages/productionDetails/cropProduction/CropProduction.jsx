@@ -259,7 +259,7 @@ export const CropProduction = () => {
     { label: "Season", value: seasons.find((s) => s.id == formik.values.seasonId)?.name || "" },
     { label: "Crop", value: crops.find((c) => c.id == formik.values.cropId)?.name || "" },
     { label: "Crop Variety", value: varieties.find((v) => v.id == formik.values.cropVarietyId)?.name || "" },
-    { label: "Production (Qtl.)", value: formik.values.productionQuantity },
+    { label: "Production (in Qtl.)", value: formik.values.productionQuantity },
     { label: "Marketable Surplus", value: formik.values.harvestedSurplus },
     { label: "Date Of Harvesting", value: formik.values.dateOfHarvesting },
     { label: "Estimated/Harvested", value: formik.values.estimatedOrHarvestedId },
@@ -276,7 +276,7 @@ export const CropProduction = () => {
       { label: "Season", value: seasonName },
       { label: "Crop", value: cropName },
       { label: "Crop Variety", value: varietyName },
-      { label: "Production (Qtl.)", value: row.productionQuantity },
+      { label: "Production (in Qtl.)", value: row.productionQuantity },
       { label: "Marketable Surplus", value: row.harvestedSurplus },
       { label: "Date Of Harvesting", value: row.dateOfHarvesting },
       { label: "Estimated/Harvested", value: row.estimatedOrHarvestedId },
@@ -394,6 +394,7 @@ export const CropProduction = () => {
         <TextArea
           label="Description"
           name="description"
+          placeholder="Enter Description"
           value={formik.values.description}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}

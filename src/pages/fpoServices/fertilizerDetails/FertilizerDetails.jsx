@@ -15,6 +15,7 @@ import { Button } from "../../../components/Buttons";
 import { AccordionGroup } from "../../../components/Accordion";
 import editSvg from "../../../assets/edit.svg";
 import viewSvg from "../../../assets/view.svg";
+import ValidationModal from "../../../components/ValidationModal";
 
 import { fertilizerDetailsValidationSchema } from "../validation";
 
@@ -33,7 +34,7 @@ const initialFertilizerDetailsData = {
   fertilizerType: "",
   fertilizerName: "",
   fertilizerGrade: "",
-  nameOfManufacturer: "",
+  manufacturerName: "",
   quantityType: "",
   quantity: "",
   purchaseDate: "",
@@ -50,20 +51,24 @@ export const FertilizerDetails = () => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [uploadResetKey, setUploadResetKey] = useState(0);
   const [publishOnEmart, setPublishOnEmart] = useState(false);
-
+  const [rowPreviewData, setRowPreviewData] = useState(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
-
+  const [previewTitle, setPreviewTitle] = useState("Preview");
   const [fertilizerList, setFertilizerList] = useState([]);
   const [editId, setEditId] = useState(null);
 
   const [uploadedFile, setUploadedFile] = useState(null);
 
-const handleFileSelect = (file) => {
-  setUploadedFile(file); // <-- real file for upload
-  setUploadedImage(file ? URL.createObjectURL(file) : null); // preview only
-};
+  const [showValidationModal, setShowValidationModal] = useState(false);
+  const [validationTitle, setValidationTitle] = useState("");
+  const [validationMessage, setValidationMessage] = useState("");
+
+  const handleFileSelect = (file) => {
+    setUploadedFile(file); // <-- real file for upload
+    setUploadedImage(file ? URL.createObjectURL(file) : null); // preview only
+  };
 
 
   const uploadConfig = {
@@ -86,14 +91,13 @@ const handleFileSelect = (file) => {
   }, []);
 
   // ================= LOAD LIST DATA =================
-const loadFertilizerList = () => {
-  const res = listFertilizer();
-  console.log("Fertilizer List Loaded:", res); // ✅ log
-  if (res.success) {
-    setFertilizerList(res.data);
-  }
-};
-
+  const loadFertilizerList = () => {
+    const res = listFertilizer();
+    console.log("Fertilizer List Loaded:", res); // ✅ log
+    if (res.success) {
+      setFertilizerList(res.data);
+    }
+  };
 
   // ================= FORMIK =================
   const formik = useFormik({
@@ -107,7 +111,7 @@ const loadFertilizerList = () => {
   // ================= OPEN PREVIEW =================
   const handleAddOrEdit = async () => {
     const errors = await formik.validateForm();
-    console.log("errors :",errors);
+    console.log("errors :", errors);
     if (Object.keys(errors).length > 0) {
       formik.setTouched(
         Object.keys(errors).reduce((acc, key) => {
@@ -115,89 +119,112 @@ const loadFertilizerList = () => {
           return acc;
         }, {})
       );
+
+      // SHOW VALIDATION MODAL
+      setValidationTitle("Validation Required");
+      setValidationMessage("Please complete all required fields before proceeding.");
+      setShowValidationModal(true);
+
       return;
     }
-
+    setPreviewTitle("Preview");
     setIsPreviewModalOpen(true);
   };
 
   // ================= SAVE AFTER PREVIEW =================
-const handlePreviewConfirm = async () => {
-  let docId = null;
+  const handlePreviewConfirm = async () => {
 
-  // Only upload if a real file is selected
-  if (uploadedFile) {
-    const uploadRes = await uploadDocument({ file: uploadedFile, fpoId: 1, docType: 1 });
-    if (uploadRes.status === 200 && uploadRes.data.success) {
-      docId = uploadRes.data.documentId;
+    // ----------------- VALIDATION -----------------
+    const errors = await formik.validateForm();
+    if (Object.keys(errors).length > 0) {
+      setIsPreviewModalOpen(false);
+      // Highlight the invalid fields
+      formik.setTouched(
+        Object.keys(errors).reduce((acc, key) => ({ ...acc, [key]: true }), {})
+      );
+
+      // Show validation modal
+      setValidationTitle("Validation Required");
+      setValidationMessage("Please complete all required fields before submitting.");
+      setShowValidationModal(true);
+      return; // stop execution if errors exist
     }
-  }
 
-  // =================== CONVERT NUMERIC FIELDS ===================
-  const payload = {
-    fpoId: 1, // always integer
-    fertilizerType: parseInt(formik.values.fertilizerType),
-    fertilizerGrade: parseInt(formik.values.fertilizerGrade),
-    fertilizerName: formik.values.fertilizerName,
-    manufacturerName: formik.values.nameOfManufacturer,
-    quantityType: parseInt(formik.values.quantityType),
-    quantity: parseFloat(formik.values.quantity), // in case user enters decimal
-    purchaseDate: formik.values.purchaseDate,
-    expiryDate: formik.values.expiryDate,
-    batchNo: formik.values.batchNo,
-    remarks: formik.values.remarks,
-    emartPublish: publishOnEmart,
-    docId: docId, // only if uploaded
+    let docId = null;
+
+    // Only upload if a real file is selected
+    if (uploadedFile) {
+      const uploadRes = await uploadDocument({ file: uploadedFile, fpoId: 1, docType: 1 });
+      if (uploadRes.status === 200 && uploadRes.data.success) {
+        docId = uploadRes.data.documentId;
+      }
+    }
+
+    // =================== CONVERT NUMERIC FIELDS ===================
+    const payload = {
+      fpoId: 1, // always integer
+      fertilizerType: parseInt(formik.values.fertilizerType),
+      fertilizerGrade: parseInt(formik.values.fertilizerGrade),
+      fertilizerName: formik.values.fertilizerName,
+      manufacturerName: formik.values.manufacturerName,
+      quantityType: parseInt(formik.values.quantityType),
+      quantity: parseFloat(formik.values.quantity), // in case user enters decimal
+      purchaseDate: formik.values.purchaseDate,
+      expiryDate: formik.values.expiryDate,
+      batchNo: formik.values.batchNo,
+      remarks: formik.values.remarks,
+      emartPublish: publishOnEmart,
+      docId: docId, // only if uploaded
+    };
+
+    let response;
+    if (editId) {
+      response = await updateFertilizer(editId, payload);
+      setStatusMessage("Fertilizer details updated successfully!");
+    } else {
+      response = await createFertilizer(payload);
+      setStatusMessage("Fertilizer added successfully!");
+    }
+
+    if (response.data.success) {
+      loadFertilizerList();
+      resetFormFields();
+      setIsStatusModalOpen(true);
+    }
+
+    setIsPreviewModalOpen(false);
   };
-
-  let response;
-  if (editId) {
-    response = await updateFertilizer(editId, payload);
-    setStatusMessage("Fertilizer details updated successfully!");
-  } else {
-    response = await createFertilizer(payload);
-    setStatusMessage("Fertilizer added successfully!");
-  }
-
-  if (response.data.success) {
-    loadFertilizerList();
-    resetFormFields();
-    setIsStatusModalOpen(true);
-  }
-
-  setIsPreviewModalOpen(false);
-};
 
 
 
 
   // ================= EDIT ROW =================
-const handleEdit = async (id) => {
-  const response = await getFertilizerById(id);
-  if (response.data?.data) {
-    const data = response.data.data;
+  const handleEdit = async (id) => {
+    const response = await getFertilizerById(id);
+    if (response.data?.data) {
+      const data = response.data.data;
 
-    formik.setValues({
-      fertilizerType: data.fertilizerType,
-      fertilizerName: data.fertilizerName,
-      fertilizerGrade: data.fertilizerGrade,
-      nameOfManufacturer: data.manufacturerName,
-      quantityType: data.quantityType,
-      quantity: data.quantity,
-      purchaseDate: data.purchaseDate,
-      expiryDate: data.expiryDate,
-      batchNo: data.batchNo,
-      remarks: data.remarks,
-    });
+      formik.setValues({
+        fertilizerType: data.fertilizerType,
+        fertilizerName: data.fertilizerName,
+        fertilizerGrade: data.fertilizerGrade,
+        manufacturerName: data.manufacturerName,
+        quantityType: data.quantityType,
+        quantity: data.quantity,
+        purchaseDate: data.purchaseDate,
+        expiryDate: data.expiryDate,
+        batchNo: data.batchNo,
+        remarks: data.remarks,
+      });
 
-    formik.setErrors({});
-    formik.setTouched({}); 
+      formik.setErrors({});
+      formik.setTouched({});
 
-    setEditId(id);
-    setPublishOnEmart(data.emartPublish || false);
-    setUploadedImage(data.docId ? `/mock/uploads/${data.docId}.jpg` : null); // <-- load preview image
-  }
-};
+      setEditId(id);
+      setPublishOnEmart(data.emartPublish || false);
+      setUploadedImage(data.docId ? `/mock/uploads/${data.docId}.jpg` : null); // <-- load preview image
+    }
+  };
 
 
 
@@ -212,18 +239,34 @@ const handleEdit = async (id) => {
 
   // ================= PREVIEW DATA =================
   const previewData = [
-    { label: "Fertilizer Type", value: formik.values.fertilizerType },
+    { label: "Fertilizer Type", value: fertilizerTypes.find((t) => t.id == formik.values.fertilizerType)?.name || "" },
     { label: "Fertilizer Name", value: formik.values.fertilizerName },
-    { label: "Grade", value: formik.values.fertilizerGrade },
-    { label: "Manufacturer", value: formik.values.nameOfManufacturer },
-    { label: "Quantity Type", value: formik.values.quantityType },
+    { label: "Fertilizer Grade", value: fertilizerGrades.find((g) => g.id == formik.values.fertilizerGrade)?.name || "" },
+    { label: "Name of Manufacturer", value: formik.values.manufacturerName },
+    { label: "Quantity Type", value: quantityTypes.find((q) => q.id == formik.values.quantityType)?.name || "" },
     { label: "Quantity", value: formik.values.quantity },
-    { label: "Purchase Date", value: formik.values.purchaseDate },
-    { label: "Expiry Date", value: formik.values.expiryDate },
-    { label: "Batch No", value: formik.values.batchNo },
-    { label: "Remarks", value: formik.values.remarks },
+    { label: "Description", value: formik.values.remarks },
     { label: "Publish on e-Mart", value: publishOnEmart ? "Yes" : "No" },
   ];
+
+  // ================= MAP ROW TO PREVIEW =================
+  const mapRowToPreview = (row) => {
+    const fertilizerTypeName = fertilizerTypes.find((t) => t.id === row.fertilizerType)?.name || "";
+    const fertilizerGradeName = fertilizerGrades.find((g) => g.id === row.fertilizerGrade)?.name || "";
+    const quantityTypeName = quantityTypes.find((q) => q.id === row.quantityType)?.name || "";
+
+    return [
+      { label: "Fertilizer Type", value: fertilizerTypeName },
+      { label: "Fertilizer Name", value: row.fertilizerName },
+      { label: "Fertilizer Grade", value: fertilizerGradeName },
+      { label: "Name of Manufacturer", value: row.manufacturerName },
+      { label: "Quantity Type", value: quantityTypeName },
+      { label: "Quantity", value: row.quantity },
+      { label: "Description", value: row.remarks },
+      { label: "Publish on e-Mart", value: row.emartPublish ? "Yes" : "No" },
+    ];
+  };
+
 
   // ================= UI =================
   return (
@@ -245,7 +288,7 @@ const handleEdit = async (id) => {
             error={formik.errors.fertilizerType}
             touched={formik.touched.fertilizerType}
           >
-            <option value="">Select Type</option>
+            <option value="">Select Fertilizer Type</option>
             {fertilizerTypes.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.name}
@@ -256,7 +299,6 @@ const handleEdit = async (id) => {
           {/* Fertilizer Name */}
           <TextField
             label="Fertilizer Name"
-            required
             name="fertilizerName"
             placeholder="Enter Name"
             value={formik.values.fertilizerName}
@@ -269,7 +311,6 @@ const handleEdit = async (id) => {
           {/* Grade */}
           <SelectField
             label="Fertilizer Grade"
-            required
             name="fertilizerGrade"
             value={formik.values.fertilizerGrade}
             onChange={formik.handleChange}
@@ -277,7 +318,7 @@ const handleEdit = async (id) => {
             error={formik.errors.fertilizerGrade}
             touched={formik.touched.fertilizerGrade}
           >
-            <option value="">Select Grade</option>
+            <option value="">Select Fertilizer Grade</option>
             {fertilizerGrades.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.name}
@@ -289,13 +330,13 @@ const handleEdit = async (id) => {
           <TextField
             label="Name of Manufacturer"
             required
-            name="nameOfManufacturer"
-            placeholder="Enter Name"
-            value={formik.values.nameOfManufacturer}
+            name="manufacturerName"
+            placeholder="Enter Name of Manufacturer"
+            value={formik.values.manufacturerName}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={formik.errors.nameOfManufacturer}
-            touched={formik.touched.nameOfManufacturer}
+            error={formik.errors.manufacturerName}
+            touched={formik.touched.manufacturerName}
           />
 
           {/* Quantity Type */}
@@ -309,7 +350,7 @@ const handleEdit = async (id) => {
             error={formik.errors.quantityType}
             touched={formik.touched.quantityType}
           >
-            <option value="">Select Unit</option>
+            <option value="">Select Quantity Type</option>
             {quantityTypes.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.name}
@@ -320,7 +361,6 @@ const handleEdit = async (id) => {
           {/* Quantity */}
           <TextField
             label="Quantity"
-            required
             name="quantity"
             placeholder="Enter Quantity"
             value={formik.values.quantity}
@@ -330,51 +370,13 @@ const handleEdit = async (id) => {
             touched={formik.touched.quantity}
           />
 
-          {/* Dates */}
-          <TextField
-            label="Purchase Date"
-            required
-            name="purchaseDate"
-            type="date"
-            value={formik.values.purchaseDate}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.errors.purchaseDate}
-            touched={formik.touched.purchaseDate}
-          />
-
-          <TextField
-            label="Expiry Date"
-            required
-            name="expiryDate"
-            type="date"
-            value={formik.values.expiryDate}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.errors.expiryDate}
-            touched={formik.touched.expiryDate}
-          />
-
-          {/* Batch No */}
-          <TextField
-            label="Batch No"
-            required
-            name="batchNo"
-            placeholder="Enter Batch No"
-            value={formik.values.batchNo}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.errors.batchNo}
-            touched={formik.touched.batchNo}
-          />
-
         </div>
 
         {/* Remarks */}
         <TextArea
-          label="Remarks"
+          label="Crop Description"
           name="remarks"
-          placeholder="Enter Remarks"
+          placeholder="Enter Crop Description"
           value={formik.values.remarks}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
@@ -383,7 +385,7 @@ const handleEdit = async (id) => {
         />
 
         {/* Upload Section */}
-               <div className="mb-6">
+        <div className="mb-6">
           <AccordionGroup
             items={[
               {
@@ -408,14 +410,22 @@ const handleEdit = async (id) => {
             <span className="text-sm font-medium">Publish on e-Mart?</span>
             <Toggle checked={publishOnEmart} onChange={setPublishOnEmart} />
           </div>
+          <div className="flex gap-4">
+            <Button
+              buttonClassName="p-[10px] text-[14px] text-primary-900 font-medium border border-primary-900 rounded-[8px] bg-white"
+              onClick={() => { setPreviewTitle("Preview"); setIsPreviewModalOpen(true) }}
+            >
+              Preview
+            </Button>
+            <Button
+              type="button"
+              onClick={handleAddOrEdit}
+              buttonClassName="px-6 py-2.5 text-sm font-semibold text-white bg-success rounded-md"
+            >
 
-          <Button
-            type="button"
-            onClick={handleAddOrEdit}
-            buttonClassName="px-6 py-2.5 text-sm font-semibold text-white bg-success rounded-md"
-          >
-            {editId ? "Update Fertilizer" : "+ Add to Inventory"}
-          </Button>
+              {editId ? "Update Fertilizer" : "+ Add to Inventory"}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -424,26 +434,48 @@ const handleEdit = async (id) => {
 
       <Table
         columns={[
-          "fertilizerTypeName",
-          "fertilizerName",
-          "fertilizerGradeName",
-          "manufacturerName",
-          "quantity",
+          "Fertilizer Type",
+          "Fertilizer Name",
+          "Fertilizer Grade",
+          "Name of Manufacturer",
+          "Quantity Type",
+          "Quantity",
+          "Crop Description",
           "Actions",
         ]}
-        data={fertilizerList}
+        data={fertilizerList.map(row => ({
+          "Fertilizer Type": row.fertilizerTypeName || "-",
+          "Fertilizer Name": row.fertilizerName || "-",
+          "Fertilizer Grade": row.fertilizerGradeName || "-",
+          "Name of Manufacturer": row.manufacturerName || "-",
+          "Quantity Type": row.quantityTypeName || "-",
+          "Crop Description": row.remarks || "-",
+          "Quantity": row.quantity || "-",
+          ...row,
+        }))}
         renderActions={(row) => (
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-2 items-center justify-center">
             <img
               src={editSvg}
               className="w-6 cursor-pointer"
               onClick={() => handleEdit(row.id)}
             />
 
-            <img
+            {/* <img
               src={viewSvg}
               className="w-6 cursor-pointer"
               onClick={() => alert("View functionality coming soon")}
+            /> */}
+
+            <img
+              src={viewSvg}
+              alt="view"
+              className="w-6 cursor-pointer"
+              onClick={() => {
+                setRowPreviewData(row);   // <-- store row data
+                setPreviewTitle("View");
+                setIsPreviewModalOpen(true);
+              }}
             />
 
             <div
@@ -459,13 +491,25 @@ const handleEdit = async (id) => {
       />
 
       {/* PREVIEW MODAL */}
-      <PreviewModal
+      {/* <PreviewModal
         isOpen={isPreviewModalOpen}
         onClose={() => setIsPreviewModalOpen(false)}
         onConfirm={handlePreviewConfirm}
         title={editId ? "Preview - Update Fertilizer" : "Preview - Add Fertilizer"}
         image={uploadedImage}
         data={previewData}
+      /> */}
+
+      <PreviewModal
+        isOpen={isPreviewModalOpen}
+        title={previewTitle}
+        data={rowPreviewData ? mapRowToPreview(rowPreviewData) : previewData}
+        onConfirm={rowPreviewData ? null : handlePreviewConfirm}
+        actionButton={rowPreviewData ? false : true}
+        onClose={() => {
+          setRowPreviewData(null); // reset after closing
+          setIsPreviewModalOpen(false);
+        }}
       />
 
       {/* STATUS MODAL */}
@@ -474,6 +518,13 @@ const handleEdit = async (id) => {
         onClose={() => setIsStatusModalOpen(false)}
         status
         message={statusMessage}
+      />
+
+      <ValidationModal
+        isOpen={showValidationModal}
+        title={validationTitle}
+        message={validationMessage}
+        onClose={() => setShowValidationModal(false)}
       />
     </div>
   );
