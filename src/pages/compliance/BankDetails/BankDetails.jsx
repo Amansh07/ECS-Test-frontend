@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useFormik } from 'formik';
 import { TextField } from '../../../components/FormFields';
 import Table from '../../../components/Table';
 import { Button } from '../../../components/Buttons';
@@ -8,14 +9,16 @@ import editSvg from "../../../assets/edit.svg";
 import viewSvg from "../../../assets/view.svg";
 import deleteSvg from "../../../assets/deleteAction.svg";
 import reloadSvg from "../../../assets/reload.svg";
+import { bankDetailsValidationSchema } from '../validation';
+
+const initialValues = {
+    ifscCode: '',
+    bankName: '',
+    branchName: '',
+    accountNumber: ''
+};
 
 export const BankDetails = () => {
-    const [formData, setFormData] = useState({
-        ifscCode: '',
-        bankName: '',
-        branchName: '',
-        accountNumber: ''
-    });
 
     const [bankList, setBankList] = useState([
         {
@@ -34,23 +37,32 @@ export const BankDetails = () => {
     const [statusConfig, setStatusConfig] = useState({ success: true, message: '' });
     const [pendingAction, setPendingAction] = useState(null);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
+    const formik = useFormik({
+        initialValues,
+        validationSchema: bankDetailsValidationSchema,
+        validateOnBlur: true,
+        validateOnChange: false,
+    });
 
     const handleReset = () => {
-        setFormData({
-            ifscCode: '',
-            bankName: '',
-            branchName: '',
-            accountNumber: ''
-        });
+        formik.resetForm();
         setIsEditMode(false);
         setEditingId(null);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        const errors = await formik.validateForm();
+
+        if (Object.keys(errors).length > 0) {
+            formik.setTouched(
+                Object.keys(errors).reduce((acc, key) => {
+                    acc[key] = true;
+                    return acc;
+                }, {})
+            );
+            return;
+        }
+
         setPendingAction(isEditMode ? 'update' : 'add');
         setIsConfirmationOpen(true);
     };
@@ -60,10 +72,10 @@ export const BankDetails = () => {
         if (pendingAction === 'add') {
             const newItem = {
                 id: Date.now(),
-                'IFSC Code': formData.ifscCode,
-                'Account Number': formData.accountNumber,
-                'Bank Name': formData.bankName,
-                'Branch Name': formData.branchName
+                'IFSC Code': formik.values.ifscCode,
+                'Account Number': formik.values.accountNumber,
+                'Bank Name': formik.values.bankName,
+                'Branch Name': formik.values.branchName
             };
             setBankList(prev => [...prev, newItem]);
             setStatusConfig({ success: true, message: 'Bank details added successfully.' });
@@ -72,10 +84,10 @@ export const BankDetails = () => {
                 item.id === editingId
                     ? {
                         ...item,
-                        'IFSC Code': formData.ifscCode,
-                        'Account Number': formData.accountNumber,
-                        'Bank Name': formData.bankName,
-                        'Branch Name': formData.branchName
+                        'IFSC Code': formik.values.ifscCode,
+                        'Account Number': formik.values.accountNumber,
+                        'Bank Name': formik.values.bankName,
+                        'Branch Name': formik.values.branchName
                     }
                     : item
             ));
@@ -89,7 +101,7 @@ export const BankDetails = () => {
     };
 
     const handleEdit = (row) => {
-        setFormData({
+        formik.setValues({
             ifscCode: row['IFSC Code'],
             bankName: row['Bank Name'],
             branchName: row['Branch Name'],
@@ -125,8 +137,11 @@ export const BankDetails = () => {
                             name="ifscCode"
                             required
                             placeholder="Search IFSC Code"
-                            value={formData.ifscCode}
-                            onChange={handleInputChange}
+                            value={formik.values.ifscCode}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.errors.ifscCode}
+                            touched={formik.touched.ifscCode}
                         />
                         <div className="absolute right-3 top-[33px] cursor-pointer">
                             {searchIcon}
@@ -140,8 +155,11 @@ export const BankDetails = () => {
                         name="bankName"
                         required
                         placeholder="Bank Name"
-                        value={formData.bankName}
-                        onChange={handleInputChange}
+                        value={formik.values.bankName}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.errors.bankName}
+                        touched={formik.touched.bankName}
                         disabled
                         inputClassName="bg-grey-50"
                     />
@@ -151,8 +169,11 @@ export const BankDetails = () => {
                         name="branchName"
                         required
                         placeholder="Branch Name"
-                        value={formData.branchName}
-                        onChange={handleInputChange}
+                        value={formik.values.branchName}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.errors.branchName}
+                        touched={formik.touched.branchName}
                         disabled
                         inputClassName="bg-grey-50"
                     />
@@ -162,8 +183,11 @@ export const BankDetails = () => {
                         name="accountNumber"
                         required
                         placeholder="Enter Account Number"
-                        value={formData.accountNumber}
-                        onChange={handleInputChange}
+                        value={formik.values.accountNumber}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.errors.accountNumber}
+                        touched={formik.touched.accountNumber}
                         inputClassName="md:col-span-1"
                     />
                 </div>

@@ -81,3 +81,47 @@ export const annualTurnoverValidationSchema = Yup.object({
     .min(0, "Total Dividend Paid cannot be negative")
     .nullable(),
 });
+
+export const bankDetailsValidationSchema = Yup.object({
+  ifscCode: Yup.string()
+    .required("IFSC Code is required")
+    .matches(/^[A-Za-z]{4}0[A-Za-z0-9]{6}$/, "Invalid IFSC Code format (should be 11 characters: 4 letters, 0, then 6 alphanumeric)"),
+
+  bankName: Yup.string()
+    .required("Bank Name is required"),
+
+  branchName: Yup.string()
+    .required("Branch Name is required"),
+
+  accountNumber: Yup.string()
+    .required("Account Number is required")
+    .matches(/^\d+$/, "Account Number must contain only numbers")
+    .min(9, "Account Number must be at least 9 digits")
+    .max(18, "Account Number must be at most 18 digits"),
+});
+
+export const licenseUpdateValidationSchema = Yup.object({
+  licenseName: Yup.string()
+    .required("License Name is required"),
+
+  otherLicense: Yup.string()
+    .when('licenseName', {
+      is: 'other',
+      then: (schema) => schema.required("Other License Name is required when License Name is 'Other'"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+
+  issuedBy: Yup.string()
+    .required("Issued By is required"),
+
+  issuedDate: Yup.string()
+    .required("Issue Date is required"),
+
+  validDate: Yup.string()
+    .required("License Valid Till is required"),
+
+  licenseNumber: Yup.string()
+    .required("License Number is required"),
+
+  isUnlimited: Yup.boolean(),
+});
