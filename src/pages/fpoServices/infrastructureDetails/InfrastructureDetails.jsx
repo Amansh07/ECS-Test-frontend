@@ -4,6 +4,7 @@ import Table from '../../../components/Table';
 import { Button } from '../../../components/Buttons';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import StatusModal from '../../../components/StatusModal';
+import ValidationModal from '../../../components/ValidationModal';
 
 import editSvg from "../../../assets/edit.svg"
 
@@ -91,6 +92,11 @@ export const InfrastructureDetails = () => {
     const [isSaveClicked, setIsSaveClicked] = useState(false);
     const [isOther, setIsOther] = useState(false);
     const [tobeUnarchived,setToBeUnarchived]= useState({});
+    
+    // Validation Modal State
+    const [showValidationModal, setShowValidationModal] = useState(false);
+    const [validationTitle, setValidationTitle] = useState("");
+    const [validationMessage, setValidationMessage] = useState("");
     const [optionsData,setoptionsData] = useState(
         [
             {
@@ -182,7 +188,26 @@ export const InfrastructureDetails = () => {
     setInfraErrors({});
   };
 
-    const handleAddOrUpdate = () => {
+    const handleAddOrUpdate = async () => {
+        // Validate form before proceeding
+        const errors = await formik.validateForm();
+        
+        if (Object.keys(errors).length > 0) {
+            // Mark all error fields as touched to show inline errors
+            formik.setTouched(
+                Object.keys(errors).reduce((acc, key) => {
+                    acc[key] = true;
+                    return acc;
+                }, {})
+            );
+            
+            // Show validation modal
+            setValidationTitle("Validation Required");
+            setValidationMessage("Please complete all required fields before proceeding.");
+            setShowValidationModal(true);
+            return;
+        }
+        
         setPendingAction(isEditMode ? 'update' : 'add');
         setIsConfirmationOpen(true);
     };
@@ -464,11 +489,8 @@ export const InfrastructureDetails = () => {
         ))}
                         
                         
-                    </SelectField>
-
-
-                    
-    </div>
+                    </SelectField>                    
+                </div>
                     {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
 
@@ -554,12 +576,11 @@ export const InfrastructureDetails = () => {
                     >
                         <div className='flex items-center gap-3'>
                      <span> <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M10.23 1.7625C9.1425 0.675 7.65 0 5.9925 0C2.6775 0 0 2.685 0 6C0 9.315 2.6775 12 5.9925 12C8.79 12 11.1225 10.0875 11.79 7.5H10.23C9.615 9.2475 7.95 10.5 5.9925 10.5C3.51 10.5 1.4925 8.4825 1.4925 6C1.4925 3.5175 3.51 1.5 5.9925 1.5C7.2375 1.5 8.3475 2.0175 9.1575 2.835L6.7425 5.25H11.9925V0L10.23 1.7625Z" fill="#253300"/>
-</svg></span><span>Reset Form</span></div>
+                        <path d="M10.23 1.7625C9.1425 0.675 7.65 0 5.9925 0C2.6775 0 0 2.685 0 6C0 9.315 2.6775 12 5.9925 12C8.79 12 11.1225 10.0875 11.79 7.5H10.23C9.615 9.2475 7.95 10.5 5.9925 10.5C3.51 10.5 1.4925 8.4825 1.4925 6C1.4925 3.5175 3.51 1.5 5.9925 1.5C7.2375 1.5 8.3475 2.0175 9.1575 2.835L6.7425 5.25H11.9925V0L10.23 1.7625Z" fill="#253300"/>
+                    </svg></span><span>Reset Form</span></div>
  
                     </Button>
                     <Button
-                        disabled={Object.keys(formik.errors).length !== 0}
                         buttonClassName="px-8 py-2.5 bg-success text-white rounded-md hover:bg-success-dark font-medium flex items-center gap-2"
                         onClick={handleAddOrUpdate}
                     >
@@ -667,6 +688,13 @@ export const InfrastructureDetails = () => {
                 onClose={() => setIsStatusOpen(false)}
                 status={statusConfig.success}
                 message={statusConfig.message}
+            />
+
+            <ValidationModal
+                isOpen={showValidationModal}
+                title={validationTitle}
+                message={validationMessage}
+                onClose={() => setShowValidationModal(false)}
             />
         </div>
     );

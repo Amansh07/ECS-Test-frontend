@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import { TextField } from '../../../components/FormFields';
 import Table from '../../../components/Table';
@@ -10,6 +10,13 @@ import viewSvg from "../../../assets/view.svg";
 import deleteSvg from "../../../assets/deleteAction.svg";
 import reloadSvg from "../../../assets/reload.svg";
 import { bankDetailsValidationSchema } from '../validation';
+import { 
+    listBankDetails, 
+    createBankDetails, 
+    updateBankDetails, 
+    deleteBankDetails,
+    getBankDetailsById 
+} from '../../../api/bankDetailsMock';
 
 const initialValues = {
     ifscCode: '',
@@ -19,17 +26,7 @@ const initialValues = {
 };
 
 export const BankDetails = () => {
-
-    const [bankList, setBankList] = useState([
-        {
-            id: 1,
-            'IFSC Code': 'SBIN0001234',
-            'Account Number': '123456789012',
-            'Bank Name': 'State Bank of India',
-            'Branch Name': 'Main Branch'
-        }
-    ]);
-
+    const [bankList, setBankList] = useState([]);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
@@ -44,6 +41,19 @@ export const BankDetails = () => {
         validateOnChange: false,
     });
 
+    // ------------------- LOAD DATA -------------------
+    useEffect(() => {
+        fetchBankList();
+    }, []);
+
+    const fetchBankList = () => {
+        const res = listBankDetails(1); // fpoId = 1
+        if (res.success) {
+            setBankList(res.data);
+        }
+    };
+
+    // ------------------- HANDLERS -------------------
     const handleReset = () => {
         formik.resetForm();
         setIsEditMode(false);
@@ -67,48 +77,66 @@ export const BankDetails = () => {
         setIsConfirmationOpen(true);
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         setIsConfirmationOpen(false);
+        
+        const payload = {
+            fpoId: 1,
+            ifscCode: formik.values.ifscCode,
+            bankName: formik.values.bankName,
+            branchName: formik.values.branchName,
+            accountNumber: formik.values.accountNumber,
+        };
+
         if (pendingAction === 'add') {
-            const newItem = {
-                id: Date.now(),
-                'IFSC Code': formik.values.ifscCode,
-                'Account Number': formik.values.accountNumber,
-                'Bank Name': formik.values.bankName,
-                'Branch Name': formik.values.branchName
-            };
-            setBankList(prev => [...prev, newItem]);
-            setStatusConfig({ success: true, message: 'Bank details added successfully.' });
+            const res = await createBankDetails(payload);
+            if (res.status === 200 && res.data.success) {
+                setStatusConfig({ success: true, message: 'Bank details added successfully.' });
+                fetchBankList(); // Refresh list from mock
+            }
         } else if (pendingAction === 'update') {
-            setBankList(prev => prev.map(item =>
-                item.id === editingId
-                    ? {
-                        ...item,
-                        'IFSC Code': formik.values.ifscCode,
-                        'Account Number': formik.values.accountNumber,
-                        'Bank Name': formik.values.bankName,
-                        'Branch Name': formik.values.branchName
-                    }
-                    : item
-            ));
-            setStatusConfig({ success: true, message: 'Bank details updated successfully.' });
+            const res = await updateBankDetails(editingId, payload);
+            if (res.status === 200 && res.data.success) {
+                setStatusConfig({ success: true, message: 'Bank details updated successfully.' });
+                fetchBankList(); // Refresh list from mock
+            }
         } else if (pendingAction === 'delete') {
-            setBankList(prev => prev.filter(item => item.id !== editingId));
-            setStatusConfig({ success: true, message: 'Bank details deleted successfully.' });
+            const res = await deleteBankDetails(editingId);
+            if (res.status === 200 && res.data.success) {
+                // For mock, manually remove from list since mock doesn't persist
+                setBankList(prev => prev.filter(item => item.id !== editingId));
+                setStatusConfig({ success: true, message: 'Bank details deleted successfully.' });
+            }
         }
+        
         setIsStatusOpen(true);
         handleReset();
     };
 
-    const handleEdit = (row) => {
-        formik.setValues({
-            ifscCode: row['IFSC Code'],
-            bankName: row['Bank Name'],
-            branchName: row['Branch Name'],
-            accountNumber: row['Account Number']
-        });
-        setEditingId(row.id);
+    const handleEdit = async (row) => {
         setIsEditMode(true);
+        setEditingId(row.id);
+
+        // Fetch by ID (optional - can use row data directly for mock)
+        const res = await getBankDetailsById(row.id);
+        if (res.status === 200 && res.data.success && res.data.data) {
+            const data = res.data.data;
+            formik.setValues({
+                ifscCode: data.ifscCode || row.ifscCode,
+                bankName: data.bankName || row.bankName,
+                branchName: data.branchName || row.branchName,
+                accountNumber: data.accountNumber || row.accountNumber,
+            });
+        } else {
+            // Fallback to row data
+            formik.setValues({
+                ifscCode: row.ifscCode,
+                bankName: row.bankName,
+                branchName: row.branchName,
+                accountNumber: row.accountNumber,
+            });
+        }
+        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -218,7 +246,13 @@ export const BankDetails = () => {
                         "Branch Name",
                         "Actions"
                     ]}
-                    data={bankList}
+                    data={bankList.map((row) => ({
+                        "IFSC Code": row.ifscCode,
+                        "Account Number": row.accountNumber,
+                        "Bank Name": row.bankName,
+                        "Branch Name": row.branchName,
+                        ...row, // Keep original data for edit/delete handlers
+                    }))}
                     renderActions={(row) => (
                         <div className="flex items-center justify-center gap-4">
                             <img src={editSvg} alt="Edit" className="w-6 h-6 cursor-pointer" onClick={() => handleEdit(row)} />

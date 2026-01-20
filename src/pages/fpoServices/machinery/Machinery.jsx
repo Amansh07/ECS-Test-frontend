@@ -7,6 +7,7 @@ import UploadDocument from '../../../components/UploadDocument';
 import Toggle from '../../../components/Toggle';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import StatusModal from '../../../components/StatusModal';
+import ValidationModal from '../../../components/ValidationModal';
 import { AccordionGroup } from '../../../components/Accordion';
 
 import editSvg from '../../../assets/edit.svg';
@@ -40,38 +41,62 @@ export const Machinery = () => {
     const [isStatusOpen, setIsStatusOpen] = useState(false);
     const [statusConfig, setStatusConfig] = useState({ success: true, message: '' });
     const [pendingAction, setPendingAction] = useState(null);
+    
+    // Validation Modal State
+    const [showValidationModal, setShowValidationModal] = useState(false);
+    const [validationTitle, setValidationTitle] = useState("");
+    const [validationMessage, setValidationMessage] = useState("");
 
     const formik = useFormik({
         initialValues,
         validationSchema: machineryValidationSchema,
         validateOnBlur: true,
         validateOnChange: true,
-        onSubmit: (values, { setFieldError, setFieldTouched }) => {
-            // Manual Validation for State Extension
-            let isExtensionValid = true;
-            const extensionData = getExtensionData('machinery');
-
-            if (extensionData.extensionEnabled) {
-                const extensionValues = values.stateExtension || {};
-                extensionData.fields.forEach(field => {
-                    if (field.isMandatory && !extensionValues[field.fieldName]) {
-                        setFieldError(`stateExtension.${field.fieldName}`, `${field.label || field.fieldName} is required`);
-                        setFieldTouched(`stateExtension.${field.fieldName}`, true, false);
-                        isExtensionValid = false;
-                    }
-                });
-            }
-
-            if (!isExtensionValid) {
-                // Ideally show a toast or alert
-                alert("Please fill all mandatory state extension fields.");
-                return;
-            }
-
-            setPendingAction(isEditMode ? 'update' : 'add');
-            setIsConfirmationOpen(true);
-        },
     });
+
+    const handleSave = async () => {
+        const errors = await formik.validateForm();
+
+        if (Object.keys(errors).length > 0) {
+            formik.setTouched(
+                Object.keys(errors).reduce((acc, key) => {
+                    acc[key] = true;
+                    return acc;
+                }, {})
+            );
+            
+            // Show validation modal
+            setValidationTitle("Validation Required");
+            setValidationMessage("Please complete all required fields before proceeding.");
+            setShowValidationModal(true);
+            return;
+        }
+
+        // Manual Validation for State Extension
+        let isExtensionValid = true;
+        const extensionData = getExtensionData('machinery');
+
+        if (extensionData.extensionEnabled) {
+            const extensionValues = formik.values.stateExtension || {};
+            extensionData.fields.forEach(field => {
+                if (field.isMandatory && !extensionValues[field.fieldName]) {
+                    formik.setFieldError(`stateExtension.${field.fieldName}`, `${field.label || field.fieldName} is required`);
+                    formik.setFieldTouched(`stateExtension.${field.fieldName}`, true, false);
+                    isExtensionValid = false;
+                }
+            });
+        }
+
+        if (!isExtensionValid) {
+            setValidationTitle("Validation Required");
+            setValidationMessage("Please fill all mandatory state extension fields.");
+            setShowValidationModal(true);
+            return;
+        }
+
+        setPendingAction(isEditMode ? 'update' : 'add');
+        setIsConfirmationOpen(true);
+    };
 
     const handleFileSelect = (file) => {
         setUploadedImage(file);
@@ -151,7 +176,7 @@ export const Machinery = () => {
                     FPO Machinery/Equipment update form/ FPO Machinery details
                 </h2>
 
-                <form onSubmit={formik.handleSubmit}>
+                <form>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                         <SelectField
                             label="Machinerysss/Equipment Category"
@@ -302,7 +327,8 @@ export const Machinery = () => {
                                 Reset
                             </Button>
                             <Button
-                                type="submit"
+                                type="button"
+                                onClick={handleSave}
                                 buttonClassName="px-8 py-2 bg-success text-white rounded-md hover:bg-success-dark font-medium"
                             >
                                 Save
@@ -364,6 +390,13 @@ export const Machinery = () => {
                 onClose={() => setIsStatusOpen(false)}
                 status={statusConfig.success}
                 message={statusConfig.message}
+            />
+
+            <ValidationModal
+                isOpen={showValidationModal}
+                title={validationTitle}
+                message={validationMessage}
+                onClose={() => setShowValidationModal(false)}
             />
         </div>
     );
