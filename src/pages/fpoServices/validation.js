@@ -109,3 +109,12 @@ export const machineryValidationSchema = (extensionData) =>
     // ✅ dynamic extension validation
     stateExtension: buildExtensionValidationSchema(extensionData),
   });
+
+
+  export const infrastructureValidationSchema = Yup.object({
+  storageType: Yup.string().required("Storage type is required"),
+  storageCapacity: Yup.string().required("Storage capacity is required"),
+  warehouseAddress: Yup.string().required("Please fill Warehouse/ColdStorage address"),
+  wdraAccredited: Yup.string().required("WDRA Accredited is required"),
+  rentAvailable: Yup.string().required("Rent Available field is required"),
+});

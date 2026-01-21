@@ -10,7 +10,6 @@ import ConfirmationModal from '../../../components/ConfirmationModal';
 import StatusModal from '../../../components/StatusModal';
 import ValidationModal from '../../../components/ValidationModal';
 import { AccordionGroup } from '../../../components/Accordion';
-import ValidationModal from '../../../components/ValidationModal';
 
 import editSvg from '../../../assets/edit.svg';
 import viewSvg from '../../../assets/view.svg';
