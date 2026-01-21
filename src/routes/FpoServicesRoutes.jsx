@@ -3,8 +3,8 @@ import { FertilizerDetails } from "../pages/fpoServices/fertilizerDetails/Fertil
 import { InsecticideOrPesticideDetails } from "../pages/fpoServices/insecticideOrPesticideDetails/InsecticideOrPesticideDetails";
 import { FpoServices } from "../pages/fpoServices/FpoServices";
 import { Machinery } from "../pages/fpoServices/machinery/Machinery";
-import { InfrastructureDetails } from "../pages/fpoServices/infrastructure/InfrastructureDetails";
-import { Infrastructure } from "../pages/fpoServices/fpoServices/infrastructure/Infrastructure";
+import { InfrastructureDetails } from "../pages/fpoServices/infrastructureDetails/InfrastructureDetails";
+import { Infrastructure } from "../pages/fpoServices/infrastructure/Infrastructure";
 
 const FpoServicesRoutes = () => (
   <Route path="fpo-services">

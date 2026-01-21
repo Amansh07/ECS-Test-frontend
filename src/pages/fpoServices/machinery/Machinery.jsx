@@ -8,6 +8,7 @@ import UploadDocument from '../../../components/UploadDocument';
 import Toggle from '../../../components/Toggle';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import StatusModal from '../../../components/StatusModal';
+import ValidationModal from '../../../components/ValidationModal';
 import { AccordionGroup } from '../../../components/Accordion';
 import ValidationModal from '../../../components/ValidationModal';
 

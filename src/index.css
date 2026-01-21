@@ -224,6 +224,8 @@ body,
   /* approximation for a lighter shade of 900 for borders/hover */
   --primary-700: 120 90 255;
   /* rgb(120 90 255) */
+  --primary-300: 137 111 252;
+  /* rgb(137 111 252) */
   --text-primary: 27 122 0;
   /* rgb(27 122 0) */
 }

@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import { TextField, SelectField, CheckboxField, RadioGroup } from '../../../../components/FormFields';
-import Table from '../../../../components/Table';
-import { Button } from '../../../../components/Buttons';
-import ConfirmationModal from '../../../../components/ConfirmationModal';
-import StatusModal from '../../../../components/StatusModal';
-import editSvg from "../../../../assets/edit.svg";
-import viewSvg from "../../../../assets/view.svg";
-import deleteSvg from "../../../../assets/deleteAction.svg";
+import { TextField, SelectField, CheckboxField, RadioGroup } from '../../../components/FormFields';
+import Table from '../../../components/Table';
+import { Button } from '../../../components/Buttons';
+import ConfirmationModal from '../../../components/ConfirmationModal';
+import StatusModal from '../../../components/StatusModal';
+import ValidationModal from '../../../components/ValidationModal';
+import editSvg from "../../../assets/edit.svg";
+import viewSvg from "../../../assets/view.svg";
+import deleteSvg from "../../../assets/deleteAction.svg";
 import { infrastructureValidationSchema } from "../validation"
 
 export const Infrastructure = () => {
@@ -27,6 +28,11 @@ export const Infrastructure = () => {
     const [editingId, setEditingId] = useState(null);
     const [statusConfig, setStatusConfig] = useState({ success: true, message: '' });
     const [isStatusOpen, setIsStatusOpen] = useState(false);
+    
+    // Validation Modal State
+    const [showValidationModal, setShowValidationModal] = useState(false);
+    const [validationTitle, setValidationTitle] = useState("");
+    const [validationMessage, setValidationMessage] = useState("");
 
     /* ================= FORMIK ================= */
     const formik = useFormik({
@@ -47,6 +53,11 @@ export const Infrastructure = () => {
                     return acc;
                 }, {})
             );
+            
+            // Show validation modal
+            setValidationTitle("Validation Required");
+            setValidationMessage("Please complete all required fields before proceeding.");
+            setShowValidationModal(true);
             return;
         }
 
@@ -258,6 +269,12 @@ export const Infrastructure = () => {
                 message={statusConfig.message}
             />
 
+            <ValidationModal
+                isOpen={showValidationModal}
+                title={validationTitle}
+                message={validationMessage}
+                onClose={() => setShowValidationModal(false)}
+            />
         </div>
     );
 };
