@@ -2,15 +2,15 @@ import * as Yup from "yup";
 
 export const fpoCapitalValidationSchema = Yup.object({
   totalEquity: Yup.string()
-  .matches(/^\d{0,50}$/, "Amount allowed only up to 50 digits")
-  .required("Total FPO Equity Capital is Required"),
+    .matches(/^\d{0,50}$/, "Amount allowed only up to 50 digits")
+    .required("Total FPO Equity Capital is Required"),
   isGrantReceived: Yup.string()
-  .required("Whether Equity Grant Recieved is required"),
-grantReceived: Yup.string()
-.when('isGrantRecieved', {
+    .required("Whether Equity Grant Recieved is required"),
+  grantReceived: Yup.string()
+    .when('isGrantRecieved', {
       is: "Yes",
       then: (schema) => schema.matches(/^\d{0,50}$/, "Amount allowed only up to 50 digits")
-  .required("Total FPO Equity Capital is Required"), // Rules if 'hasDiscount' is true
+        .required("Total FPO Equity Capital is Required"), // Rules if 'hasDiscount' is true
       otherwise: (schema) => schema.notRequired(), // Rules if 'hasDiscount' is false
     }),
 
@@ -18,18 +18,18 @@ grantReceived: Yup.string()
 
 export const AGMMeetingValidationSchema = Yup.object({
   financialYear: Yup.string()
-  .required("Financial Year is Required."),
+    .required("Financial Year is Required."),
   //isAgmConducted: Yup.string()
   //.required("Please answer this question."),
-agmCount: Yup.string()
-// .when('isAgmConducted', {
-//       is: "Yes",
-//       then: (schema) => schema.matches(/^\d{0,50}$/, "Amount allowed only up to 50 digits")
-  .required("Total FPO Equity Capital is Required"), // Rules if 'hasDiscount' is true
-    //   otherwise: (schema) => schema.notRequired(), // Rules if 'hasDiscount' is false
-    // }),,
+  agmCount: Yup.string()
+    // .when('isAgmConducted', {
+    //       is: "Yes",
+    //       then: (schema) => schema.matches(/^\d{0,50}$/, "Amount allowed only up to 50 digits")
+    .required("Total FPO Equity Capital is Required"), // Rules if 'hasDiscount' is true
+  //   otherwise: (schema) => schema.notRequired(), // Rules if 'hasDiscount' is false
+  // }),,
 
-    uploadFileURL:Yup.string().required("Proof of meeting is required")
+  uploadFileURL: Yup.string().required("Proof of meeting is required")
 
 });
 
@@ -101,24 +101,23 @@ export const bankDetailsValidationSchema = Yup.object({
 });
 
 export const licenseUpdateValidationSchema = Yup.object({
-  licenseName: Yup.string()
+  licenseId: Yup.string()
     .required("License Name is required"),
 
-  otherLicense: Yup.string()
-    .when('licenseName', {
-      is: 'other',
-      then: (schema) => schema.required("Other License Name is required when License Name is 'Other'"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
+  licenseName: Yup.string().when("licenseId", {
+    is: (val) => val === 26 || val === "26", // handle both number and string
+    then: (schema) => schema.required("Other License Name is required when License Name is 'Other'"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 
   issuedBy: Yup.string()
     .required("Issued By is required"),
 
-  issuedDate: Yup.string()
-    .required("Issue Date is required"),
+  // issuedDate: Yup.string()
+  //   .required("Issue Date is required"),
 
-  validDate: Yup.string()
-    .required("License Valid Till is required"),
+  // validDate: Yup.string()
+  //   .required("License Valid Till is required"),
 
   licenseNumber: Yup.string()
     .required("License Number is required"),
