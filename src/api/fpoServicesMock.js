@@ -331,3 +331,164 @@ export const listInsecticide = () => {
   };
 };
 
+// ==============================================
+// machineryServicesMock.js
+// ==============================================
+
+// ================= CREATE =================
+export const createMachinery = async (payload) => {
+  console.log("Mock createMachinery called:", payload);
+
+  return {
+    status: 200,
+    data: {
+      success: true,
+      message: "Machinery entry created successfully (mock)",
+      data: {
+        id: Date.now(), // mock unique ID
+        fpoId: payload.fpoId,
+        machineryCategory: payload.machineryCategory,
+        machineryName: payload.machineryName,
+        modelNo: payload.modelNo,
+        manufacturerName: payload.manufacturerName,
+        purchaseDate: payload.purchaseDate,
+        purchaseValue: payload.purchaseValue,
+        quantity: payload.quantity,
+        unit: payload.unit,
+        condition: payload.condition,
+        remarks: payload.remarks,
+        docId: payload.docId || `MACH-MOCK-${Math.floor(Math.random() * 1000).toString().padStart(3,'0')}`,
+        createdOn: new Date().toISOString(),
+        isActive: true
+      }
+    }
+  };
+};
+
+// ================= GET BY ID =================
+export const getMachineryById = async (id) => {
+  console.log("Mock getMachineryById called:", id);
+
+  return {
+    status: 200,
+    data: {
+      success: true,
+      data: {
+        id,
+        fpoId: 1,
+        machineryCategory: 1,
+        machineryName: "Tractor",
+        modelNo: "MODEL001",
+        manufacturerName: "ABC Machinery",
+        purchaseDate: "2024-01-10",
+        purchaseValue: 50000.0,
+        quantity: 2,
+        unit: 201,
+        condition: "Good",
+        remarks: "Sample machinery",
+        docId: "MACH-MOCK-123",
+        isActive: true,
+        createdOn: "2024-01-01T09:30:00Z"
+      }
+    }
+  };
+};
+
+// ================= UPDATE =================
+export const updateMachinery = async (id, payload) => {
+  console.log("Mock updateMachinery called:", id, payload);
+
+  return {
+    status: 200,
+    data: {
+      success: true,
+      message: "Machinery entry updated successfully (mock)",
+      data: {
+        id,
+        fpoId: payload.fpoId,
+        machineryCategory: payload.machineryCategory,
+        machineryName: payload.machineryName,
+        modelNo: payload.modelNo,
+        manufacturerName: payload.manufacturerName,
+        purchaseDate: payload.purchaseDate,
+        purchaseValue: payload.purchaseValue,
+        quantity: payload.quantity,
+        unit: payload.unit,
+        condition: payload.condition,
+        remarks: payload.remarks,
+        docId: payload.docId || `MACH-MOCK-${Math.floor(Math.random() * 1000).toString().padStart(3,'0')}`,
+        updatedOn: new Date().toISOString(),
+        isActive: true
+      }
+    }
+  };
+};
+
+// ================= LIST =================
+export const listMachinery = () => {
+  return {
+    success: true,
+    message: "Success",
+    error: null,
+    metadata: null,
+    pagination: {
+      page: 0,
+      size: 10,
+      totalElements: 3,
+      totalPages: 1
+    },
+    data: [
+      {
+        id: 1,
+        fpoId: 1,
+        machineryCategory: 1,
+        machineryName: "Tractor",
+        modelNo: "MODEL001",
+        manufacturerName: "ABC Machinery",
+        purchaseDate: "2024-01-10",
+        purchaseValue: 50000.0,
+        quantity: 2,
+        unit: 201,
+        condition: "Good",
+        remarks: "Sample tractor",
+        docId: "MACH-MOCK-001",
+        isActive: true,
+        createdOn: "2024-01-01T09:30:00Z"
+      },
+      {
+        id: 2,
+        fpoId: 1,
+        machineryCategory: 2,
+        machineryName: "Harvester",
+        modelNo: "HARV-001",
+        manufacturerName: "AgriTools",
+        purchaseDate: "2024-02-15",
+        purchaseValue: 75000.0,
+        quantity: 1,
+        unit: 202,
+        condition: "Excellent",
+        remarks: "High capacity harvester",
+        docId: "MACH-MOCK-002",
+        isActive: true,
+        createdOn: "2024-02-15T10:00:00Z"
+      },
+      {
+        id: 3,
+        fpoId: 1,
+        machineryCategory: 3,
+        machineryName: "Pump",
+        modelNo: "PUMP001",
+        manufacturerName: "WaterWorks",
+        purchaseDate: "2024-03-01",
+        purchaseValue: 20000.0,
+        quantity: 3,
+        unit: 201,
+        condition: "Good",
+        remarks: "Irrigation pump",
+        docId: "MACH-MOCK-003",
+        isActive: true,
+        createdOn: "2024-03-01T08:30:00Z"
+      }
+    ]
+  };
+};

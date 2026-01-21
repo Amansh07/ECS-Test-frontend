@@ -100,6 +100,40 @@ export const getGeneralMasterByType = (type) => {
         success: true
       };
 
+
+    case "machinerycategory":
+      return {
+        data: [
+          { id: 1, name: "Tractor", typeId: 10, parentId: null, displayOrder: 1, isActive: true },
+          { id: 2, name: "Harvester", typeId: 10, parentId: null, displayOrder: 2, isActive: true },
+          { id: 3, name: "Pump", typeId: 10, parentId: null, displayOrder: 3, isActive: true },
+          { id: 4, name: "Plough", typeId: 10, parentId: null, displayOrder: 4, isActive: true },
+          { id: 5, name: "Seeder", typeId: 10, parentId: null, displayOrder: 5, isActive: true },
+          { id: 6, name: "Sprayer", typeId: 10, parentId: null, displayOrder: 6, isActive: true }
+        ],
+        error: null,
+        message: "Success",
+        metadata: null,
+        pagination: null,
+        success: true
+      };
+
+    case "machineryunit":
+      return {
+        data: [
+          { id: 1, name: "Per Hour", typeId: 11, parentId: null, displayOrder: 1, isActive: true },
+          { id: 2, name: "Per Day", typeId: 11, parentId: null, displayOrder: 2, isActive: true },
+          { id: 3, name: "Per Hectare", typeId: 11, parentId: null, displayOrder: 3, isActive: true },
+          { id: 4, name: "Per Acre", typeId: 11, parentId: null, displayOrder: 4, isActive: true },
+          { id: 5, name: "Per Month", typeId: 11, parentId: null, displayOrder: 5, isActive: true }
+        ],
+        error: null,
+        message: "Success",
+        metadata: null,
+        pagination: null,
+        success: true
+      };
+
     // -----------------------------------
     // DEFAULT
     // -----------------------------------

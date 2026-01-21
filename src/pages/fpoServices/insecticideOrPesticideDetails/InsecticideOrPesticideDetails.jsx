@@ -35,9 +35,8 @@ const initialInsecticideData = {
   manufacturerName: "",
   quantityType: "",
   quantity: "",
-  purchaseDate: "",
-  expiryDate: "",
-  batchNo: "",
+  cibRcNumber: "",
+  cibRcIssueDate: "",
   remarks: "",
 };
 
@@ -161,9 +160,6 @@ export const InsecticideOrPesticideDetails = () => {
       manufacturerName: formik.values.manufacturerName,
       quantityType: parseInt(formik.values.quantityType),
       quantity: parseFloat(formik.values.quantity),
-      purchaseDate: formik.values.purchaseDate,
-      expiryDate: formik.values.expiryDate,
-      batchNo: formik.values.batchNo,
       remarks: formik.values.remarks,
       emartPublish: publishOnEmart,
       docId: docId, // only if uploaded
@@ -201,15 +197,13 @@ export const InsecticideOrPesticideDetails = () => {
         quantity: data.quantity,
         cibRcNumber: data.cibRcNumber,
         cibRcIssueDate: data.cibRcIssueDate,
-        purchaseDate: data.purchaseDate,
-        expiryDate: data.expiryDate,
-        batchNo: data.batchNo,
         remarks: data.remarks,
       });
       formik.setErrors({});
       formik.setTouched({});
       setEditId(id);
       setPublishOnEmart(data.emartPublish || false);
+      setUploadedFile(null);
       setUploadedImage(data.docId ? `/mock/uploads/${data.docId}.jpg` : null);
     }
   };
@@ -218,6 +212,7 @@ export const InsecticideOrPesticideDetails = () => {
   const resetFormFields = () => {
     setEditId(null);
     formik.resetForm();
+    setUploadedFile(null);
     setUploadedImage(null);
     setPublishOnEmart(false);
     setUploadResetKey((prev) => prev + 1);
@@ -486,6 +481,7 @@ export const InsecticideOrPesticideDetails = () => {
         data={rowPreviewData ? mapRowToPreview(rowPreviewData) : previewData}
         onConfirm={rowPreviewData ? null : handlePreviewConfirm}
         actionButton={rowPreviewData ? false : true}
+        image={uploadedImage}
         onClose={() => {
           setRowPreviewData(null); // reset after closing
           setIsPreviewModalOpen(false);

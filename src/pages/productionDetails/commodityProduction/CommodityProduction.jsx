@@ -184,8 +184,8 @@ export const CommodityProduction = () => {
       productCategoryId: Number(formik.values.productCategoryId),
       productSubcategoryId: Number(formik.values.productSubcategoryId),
       productId: Number(formik.values.productId),
-      annualProductionCap: ParseFloat(formik.values.annualProductionCap),
-      availableStock: ParseFloat(formik.values.availableStock),
+      annualProductionCap: parseFloat(formik.values.annualProductionCap),
+      availableStock: parseFloat(formik.values.availableStock),
       inProduction: formik.values.inProduction,
       dateOfAvailability: formik.values.dateOfAvailability,
       isOrganic: formik.values.isOrganic,
@@ -519,6 +519,7 @@ export const CommodityProduction = () => {
         onConfirm={rowPreviewData ? null : handlePreviewConfirm}
         actionButton={rowPreviewData ? false : true}
         isDescriptionAvailable={false}
+        image={previewImage}
         onClose={() => {
           setRowPreviewData(null); // reset after closing
           setIsPreviewModalOpen(false);

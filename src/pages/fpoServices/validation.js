@@ -1,4 +1,5 @@
 import * as Yup from "yup";
+import {buildExtensionValidationSchema} from "../../utils/buildExtensionValidationSchema.js";
 
 export const fertilizerDetailsValidationSchema = Yup.object({
   fertilizerType: Yup.string()
@@ -83,22 +84,28 @@ export const insecticideOrPesticideDetailsValidationSchema = Yup.object({
 });
 
 
-export const machineryValidationSchema = Yup.object().shape({
-  machineryCategory: Yup.string().required('Machinery Category is required'),
-  machineryName: Yup.string().required('Machinery Name is required'),
-  brandName: Yup.string().required('Brand Name is required'),
-  unit: Yup.string().required('Unit is required'),
-  rentAmount: Yup.number()
-    .typeError('Rent Amount must be a number')
-    .required('Rent Amount is required')
-    .positive('Rent Amount must be positive'),
-  quantity: Yup.number()
-    .typeError('Quantity must be a number')
-    .required('Quantity is required')
-    .positive('Quantity must be positive')
-    .integer('Quantity must be an integer'),
-  address: Yup.string().required('Address is required'),
-  specifications: Yup.string(),
-  manufacturerName: Yup.string(),
-  stateExtension: Yup.object(),
-});
+export const machineryValidationSchema = (extensionData) =>
+  Yup.object().shape({
+    machineryCategory: Yup.string().required("Machinery Category is required"),
+    machineryName: Yup.string().required("Machinery Name is required"),
+    // brandName: Yup.string().required("Brand Name is required"),
+    unit: Yup.string().required("Unit is required"),
+
+    rentAmount: Yup.number()
+      .typeError("Rent Amount must be a number")
+      .required("Rent Amount is required")
+      .positive("Rent Amount must be positive"),
+
+    quantity: Yup.number()
+      .typeError("Quantity must be a number")
+      .required("Quantity is required")
+      .positive("Quantity must be positive")
+      .integer("Quantity must be an integer"),
+
+    // address: Yup.string().required("Address is required"),
+    specifications: Yup.string(),
+    manufacturerName: Yup.string(),
+
+    // ✅ dynamic extension validation
+    stateExtension: buildExtensionValidationSchema(extensionData),
+  });

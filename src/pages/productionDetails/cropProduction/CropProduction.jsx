@@ -512,6 +512,7 @@ export const CropProduction = () => {
         data={rowPreviewData ? mapRowToPreview(rowPreviewData) : previewData}
         onConfirm={rowPreviewData ? null : handlePreviewConfirm}
         actionButton={rowPreviewData ? false : true}
+        image={previewImage}
         onClose={() => {
           setRowPreviewData(null); // reset after closing
           setIsPreviewModalOpen(false);

@@ -55,7 +55,7 @@ export default function PreviewModal({
                                 {image ? (
                                     <img
                                         src={image}
-                                        alt="Crop Preview"
+                                        alt="Preview Image"
                                         className="w-full h-full object-cover"
                                     />
                                 ) : (
