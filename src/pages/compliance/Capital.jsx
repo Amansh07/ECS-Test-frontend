@@ -1,215 +1,141 @@
 import React, { useEffect, useState } from 'react';
-//import { TextField, SelectField } from '../../../components/FormFields';
-import { TextField,SelectField } from '../../components/FormFields';
+import { TextField, SelectField } from '../../components/FormFields';
 import Table from '../../components/Table';
-//import UploadDocument from '../../../components/UploadDocument';
 import { Button } from '../../components/Buttons';
 import ConfirmationModal from '../../components/ConfirmationModal';
 import StatusModal from '../../components/StatusModal';
 
-import editSvg from "../../assets/edit.svg"
+import editSvg from "../../assets/edit.svg";
+import viewSvg from "../../assets/view.svg";
+import deleteSvg from "../../assets/deleteAction.svg";
+import reloadSvg from "../../assets/reload.svg";
 
-import viewSvg from "../../assets/view.svg"
-//import deleteSvg from "../../../assets/deleteAction.svg";
-import deleteSvg from "../../assets/deleteAction.svg"
-//import { AccordionGroup } from '../../../components/Accordion';
 import { useFormik } from "formik";
 import { fpoCapitalValidationSchema } from './validation';
-import * as Yup from "yup";
+import {
+    listCapitalDetails,
+    createCapitalDetails,
+    updateCapitalDetails,
+    deleteCapitalDetails,
+    getCapitalDetailsById
+} from '../../api/FpoCapitalUpdate';
+
+const initialCapitalData = {
+    totalEquity: '',
+    isGrantReceived: '',
+    grantReceived: ''
+};
 
 export const Capital = () => {
-    // const [formData, setFormData] = useState({
-    //     totalEquity: 0,
-    //     isGrantReceived: '',
-    //     grantReceived: 0
-    // });
-
-    const initialCapitalData = {
-    totalEquity: 0,
-    isGrantReceived: '',
-    grantReceived: 0
-  };
-
-    //const [uploadedFile, setUploadedFile] = useState(null);
-    const [capitalList, setCapitalList] = useState([
-        {
-            id: 1,
-            'Total FPO Equity Capital(in Rupees)': 10000,
-            'Whether Equity Grant Received?': 'Yes',
-            'FPO Equity Grant Received(in Rupees)': 1000000
-        },
-        {
-           id: 2,
-            'Total FPO Equity Capital(in Rupees)': 20000,
-            'Whether Equity Grant Received?': 'No',
-            'FPO Equity Grant Received(in Rupees)': 0
-        }
-    ]);
-
+    const [capitalList, setCapitalList] = useState([]);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
     const [isStatusOpen, setIsStatusOpen] = useState(false);
     const [statusConfig, setStatusConfig] = useState({ success: true, message: '' });
     const [pendingAction, setPendingAction] = useState(null);
-    const [fpoCapitalData, setFpoCapitalData] = useState(initialCapitalData);
-    const [fpoCapitalErrors, setfpoCapitalErrors] = useState({});
-    const [isSaveClicked, setIsSaveClicked] = useState(false);
 
     /* ================= FORMIK ================= */
-      const formik = useFormik({
+    const formik = useFormik({
         initialValues: initialCapitalData,
         validationSchema: fpoCapitalValidationSchema,
-        validateOnChange: true,
+        validateOnChange: false,
         validateOnBlur: true,
-      });
-    // const handleInputChange = (e) => {
-    //     const { name, value } = e.target;
-    //     console.log("name: "+name+" value: "+value);
-        
+    });
 
-    //    // setFormData(prev => ({ ...prev, [name]: value }));
-        
-    // };
+    // ------------------- LOAD DATA -------------------
+    useEffect(() => {
+        fetchCapitalList();
+    }, []);
 
-    /* ================= SYNC FORM VALUES TO STATE ================= */
-      useEffect(() => {
-        const syncForm = async () => {
-          const errors = await formik.validateForm();
-          setfpoCapitalErrors(errors);
-          setFpoCapitalData({ ...formik.values });
-        };
-        syncForm();
-      }, [formik.values]);
-    
-    // const handleFileSelect = (file) => {
-    //     setUploadedFile(file);
-    // };
+    const fetchCapitalList = () => {
+        const res = listCapitalDetails(1); // fpoId = 1
+        if (res.success) {
+            setCapitalList(res.data);
+        }
+    };
 
-    /* ================= SAVE CLICK VALIDATION ================= */
-      useEffect(() => {
-        if (!isSaveClicked) return;
-    
-        const validateAndSubmit = async () => {
-          const errors = await formik.validateForm();
-          setfpoCapitalErrors(errors);
-          console.log("values :", fpoCapitalData);
-          console.log("errors :", fpoCapitalErrors);
-    
-          if (Object.keys(errors).length > 0) {
+    /* ================= HANDLERS ================= */
+    const handleReset = () => {
+        formik.resetForm();
+        setIsEditMode(false);
+        setEditingId(null);
+    };
+
+    const handleSave = async () => {
+        const errors = await formik.validateForm();
+
+        if (Object.keys(errors).length > 0) {
             formik.setTouched(
-              Object.keys(errors).reduce((acc, key) => {
-                acc[key] = true;
-                return acc;
-              }, {})
+                Object.keys(errors).reduce((acc, key) => {
+                    acc[key] = true;
+                    return acc;
+                }, {})
             );
-            setIsSaveClicked(false);
             return;
-          }
-    
-          try {
-            //await addBoardMember(boardMemberCooperativeData);
-            //alert("FPO Equity Capitl added successfully!");
-    
-            setFpoCapitalData(initialCapitalData);
-            formik.resetForm();
-            setfpoCapitalErrors({});
-          } catch (error) {
-            console.error("Error adding FPO Equity Capital:", error);
-          } finally {
-            setIsSaveClicked(false);
-          }
-        };
-    
-        validateAndSubmit();
-      }, [isSaveClicked]);
-    
-      /* ================= HANDLERS ================= */
-  const handleChange = (e) => {formik.handleChange(e);
-    console.log("e "+e);
-  };
+        }
 
-  const handleReset = () => {
-    setFpoCapitalData(initialCapitalData);
-    //formik.resetForm();
-    setfpoCapitalErrors({});
-  };
-
-    const handleAddOrUpdate = () => {
         setPendingAction(isEditMode ? 'update' : 'add');
         setIsConfirmationOpen(true);
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         setIsConfirmationOpen(false);
-        if (pendingAction === 'add') {
-            setIsSaveClicked(true);
-            const newItem = {
-                id: Date.now,
-                'Total FPO Equity Capital(in Rupees)': formik.values.totalEquity,
-            'Whether Equity Grant Received?': formik.values.isGrantReceived,
-            'FPO Equity Grant Received(in Rupees)': formik.values.grantReceived
-                //'Balance Sheet': !!uploadedFile
-            };
-            setCapitalList(prev => [...prev, newItem]);
-            setStatusConfig({ success: true, message: 'FPO Capital details added successfully.' });
-        } else if (pendingAction === 'update') {
-            setIsSaveClicked(true);
-            setCapitalList(prev => prev.map(item =>
-                item.id === editingId
-                    ? {
-                        ...item,
-                        'Total FPO Equity Capital(in Rupees)': formik.values.totalEquity,
-            'Whether Equity Grant Received?': formik.values.isGrantReceived,
-            'FPO Equity Grant Received(in Rupees)': formik.values.grantReceived
-                    }
-                    : item
-            ));
-            setStatusConfig({ success: true, message: 'FPO Capital details updated successfully.' });
-        } else if (pendingAction === 'delete') {
-            setCapitalList(prev => prev.filter(item => item.id !== editingId));
-            setStatusConfig({ success: true, message: 'FPO Capital details deleted successfully.' });
-        }
-        setIsStatusOpen(true);
-        resetForm();
-    };
 
-    const resetForm = () => {
-        setFpoCapitalData(initialCapitalData);
-        //setUploadedFile(null);
-        setIsEditMode(false);
-        setEditingId(null);
+        const payload = {
+            fpoId: 1,
+            totalFpoEquityCap: parseFloat(formik.values.totalEquity),
+            isEquityGrant: formik.values.isGrantReceived === 'Yes',
+            fpoEquityGrantAmt: formik.values.isGrantReceived === 'Yes' ? parseFloat(formik.values.grantReceived) : 0
+        };
+
+        if (pendingAction === 'add') {
+            const res = await createCapitalDetails(payload);
+            if (res.status === 200 && res.data.success) {
+                setStatusConfig({ success: true, message: 'FPO Capital details added successfully.' });
+                fetchCapitalList();
+            }
+        } else if (pendingAction === 'update') {
+            const res = await updateCapitalDetails(editingId, payload);
+            if (res.status === 200 && res.data.success) {
+                setStatusConfig({ success: true, message: 'FPO Capital details updated successfully.' });
+                fetchCapitalList();
+            }
+        } else if (pendingAction === 'delete') {
+            const res = await deleteCapitalDetails(editingId);
+            if (res.status === 200 && res.data.success) {
+                setCapitalList(prev => prev.filter(item => item.id !== editingId));
+                setStatusConfig({ success: true, message: 'FPO Capital details deleted successfully.' });
+            }
+        }
+
+        setIsStatusOpen(true);
         handleReset();
     };
 
-    const handleEdit = (row) => {
-        console.log("row: "+row)
-
-        const editValues = {
-        totalEquity: row['Total FPO Equity Capital(in Rupees)'],
-        isGrantReceived: row['Whether Equity Grant Received?'],
-        grantReceived: row['FPO Equity Grant Received(in Rupees)']
-    };
-    
-    // Update local state
-    setFpoCapitalData(editValues);
-    
-    // UPDATE FORMIK STATE (This is the missing step)
-    formik.setValues(editValues);
-        
-        // setFpoCapitalData({
-        //     totalEquity: row['Total FPO Equity Capital(in Rupees)'],
-        //     isGrantReceived: row['Whether Equity Grant Received?'],
-        //     grantReceived: row['FPO Equity Grant Received(in Rupees)']
-            
-        // });
-        //setFpoCapitalData(formData);
+    const handleEdit = async (row) => {
         setIsEditMode(true);
         setEditingId(row.id);
+
+        const res = await getCapitalDetailsById(row.id);
+        if (res.status === 200 && res.data.success && res.data.data) {
+            const data = res.data.data;
+            formik.setValues({
+                totalEquity: data.totalFpoEquityCap,
+                isGrantReceived: data.isEquityGrant ? 'Yes' : 'No',
+                grantReceived: data.fpoEquityGrantAmt
+            });
+        } else {
+            // Fallback
+            formik.setValues({
+                totalEquity: row.totalFpoEquityCap,
+                isGrantReceived: row.isEquityGrant ? 'Yes' : 'No',
+                grantReceived: row.fpoEquityGrantAmt
+            });
+        }
+
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
-
-    
 
     const handleDelete = (id) => {
         setEditingId(id);
@@ -218,126 +144,104 @@ export const Capital = () => {
     };
 
     return (
-        <div className="flex flex-col gap-6 animate-fadeIn">
+        <div className="flex flex-col gap-6 animate-fadeIn pb-10">
             <div className="bg-white p-6 rounded-lg shadow-sm border border-stroke-200">
-                <h2 className="text-xl font-semibold text-grey-900 mb-6">FPO Capital Update Form</h2>
+                <h2 className="text-base font-bold text-grey-900 mb-6">FPO Capital Update Form</h2>
 
-               {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> */}
-                    
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <TextField
                         label="Total FPO Equity Capital (in Rupees)"
                         name="totalEquity"
                         placeholder="Enter Value"
                         required
-                       // value={formData.totalEquity}
-                       // onChange={handleInputChange}
-                       //onChange={handleChange}
-                    //    value={formik.values.totalEquity}
-                    value={fpoCapitalData.totalEquity}
-                        onChange={handleChange}
+                        value={formik.values.totalEquity}
+                        onChange={(e) => {
+                            if (/^\d*\.?\d*$/.test(e.target.value)) {
+                                formik.handleChange(e);
+                            }
+                        }}
                         onBlur={formik.handleBlur}
-                        error={fpoCapitalErrors.totalEquity}
+                        error={formik.errors.totalEquity}
                         touched={formik.touched.totalEquity}
-                        
                     />
-    </div>
-                    {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-
-        <SelectField
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <SelectField
                         label="Whether Equity Grant Received?"
                         name="isGrantReceived"
                         required
-                        // value={formik.values.isGrantReceived}
-                        value={fpoCapitalData.isGrantReceived}
-                        onChange={handleChange}
+                        value={formik.values.isGrantReceived}
+                        onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        error={fpoCapitalErrors.isGrantReceived}
+                        error={formik.errors.isGrantReceived}
                         touched={formik.touched.isGrantReceived}
                     >
                         <option value="">Select</option>
                         <option value="Yes">Yes</option>
                         <option value="No">No</option>
-                        
                     </SelectField>
 
+                    {(formik.values.isGrantReceived === 'Yes') && (
+                        <TextField
+                            label="FPO Equity Grant Received(in Rupees)"
+                            name="grantReceived"
+                            value={formik.values.grantReceived}
+                            placeholder="Enter Value"
+                            required
+                            onChange={(e) => {
+                                if (/^\d*\.?\d*$/.test(e.target.value)) {
+                                    formik.handleChange(e);
+                                }
+                            }}
+                            onBlur={formik.handleBlur}
+                            error={formik.errors.grantReceived}
+                            touched={formik.touched.grantReceived}
+                        />
+                    )}
 
-                    {fpoCapitalData.isGrantReceived === 'Yes' && (
-       <TextField
-                        label="FPO Equity Grant Received(in Rupees)"
-                        name="grantReceived"
-                        // value={formik.values.grantReceived}
-                        value={fpoCapitalData.grantReceived}
-                         placeholder="Enter Value"
-                        required
-                        
-                        onChange={handleChange}
-                        onBlur={formik.handleBlur}
-                        error={fpoCapitalErrors.grantReceived}
-                        touched={formik.touched.grantReceived}
-                    />
-      )}
+                    {(formik.values.isGrantReceived === 'No' || formik.values.isGrantReceived === '') && (
+                        <TextField
+                            label="FPO Equity Grant Received(in Rupees)"
+                            name="grantReceived"
+                            value=""
+                            placeholder="Enter Value"
+                            disabled={true}
+                        />
+                    )}
+                </div>
 
-{(fpoCapitalData.isGrantReceived === 'No' || fpoCapitalData.isGrantReceived === '' ) && (
-       <TextField
-                        label="FPO Equity Grant Received(in Rupees)"
-                        name="grantReceived"
-                        value={fpoCapitalData.grantReceived}
-                         placeholder="Enter Value"
-                         disabled = {true}
-                        //required
-                        
-                       // onChange={handleInputChange}
-                        //onBlur={formik.handleBlur}
-                        //error={fpoCapitalErrors.grantReceived}
-                        //touched={formik.touched.grantReceived}
-                    />
-      )}
-                         </div>
-
-                
-
-                <div className="flex justify-end gap-4 mt-8">
+                <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-stroke-100">
                     <Button
-                        buttonClassName="px-8 py-2.5 bg-white border border-stroke-300 text-grey-700 rounded-md hover:bg-grey-50 font-medium"
-                        onClick={resetForm}
+                        buttonClassName="px-6 py-2 bg-white border border-stroke-300 text-grey-700 rounded-md hover:bg-grey-50 font-medium flex items-center gap-2"
+                        onClick={handleReset}
                     >
-                        <div className='flex items-center gap-3'>
-                     <span> <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M10.23 1.7625C9.1425 0.675 7.65 0 5.9925 0C2.6775 0 0 2.685 0 6C0 9.315 2.6775 12 5.9925 12C8.79 12 11.1225 10.0875 11.79 7.5H10.23C9.615 9.2475 7.95 10.5 5.9925 10.5C3.51 10.5 1.4925 8.4825 1.4925 6C1.4925 3.5175 3.51 1.5 5.9925 1.5C7.2375 1.5 8.3475 2.0175 9.1575 2.835L6.7425 5.25H11.9925V0L10.23 1.7625Z" fill="#253300"/>
-</svg></span><span>Reset Form</span></div>
- 
+                        <img src={reloadSvg} alt="Reset" className="w-4 h-4" />
+                        Reset Form
                     </Button>
                     <Button
-                        disabled={Object.keys(formik.errors).length !== 0}
-                        buttonClassName="px-8 py-2.5 bg-success text-white rounded-md hover:bg-success-dark font-medium flex items-center gap-2"
-                        onClick={handleAddOrUpdate}
+                        buttonClassName="px-8 py-2 bg-success text-white rounded-md hover:bg-success-dark font-medium"
+                        onClick={handleSave}
                     >
-                        {isEditMode ? (
-                            <>
-                                <span>+</span> Update FPO Capital List
-                            </>
-                        ) : (
-                            <>
-                                <span></span> Save
-                            </>
-                        )}
+                        {isEditMode ? 'Update' : 'Save'}
                     </Button>
                 </div>
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow-sm border border-stroke-200">
-                <h3 className="text-lg font-semibold text-grey-900 mb-6">FPO Capital Details View Table</h3>
+                <h3 className="text-base font-bold text-grey-900 mb-6">FPO Capital Details View Table</h3>
                 <Table
-
                     columns={[
                         "Total FPO Equity Capital(in Rupees)",
                         "Whether Equity Grant Received?",
                         "FPO Equity Grant Received(in Rupees)",
                         "Actions"
                     ]}
-                    data={capitalList}
+                    data={capitalList.map(row => ({
+                        "Total FPO Equity Capital(in Rupees)": row.totalFpoEquityCap,
+                        "Whether Equity Grant Received?": row.isEquityGrant ? 'Yes' : 'No', // Passed as boolean, handled in renderColumn
+                        "FPO Equity Grant Received(in Rupees)": row.fpoEquityGrantAmt,
+                        ...row
+                    }))}
                     renderActions={(row) => (
                         <div className="flex items-center justify-center gap-4">
                             <img src={editSvg} alt="Edit" className="w-6 h-6 cursor-pointer" onClick={() => handleEdit(row)} />
@@ -364,11 +268,11 @@ export const Capital = () => {
                 isOpen={isConfirmationOpen}
                 onClose={() => setIsConfirmationOpen(false)}
                 onConfirm={handleConfirm}
-                title={pendingAction === 'delete' ? 'Delete Record' : pendingAction?.charAt(0)?.toUpperCase() + pendingAction?.slice(1) + " Record"}
+                title={pendingAction === 'delete' ? 'Delete Record' : (isEditMode ? 'Update Record' : 'Save Record')}
                 description={
                     pendingAction === 'delete'
                         ? 'Are you sure you want to delete this record?'
-                        : `Are you sure you want to ${pendingAction} these details?`
+                        : `Are you sure you want to ${isEditMode ? 'update' : 'save'} these details?`
                 }
             />
 

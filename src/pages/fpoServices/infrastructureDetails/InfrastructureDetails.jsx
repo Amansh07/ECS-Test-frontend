@@ -1,308 +1,191 @@
 import React, { useEffect, useState } from 'react';
-import { TextField,SelectField } from '../../../components/FormFields';
+import { TextField, SelectField } from '../../../components/FormFields';
 import Table from '../../../components/Table';
 import { Button } from '../../../components/Buttons';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import StatusModal from '../../../components/StatusModal';
-import ValidationModal from '../../../components/ValidationModal';
-
-import editSvg from "../../../assets/edit.svg"
-
-import viewSvg from "../../../assets/view.svg"
-import deleteSvg from "../../../assets/deleteAction.svg"
-import unarchive from "../../../assets/unarchive.svg"
-//import { AccordionGroup } from '../../../components/Accordion';
+import editSvg from "../../../assets/edit.svg";
+import viewSvg from "../../../assets/view.svg";
+import deleteSvg from "../../../assets/deleteAction.svg";
+import unarchive from "../../../assets/unarchive.svg";
+import reloadSvg from "../../../assets/reload.svg";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import { infraDetailsValidationSchema } from '../validation';
-
 import Toggle from "../../../components/Toggle";
+import {
+    getAllInfrastructure,
+    createInfrastructure,
+    updateInfrastructure,
+    deleteInfrastructure,
+    getInfrastructureById,
+    getInfraSubcategoriesByCategoryId,
+    getArchivedInfrastructure
+} from '../../../api/InfrastructureDetailsMock';
+
 export const InfrastructureDetails = () => {
-    
-
     const initialInfrastructureDetailsData = {
-    category: '',
-    subCategory:'',
-    unit:'',
-    capacity: 0,
-   
-  };
+        category: '',
+        subCategory: '',
+        unit: '',
+        capacity: '',
+        other: ''
+    };
 
-    
-    const [infraDetailList, setInfraDetailList] = useState([
-        {
-            id: 1,
-            'Infra Category': 'Cultivation',
-            'Infra Subcategory': 'Greenhouse/ Polyhouse',
-            'Unit': 'Suare Feet (SqF)',
-            'Available Capacity':20
-        },
-        
-        {
-           id: 3,
-            'Infra Category': 'Processing',
-            'Infra Subcategory':'Seed Processing Unit',
-            'Unit': 'Suare Feet (SqF)',
-            'Available Capacity':20
-        },
-        {
-           id: 4,
-            'Infra Category': 'Processing',
-           'Infra Subcategory':'Seed Processing Unit',
-            'Unit': 'Suare Feet (SqF)',
-            'Available Capacity':20
-        },
-        
-        {
-           id: 6,
-            'Infra Category': 'Processing',
-            'Infra Subcategory':'Seed Processing Unit',
-            'Unit': 'Suare Feet (SqF)',
-            'Available Capacity':20
-        }
-    ]);
-
-    const [archivedInfraList, setArchivedInfraList] = useState([
-        {
-            id: 5,
-            'Infra Category': 'Cultivation',
-            'Infra Subcategory': 'Greenhouse/ Polyhouse',
-            'Unit': 'Suare Feet (SqF)',
-            'Available Capacity':500
-        },
-        
-        
-        {
-           id: 2,
-            'Infra Category': 'Processing',
-            'Infra Subcategory':'Seed Processing Unit',
-            'Unit': 'Suare Feet (SqF)',
-            'Available Capacity':80
-        }
-    ]);
-
+    const [infraDetailList, setInfraDetailList] = useState([]);
+    const [archivedInfraList, setArchivedInfraList] = useState([]);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
     const [isStatusOpen, setIsStatusOpen] = useState(false);
     const [statusConfig, setStatusConfig] = useState({ success: true, message: '' });
     const [pendingAction, setPendingAction] = useState(null);
-    const [infraData, setInfraData] = useState(initialInfrastructureDetailsData);
+    // const [infraData, setInfraData] = useState(initialInfrastructureDetailsData);
     const [infraErrors, setInfraErrors] = useState({});
     const [isSaveClicked, setIsSaveClicked] = useState(false);
     const [isOther, setIsOther] = useState(false);
-    const [tobeUnarchived,setToBeUnarchived]= useState({});
-    
+    const [tobeUnarchived, setToBeUnarchived] = useState({});
+
     // Validation Modal State
     const [showValidationModal, setShowValidationModal] = useState(false);
     const [validationTitle, setValidationTitle] = useState("");
     const [validationMessage, setValidationMessage] = useState("");
-    const [optionsData,setoptionsData] = useState(
-        [
-            {
-            value:"Greenhouse/ Polyhouse",
-            label:"Greenhouse/ Polyhouse" },
-            {
-                value:"Hardening Chamber ",
-                label:"Hardening Chamber "
-            },
-            {
-                value:"Tissue Culture Facility",
-                label:"Tissue Culture Facility"
-            },
-            {
-                value:"Drone Facility",
-                label:"Drone Facility"
-            }
 
-        ])
-   
+    const [optionsData, setoptionsData] = useState([]);
+    const [isSubCategoryLoading, setIsSubCategoryLoading] = useState(false);
 
     /* ================= FORMIK ================= */
-      const formik = useFormik({
+    const formik = useFormik({
         initialValues: initialInfrastructureDetailsData,
         validationSchema: infraDetailsValidationSchema,
-        validateOnChange: true,
+        validateOnChange: false,
         validateOnBlur: true,
-      });
-   
-    /* ================= SYNC FORM VALUES TO STATE ================= */
-      useEffect(() => {
-        const syncForm = async () => {
-          const errors = await formik.validateForm();
-          setInfraErrors(errors);
-          setInfraData({ ...formik.values });
-        };
-        syncForm();
-      }, [formik.values]);
-    
-   
-    /* ================= SAVE CLICK VALIDATION ================= */
-      useEffect(() => {
-        if (!isSaveClicked) return;
-    
-        const validateAndSubmit = async () => {
-          const errors = await formik.validateForm();
-          setInfraErrors(errors);
-          console.log("values :", infraData);
-          console.log("errors :", infraErrors);
-    
-          if (Object.keys(errors).length > 0) {
-            formik.setTouched(
-              Object.keys(errors).reduce((acc, key) => {
-                acc[key] = true;
-                return acc;
-              }, {})
-            );
-            setIsSaveClicked(false);
-            return;
-          }
-    
-          try {
-            
-    
-            setInfraData(initialInfrastructureDetailsData);
-            formik.resetForm();
-            // setIsOrganicFarming(false);
-            setInfraErrors({});
-          } catch (error) {
-            console.error("Error adding Infrastructure Details:", error);
-          } finally {
-            setIsSaveClicked(false);
-          }
-        };
-    
-        validateAndSubmit();
-      }, [isSaveClicked]);
-    
-      /* ================= HANDLERS ================= */
-  const handleChange = (e) => {formik.handleChange(e);
-    console.log("e "+e);
-   
-  };
+    });
 
-  
-  const handleReset = () => {
-    setInfraData(initialInfrastructureDetailsData);
-    setIsOther(false);
-    setInfraErrors({});
-  };
+    // ------------------- LOAD DATA -------------------
+    useEffect(() => {
+        fetchInfraList();
+    }, []);
 
-    const handleAddOrUpdate = async () => {
-        // Validate form before proceeding
+    const fetchInfraList = () => {
+        const res = getAllInfrastructure(1); // fpoId = 1
+        if (res.success) {
+            setInfraDetailList(res.data);
+        }
+
+        // Fetch Archived List
+        const archivedRes = getArchivedInfrastructure(1);
+        if (archivedRes.success) {
+            setArchivedInfraList(archivedRes.data);
+        }
+    };
+
+    /* ================= HANDLERS ================= */
+    const handleReset = () => {
+        formik.resetForm();
+        setoptionsData([]);
+        setIsOther(false);
+        setInfraErrors({});
+        setIsEditMode(false);
+        setEditingId(null);
+    };
+
+    const handleSave = async () => {
         const errors = await formik.validateForm();
-        
+
         if (Object.keys(errors).length > 0) {
-            // Mark all error fields as touched to show inline errors
             formik.setTouched(
                 Object.keys(errors).reduce((acc, key) => {
                     acc[key] = true;
                     return acc;
                 }, {})
             );
-            
-            // Show validation modal
+
             setValidationTitle("Validation Required");
             setValidationMessage("Please complete all required fields before proceeding.");
             setShowValidationModal(true);
             return;
         }
-        
+
         setPendingAction(isEditMode ? 'update' : 'add');
         setIsConfirmationOpen(true);
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         setIsConfirmationOpen(false);
+
+        const payload = {
+            fpoId: 1,
+            infraCategory: parseInt(formik.values.category),
+            infraSubCategory: parseInt(formik.values.subCategory),
+            availableCapacity: parseFloat(formik.values.capacity)
+            // 'other' handling if API supports it, currently mock doesn't explicitly show 'other' field in payload structure
+        };
+
         if (pendingAction === 'add') {
-            setIsSaveClicked(true);
-
-            const newItem = {
-                id: Date.now,
-                
-                 'Infra Category': formik.values.category,
-            'Infra Subcategory': formik.values.subCategory,
-            'Unit': formik.values.unit,
-            'Available Capacity':formik.values.capacity
-               
-            };
-            setInfraDetailList(prev => [...prev, newItem]);
-
-           
-            setStatusConfig({ success: true, message: 'Infrastructure added successfully.' });
+            const res = await createInfrastructure(payload);
+            if (res.status === 200 && res.data.success) {
+                setStatusConfig({ success: true, message: 'Infrastructure added successfully.' });
+                fetchInfraList();
+            }
         } else if (pendingAction === 'update') {
-            setIsSaveClicked(true);
-            setInfraDetailList(prev => prev.map(item =>
-                item.id === editingId
-                    ? {
-                        ...item,
-                         'Infra Category': archivedInfraList,
-            'Infra Subcategory': formik.values.subCategory,
-            'Unit': formik.values.unit,
-            'Available Capacity':formik.values.capacity
-                    }
-                    : item
-            ));
-            setStatusConfig({ success: true, message: 'Infrastructure Details updated successfully.' });
+            const res = await updateInfrastructure(editingId, payload);
+            if (res.status === 200 && res.data.success) {
+                setStatusConfig({ success: true, message: 'Infrastructure updated successfully.' });
+                fetchInfraList();
+            }
         } else if (pendingAction === 'delete') {
-            setInfraDetailList(prev => prev.filter(item => item.id !== editingId));
-            setStatusConfig({ success: true, message: 'FPO Capital details deleted successfully.' });
-        }
-        else if (pendingAction === 'unarchive') {
+            const res = await deleteInfrastructure(editingId);
+            if (res.status === 200 && res.data.success) {
+                setInfraDetailList(prev => prev.filter(item => item.id !== editingId));
+                setStatusConfig({ success: true, message: 'Infrastructure deleted successfully.' });
+            }
+        } else if (pendingAction === 'archive') {
+            // Mock archive logic - move to local archived list for UI demo
+            const itemToArchive = infraDetailList.find(item => item.id === editingId);
+            if (itemToArchive) {
+                setArchivedInfraList(prev => [...prev, itemToArchive]);
+                setInfraDetailList(prev => prev.filter(item => item.id !== editingId));
+                setStatusConfig({ success: true, message: 'Infrastructure archived successfully.' });
+            }
+        } else if (pendingAction === 'unarchive') {
+            // Mock unarchive logic
             const newItem = {
-                id: editingId,
-                
-                 'Infra Category': tobeUnarchived.category,
-            'Infra Subcategory': tobeUnarchived.subCategory,
-            'Unit': tobeUnarchived.unit,
-            'Available Capacity':tobeUnarchived.capacity
-               
+                ...tobeUnarchived,
+                id: editingId
             };
+            // For real API this would be an 'activate' call
             setInfraDetailList(prev => [...prev, newItem]);
-
-           
-            setStatusConfig({ success: true, message: 'Infrastructure unarchived successfully.' });
             setArchivedInfraList(prev => prev.filter(item => item.id !== editingId));
-            //setStatusConfig({ success: true, message: 'FPO Capital details deleted successfully.' });
+            setStatusConfig({ success: true, message: 'Infrastructure unarchived successfully.' });
         }
-        setIsStatusOpen(true);
-        resetForm();
-    };
 
-    const resetForm = () => {
-        setInfraData(initialInfrastructureDetailsData);
-        setIsOther(false);
-        setIsEditMode(false);
-        setEditingId(null);
+        setIsStatusOpen(true);
         handleReset();
     };
 
-    const handleEdit = (row) => {
-        console.log("row: "+row)
-
-        //handleChangeOnselectCategory(row)
-        subCategoryLoading(row['Infra Category']);
-        unitLoading(row['Infra Subcategory']);
-        const editValues = {
-        category: row['Infra Category'],
-        subCategory: row['Infra Subcategory'],
-        unit: row['Unit'],
-        capacity: row['Available Capacity'],
-    };
-    
-   
-    // Update local state
-    setInfraData(editValues);
-    
-    // UPDATE FORMIK STATE (This is the missing step)
-    formik.setValues(editValues);
-        
+    const handleEdit = async (row) => {
         setIsEditMode(true);
         setEditingId(row.id);
+
+        // Load Subcategories first based on category
+        if (row.infraCategory) {
+            await loadSubCategories(row.infraCategory);
+        }
+
+        const res = await getInfrastructureById(row.id);
+        if (res.status === 200 && res.data.success && res.data.data) {
+            const data = res.data.data;
+            formik.setValues({
+                category: data.infraCategory,
+                subCategory: data.infraSubCategory,
+                unit: data.unitName, // Display string for read-only unit field
+                capacity: data.availableCapacity,
+                other: '' // Mock doesn't have other field in response
+            });
+        }
+
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
-
-    
 
     const handleDelete = (id) => {
         setEditingId(id);
@@ -310,377 +193,251 @@ export const InfrastructureDetails = () => {
         setIsConfirmationOpen(true);
     };
 
+    const handleArchive = (id) => {
+        setEditingId(id);
+        setPendingAction('archive');
+        setIsConfirmationOpen(true);
+    };
+
     const handleUnArchive = (row) => {
         setEditingId(row.id);
-        setToBeUnarchived({
-            category: row['Infra Category'],
-        subCategory: row['Infra Subcategory'],
-        unit: row['Unit'],
-        capacity: row['Available Capacity'],
-        })
+        setToBeUnarchived(row); // Keep track of data to restore
         setPendingAction('unarchive');
         setIsConfirmationOpen(true);
     };
 
-    const subCategoryLoading = (value) => {
-        infraData.unit ="";
-        if(value==="Cultivation"){
-            setoptionsData([
-            {
-            value:"Greenhouse/ Polyhouse",
-            label:"Greenhouse/ Polyhouse" },
-            {
-                value:"Hardening Chamber",
-                label:"Hardening Chamber"
-            },
-            // {
-            //     value:"Tissue Culture Facility",
-            //     label:"Tissue Culture Facility"
-            // },
-            // {
-            //     value:"Drone Facility",
-            //     label:"Drone Facility"
-            // }
+    const handleChangeOnselectCategory = async (e) => {
+        const categoryId = e.target.value;
+        formik.handleChange(e);
+        formik.setFieldValue('subCategory', ''); // Reset subcategory
+        formik.setFieldValue('unit', ''); // Reset unit
 
-        ]);
-        
+        if (categoryId) {
+            await loadSubCategories(categoryId);
+        } else {
+            setoptionsData([]);
         }
-        else if(value==="Processing"){
-            setoptionsData([
-            {
-            value:"Seed Processing Unit",
-            label:"Seed Processing Unit" },
-            {
-                value:"Food Processing Unit",
-                label:"Food Processing Unit"
-            },
-            // {
-            //     value:"Integrated Packhouse",
-            //     label:"Integrated Packhouse"
-            // },
-            // {
-            //     value:"Ripening Chamber",
-            //     label:"Ripening Chamber"
-            // },
-            // {
-            //     value:"Washing facility",
-            //     label:"Washing facility"
-            // },
-            // {
-            //     value:"Sorting machines",
-            //     label:"Sorting machines"
-            // },
-            // {
-            //     value:"Grading machines",
-            //     label:"Grading machines"
-            // },
-            // {
-            //     value:"Packaging machines",
-            //     label:"Packaging machines"
-            // },
-            // {
-            //     value:"Flour Mill",
-            //     label:"Flour Mill"
-            // },
-            // {
-            //     value:"Oil Extraction Unit",
-            //     label:"Oil Extraction Unit"
-            // },
-            // {
-            //     value:"Spices Milling Unit",
-            //     label:"Spices Milling Unit"
-            // },
-            {
-                value:"Others",
-                label:"Others"
-            }
+    };
 
-        ]);
+    const loadSubCategories = async (categoryId) => {
+        setIsSubCategoryLoading(true);
+        const res = await getInfraSubcategoriesByCategoryId(categoryId);
+        if (res.success) {
+            const options = res.data.map(item => ({
+                value: item.id,
+                label: item.subcategoryName,
+                unit: item.unit
+            }));
+            setoptionsData(options);
+        } else {
+            setoptionsData([]);
         }
-        formik.setValues(infraData)
+        setIsSubCategoryLoading(false);
+    };
 
-    }
+    const handleChangeOnSelectSubCategory = (e) => {
+        const subCategoryId = parseInt(e.target.value);
+        formik.handleChange(e);
 
-    const handleChangeOnselectCategory = (e) =>{
-        setIsOther(false);
-        subCategoryLoading(e.target.value);
-        handleChange(e);
-    }
-
-    const unitLoading = (value) =>{
-        if( value === 'Greenhouse/ Polyhouse' || value === 'Hardening Chamber')
-        {
-            const unit = 'Suare Feet (SqF)';
-            infraData.unit = unit ;
-            
-
-        }
-        else  if(value === 'Seed Processing Unit')
-        {
-            const unit = 'Quintals per day';
-            infraData.unit = unit ;
-            
-
-        }
-        else if(value==='Food Processing Unit'){
-             const unit = 'Kg/Liters per day';
-            infraData.unit = unit ;
-        }
-        else{
-            if(value==='Others'){
+        // Find selected option to set Unit
+        const selectedOption = optionsData.find(opt => opt.value === subCategoryId);
+        if (selectedOption) {
+            formik.setFieldValue('unit', selectedOption.unit);
+            // Logic for 'Other' if needed - checking label "Others"
+            if (selectedOption.label === "Others") {
                 setIsOther(true);
+            } else {
+                setIsOther(false);
             }
-            const unit = 'Metric tons (MT)';
-            infraData.unit = unit ;
         }
-        formik.setValues(infraData);
-        
-    }
-    const handleChangeOnSelectSubCategory = (e)=>{
-
-        setIsOther(false);
-        const value = e.target.value;
-        unitLoading(value);
-        handleChange(e);
-    }
+    };
 
     return (
-        <div className="flex flex-col gap-6 animate-fadeIn">
+        <div className="flex flex-col gap-6 animate-fadeIn pb-10">
             <div className="bg-white p-6 rounded-lg shadow-sm border border-stroke-200">
-                <h2 className="text-xl font-semibold text-grey-900 mb-6">Infrastructure Update Form</h2>
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-base font-bold text-grey-900">Infrastructure Update Form</h2>
+                    <Toggle
+                        label="Organic Farming"
+                        toggled={false}
+                        onClick={() => { }}
+                    />
+                </div>
 
-               {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> */}
-                    
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <SelectField
                         label="Infrastructure Category"
                         name="category"
                         required
-                        // value={formik.values.isGrantReceived}
-                        value={infraData.category}
+                        value={formik.values.category}
                         onChange={handleChangeOnselectCategory}
                         onBlur={formik.handleBlur}
-                        error={infraErrors.category}
+                        error={formik.errors.category}
                         touched={formik.touched.category}
                     >
                         <option value="">Select</option>
-                        <option value="Cultivation">Cultivation</option>
-                        <option value="Processing">Processing</option>
-                        
+                        {/* IDs from requirements/mock, labels hardcoded for now or fetch Master if exists */}
+                        <option value="955">Cultivation</option>
+                        <option value="956">Processing</option>
                     </SelectField>
 
                     <SelectField
-                        label="Infrastructure SubCategory"
+                        label="Infrastructure Subcategory"
                         name="subCategory"
                         required
-                        // value={formik.values.isGrantReceived}
-                        value={infraData.subCategory}
+                        value={formik.values.subCategory}
                         onChange={handleChangeOnSelectSubCategory}
                         onBlur={formik.handleBlur}
-                        error={infraErrors.subCategory}
+                        error={formik.errors.subCategory}
                         touched={formik.touched.subCategory}
+                        disabled={!formik.values.category}
                     >
                         <option value="">Select Subcategory</option>
-
                         {optionsData.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-                        
-                        
-                    </SelectField>                    
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </SelectField>
                 </div>
-                    {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
 
-                        {isOther && (<TextField
-                        label="Other Facilities"
-                        name="other"
-                        placeholder="Enter Other Facilities"
-                        // required
-                        // disabled = {true}
-                       // value={formData.totalEquity}
-                       // onChange={handleInputChange}
-                       //onChange={handleChange}
-                    //    value={formik.values.totalEquity}
-                    value={infraData.other}
-                        onChange={handleChange}
-                        onBlur={formik.handleBlur}
-                        error={infraErrors.other}
-                        touched={formik.touched.other}
-                        
-                    />)}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    {isOther && (
+                        <TextField
+                            label="Other Facilities"
+                            name="other"
+                            placeholder="Enter Other Facilities"
+                            value={formik.values.other}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.errors.other}
+                            touched={formik.touched.other}
+                        />
+                    )}
 
                     <TextField
                         label="Unit"
-                        name="unir"
-                        placeholder="Enter Unit"
+                        name="unit"
+                        placeholder="Unit"
                         required
-                        disabled = {true}
-                       // value={formData.totalEquity}
-                       // onChange={handleInputChange}
-                       //onChange={handleChange}
-                    //    value={formik.values.totalEquity}
-                    value={infraData.unit}
-                        onChange={handleChange}
-                        onBlur={formik.handleBlur}
-                        error={infraErrors.unit}
-                        touched={formik.touched.unit}
-                        
+                        disabled={true}
+                        value={formik.values.unit}
+                        onChange={formik.handleChange} // Read-only but kept standard
+                        inputClassName="bg-gray-100"
                     />
 
-        
-
-                    
-       
-
-       
-                         </div>
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                            <TextField
+                    <TextField
                         label="Available Capacity"
                         name="capacity"
-                        type="number"
-                        // value={formik.values.grantReceived}
-                        value={infraData.capacity}
-                         placeholder="Enter Value"
+                        type="text"
+                        value={formik.values.capacity}
+                        placeholder="Enter Value"
                         required
-                        
-                        onChange={handleChange}
+                        onChange={(e) => {
+                            if (/^\d*\.?\d*$/.test(e.target.value)) {
+                                formik.handleChange(e);
+                            }
+                        }}
                         onBlur={formik.handleBlur}
-                        error={infraErrors.capacity}
+                        error={formik.errors.capacity}
                         touched={formik.touched.capacity}
                     />
-      
+                </div>
 
-                         </div>
-
-                 
-                
-
-                <div className="flex justify-end gap-4 mt-8">
-                    {/* <div className=" w-full">
-                        <div
-                    className="w-full bg-grey-100 rounded-xl p-4 cursor-pointer flex justify-between items-center"
-                    
-                >
-                        
-                         <span className="text-sm font-medium">Is the farmer doing organic farming?</span>
-                        <Toggle checked={isOrganicFarming} onChange={setIsOrganicFarming} />
-                        </div>
-                      </div> */}
+                <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-stroke-100">
                     <Button
-                        buttonClassName="px-8 py-2.5 bg-white border border-stroke-300 text-grey-700 rounded-md hover:bg-grey-50 font-medium"
-                        onClick={resetForm}
+                        buttonClassName="px-6 py-2 bg-white border border-stroke-300 text-grey-700 rounded-md hover:bg-grey-50 font-medium flex items-center gap-2"
+                        onClick={handleReset}
                     >
-                        <div className='flex items-center gap-3'>
-                     <span> <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10.23 1.7625C9.1425 0.675 7.65 0 5.9925 0C2.6775 0 0 2.685 0 6C0 9.315 2.6775 12 5.9925 12C8.79 12 11.1225 10.0875 11.79 7.5H10.23C9.615 9.2475 7.95 10.5 5.9925 10.5C3.51 10.5 1.4925 8.4825 1.4925 6C1.4925 3.5175 3.51 1.5 5.9925 1.5C7.2375 1.5 8.3475 2.0175 9.1575 2.835L6.7425 5.25H11.9925V0L10.23 1.7625Z" fill="#253300"/>
-                    </svg></span><span>Reset Form</span></div>
- 
+                        <img src={reloadSvg} alt="Reset" className="w-4 h-4" />
+                        Reset Form
                     </Button>
                     <Button
-                        buttonClassName="px-8 py-2.5 bg-success text-white rounded-md hover:bg-success-dark font-medium flex items-center gap-2"
-                        onClick={handleAddOrUpdate}
+                        buttonClassName="px-8 py-2 bg-success text-white rounded-md hover:bg-success-dark font-medium"
+                        onClick={handleSave}
                     >
-                        {isEditMode ? (
-                            <>
-                                <span>+</span> Update Infrastructure Details
-                            </>
-                        ) : (
-                            <>
-                                <span></span> Save
-                            </>
-                        )}
+                        {isEditMode ? 'Update' : 'Save'}
                     </Button>
                 </div>
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow-sm border border-stroke-200">
-                <h3 className="text-lg font-semibold text-grey-900 mb-6">Active Infrastructures</h3>
+                <h3 className="text-base font-bold text-grey-900 mb-6">Infrastructure Details View Table</h3>
                 <Table
-
                     columns={[
                         'Infra Category',
-            'Infra Subcategory',
-            'Unit',
-            'Available Capacity',
-               
-                        
+                        'Infra Subcategory',
+                        'Unit',
+                        'Available Capacity',
                         "Actions"
                     ]}
-                    data={infraDetailList}
+                    data={infraDetailList.map(item => ({
+                        ...item,
+                        // Map fields for table column matching
+                        'Infra Category': item.infraCategoryName,
+                        'Infra Subcategory': item.infraSubCategoryName,
+                        'Unit': item.unitName,
+                        'Available Capacity': item.availableCapacity
+                    }))}
                     renderActions={(row) => (
                         <div className="flex items-center justify-center gap-4">
                             <img src={editSvg} alt="Edit" className="w-6 h-6 cursor-pointer" onClick={() => handleEdit(row)} />
                             <img src={viewSvg} alt="View" className="w-6 h-6 cursor-pointer" />
-                            <img src={deleteSvg} alt="Delete" className="w-6 h-6 cursor-pointer" onClick={() => handleDelete(row.id)} />
+                            <img src={deleteSvg} alt="Delete" className="w-6 h-6 cursor-pointer" onClick={() => handleArchive(row.id)} />
                         </div>
                     )}
-                    // renderColumn={(col, value) => {
-                    //     if (col === "Whether Equity Grant Received?") {
-                    //         return (
-                    //             <div className="flex justify-center">
-                    //                 <span className={`w-6 h-6 flex items-center justify-center rounded-full ${value ? 'bg-success-100 text-success' : 'bg-danger-100 text-danger'}`}>
-                    //                     {value ? '✓' : '✕'}
-                    //                 </span>
-                    //             </div>
-                    //         );
-                    //     }
-                    //     return value;
-                    // }}
                 />
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-stroke-200" >
-                <h3 className="text-lg font-semibold text-grey-900 mb-6">Archived Infrastructures</h3>
-                <Table
-
-                    columns={[
-                        'Infra Category',
-            'Infra Subcategory',
-            'Unit',
-            'Available Capacity',
-               
-                        
-                        "Actions"
-                    ]}
-                    data={archivedInfraList}
-                    renderActions={(row) => (
-                        <div className="flex items-center justify-center gap-4">
-                            {/* <img src={editSvg} alt="Edit" className="w-6 h-6 cursor-pointer" onClick={() => handleEdit(row)} />
-                            <img src={viewSvg} alt="View" className="w-6 h-6 cursor-pointer" /> */}
-                            <img src={unarchive} alt="Delete" className="w-6 h-6 cursor-pointer" onClick={() => handleUnArchive(row)} />
-                        </div>
-                    )}
-                    // renderColumn={(col, value) => {
-                    //     if (col === "Whether Equity Grant Received?") {
-                    //         return (
-                    //             <div className="flex justify-center">
-                    //                 <span className={`w-6 h-6 flex items-center justify-center rounded-full ${value ? 'bg-success-100 text-success' : 'bg-danger-100 text-danger'}`}>
-                    //                     {value ? '✓' : '✕'}
-                    //                 </span>
-                    //             </div>
-                    //         );
-                    //     }
-                    //     return value;
-                    // }}
-                />
-            </div>
-
-
+            {archivedInfraList.length > 0 && (
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-stroke-200 mt-6 opacity-100">
+                    <h3 className="text-base font-bold text-grey-900 mb-6">Archived Infrastructure</h3>
+                    <Table
+                        columns={[
+                            'Infra Category',
+                            'Infra Subcategory',
+                            'Unit',
+                            'Available Capacity',
+                            "Actions"
+                        ]}
+                        data={archivedInfraList.map(item => ({
+                            ...item,
+                            'Infra Category': item.infraCategoryName,
+                            'Infra Subcategory': item.infraSubCategoryName,
+                            'Unit': item.unitName,
+                            'Available Capacity': item.availableCapacity
+                        }))}
+                        renderActions={(row) => (
+                            <div className="flex items-center justify-center gap-4">
+                                <img src={unarchive} alt="Unarchive" className="w-6 h-6 cursor-pointer" onClick={() => handleUnArchive(row)} />
+                            </div>
+                        )}
+                    />
+                </div>
+            )}
 
             <ConfirmationModal
                 isOpen={isConfirmationOpen}
                 onClose={() => setIsConfirmationOpen(false)}
                 onConfirm={handleConfirm}
-                title={pendingAction === 'delete' ? 'Delete Record' : pendingAction?.charAt(0)?.toUpperCase() + pendingAction?.slice(1) + " Record"}
+                title={pendingAction === 'delete' ? 'Delete Record' : (pendingAction === 'archive' ? 'Archive Record' : (pendingAction === 'unarchive' ? 'Unarchive Record' : (isEditMode ? 'Update Record' : 'Save Record')))}
                 description={
                     pendingAction === 'delete'
                         ? 'Are you sure you want to delete this record?'
-                        : `Are you sure you want to ${pendingAction} these details?`
+                        : (pendingAction === 'archive'
+                            ? 'Are you sure you want to archive this record?'
+                            : (pendingAction === 'unarchive'
+                                ? 'Are you sure you want to unarchive this record?'
+                                : `Are you sure you want to ${isEditMode ? 'update' : 'save'} these details?`))
                 }
+            />
+
+            <StatusModal
+                isOpen={showValidationModal}
+                onClose={() => setShowValidationModal(false)}
+                status={false}
+                title={validationTitle}
+                message={validationMessage}
             />
 
             <StatusModal
@@ -688,13 +445,6 @@ export const InfrastructureDetails = () => {
                 onClose={() => setIsStatusOpen(false)}
                 status={statusConfig.success}
                 message={statusConfig.message}
-            />
-
-            <ValidationModal
-                isOpen={showValidationModal}
-                title={validationTitle}
-                message={validationMessage}
-                onClose={() => setShowValidationModal(false)}
             />
         </div>
     );
