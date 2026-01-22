@@ -1,55 +1,20 @@
 import { useState } from "react";
-// import "./RegisterScreen.css";
 import SelectUser from "./SelectUser";
 import RegistrationForm from "./RegistrationForm";
-import AddDocuments from "../../components/AddDocuments";
-import Review from "./Review";
-import { Button } from "../../components/Buttons";
 import StepWizard from "../../components/StepWizard";
 
 import StatusModal from "../../components/StatusModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 
 const initialValues = {
-  // Registration Details (Accordions)
   registeredUnder: "companies",
-  cin: "",
-  doi: "",
-  companyName: "",
-  rocName: "",
-  companyStatus: "",
-  district: "",
-  primaryEmail: "",
-  primaryContact: "",
-  secondaryEmail: "",
-  secondaryContact: "",
-  totalShareholders: "",
-  financialYear: "",
-  turnOver: "",
-  totalLand: "",
-  // Cooperative specific
-  regdNo: "",
-  coopsocietyName: "",
-  doreg: "",
-  roaName: "",
-  area: "",
-  emailAddress: "",
-  contactNumber: "",
-  profitLoss: "",
-  financialRange: "",
-  auditApplicability: "",
-  auditStatus: "",
-  auditType: "",
-  // Registration form fields (below accordions)
-  implementingAgency: "",
-  block: "",
-  communicationAddress: "",
-  username: "",
-  password: "",
-  confirmPassword: "",
-  fpopan: "",
-  bannerImage: null,
-  shareholderSheet: null,
+  companyDetails: { cin: "", doi: "", companyName: "", rocName: "", companyStatus: "" },
+  cooperativeDetails: { regdNo: "", coopsocietyName: "", doreg: "", roaName: "", area: "" },
+  primaryEmail: "", primaryContact: "", secondaryEmail: "", secondaryContact: "",
+  financialForm: { financialYear: "", turnOver: "", profitLoss: "", financialRange: "", auditApplicability: "", auditStatus: "", auditType: "" },
+  district: "", implementingAgency: "", block: "", communicationAddress: "", totalShareholders: "", totalLand: "",
+  username: "", password: "", confirmPassword: "", fpopan: "",
+  bannerImage: null, shareholderSheet: null,
 };
 
 const pdfConfig = {
@@ -72,58 +37,103 @@ export default function Registration() {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const handleChange = (e) => {
-    const { name, type } = e.target;
-    const value = type === "radio" ? e.target.value : e.target.value;
+    const { name, value } = e.target;
     setValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  function handleFileSelect(type, file) {
-    if (type === "image") {
-      setValues((prev) => ({ ...prev, bannerImage: file }));
-    } else if (type === "pdf") {
-      setValues((prev) => ({ ...prev, shareholderSheet: file }));
-    }
-  }
+  const handleNestedChange = (e) => {
+    const { name, value } = e.target;
+    const keys = name.split(".");
+    setValues((prev) => {
+      const updated = { ...prev };
+      let temp = updated;
+      for (let i = 0; i < keys.length - 1; i++) {
+        temp[keys[i]] = { ...temp[keys[i]] };
+        temp = temp[keys[i]];
+      }
+      temp[keys[keys.length - 1]] = value;
+      return updated;
+    });
+  };
 
-  function handleSubmit() {
-    setIsConfirmModalOpen(true);
-  }
+  const handleRegisteredUnderChange = (e) => {
+    const value = e.target.value;
+    setValues((prev) => ({
+      ...prev,
+      registeredUnder: value,
+      companyDetails: value === "companies" ? prev.companyDetails : { cin: "", doi: "", companyName: "", rocName: "", companyStatus: "" },
+      cooperativeDetails: value === "cooperatives" ? prev.cooperativeDetails : { regdNo: "", coopsocietyName: "", doreg: "", roaName: "", area: "" },
+    }));
+  };
 
-  function handleConfirmSubmit() {
-    // TODO: submit to API
-    console.log("Form submit", values);
+  const handleFileSelect = (type, file) => {
+    setValues((prev) => ({
+      ...prev,
+      ...(type === "image" ? { bannerImage: file } : { shareholderSheet: file }),
+    }));
+  };
+
+  const handleSubmit = () => setIsConfirmModalOpen(true);
+  const handleConfirmSubmit = () => {
+    console.log("Final Submit Payload", values);
     setIsConfirmModalOpen(false);
-
-    // Simulate API success
     setTimeout(() => {
       setModalStatus(true);
       setModalMessage("The form has been registered successfully!!");
       setIsModalOpen(true);
     }, 300);
-  }
+  };
 
+  // ------------------------ STEPS ------------------------
   const steps = [
-    {
-      label: "Select User",
-      component: <SelectUser />
-    },
+    { label: "Select User", component: <SelectUser /> },
     {
       label: "Registration Details",
-      component: <RegistrationForm values={values} handleChange={handleChange} />
+      component: (
+        <RegistrationForm
+          values={values}
+          handleChange={handleChange}
+          handleNestedChange={handleNestedChange}
+          handleRegisteredUnderChange={handleRegisteredUnderChange}
+          showForm={true}
+          showDocuments={false} // Hide documents in step 2
+          disabled={false}       // Editable
+        />
+      ),
     },
     {
       label: "Add Documents",
       component: (
-        <AddDocuments
+        <RegistrationForm
+          values={values}
+          handleChange={handleChange}
+          handleNestedChange={handleNestedChange}
+          handleRegisteredUnderChange={handleRegisteredUnderChange}
           imgConfig={imgConfig}
           pdfConfig={pdfConfig}
-          onFileSelect={handleFileSelect}
+          handleFileSelect={handleFileSelect}
+          showForm={false}
+          showDocuments={true}  // Show documents in step 3
+          disabled={false}       // Editable
         />
-      )
+      ),
     },
     {
       label: "Review",
-      component: <Review values={values} imgConfig={imgConfig} pdfConfig={pdfConfig} onFileSelect={handleFileSelect} />
+      component: (
+        <RegistrationForm
+          values={values}
+          handleChange={handleChange}
+          handleNestedChange={handleNestedChange}
+          handleRegisteredUnderChange={handleRegisteredUnderChange}
+          imgConfig={imgConfig}
+          pdfConfig={pdfConfig}
+          handleFileSelect={handleFileSelect}
+          showForm={true}
+          showDocuments={true}  // Show documents in step 4
+          disabled={true}        // Disabled for review
+        />
+      ),
     },
   ];
 
@@ -134,6 +144,7 @@ export default function Registration() {
         steps={steps}
         onComplete={handleSubmit}
       />
+
       <ConfirmationModal
         isOpen={isConfirmModalOpen}
         onClose={() => setIsConfirmModalOpen(false)}
@@ -141,6 +152,7 @@ export default function Registration() {
         title="Submit Registration Form"
         description="Are you sure you want to submit the registration form? Forms once submitted cannot be edited."
       />
+
       <StatusModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

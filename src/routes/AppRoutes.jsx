@@ -2,7 +2,6 @@ import { Routes, Route } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import AuthLayout from "../layouts/AuthLayout";
 import Registration from "../pages/registration/Registration";
-import RegistrationCoopForm from "../pages/registration/RegistrationCoopForm";
 import Login from "../pages/login/login";
 import PrivateRoute from "./PrivateRoute";
 import MemberManagementRoutes from "./MemberManagementRoutes";
@@ -24,7 +23,6 @@ const AppRoutes = () => {
         <Route path="/dashboard" element={<Dashboard />} />
 		<Route path="/" element={<Registration />} />
         <Route path="/registration" element={<Registration />} />
-		<Route path="/registrationcoop" element={<RegistrationCoopForm />} />
 		
         {MemberManagementRoutes()}
         {ProductionDetailsRoutes()}

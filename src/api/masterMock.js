@@ -134,6 +134,48 @@ export const getGeneralMasterByType = (type) => {
         success: true
       };
 
+
+    case "agency":
+      return {
+        data: [
+          { id: 1, name: "SIFA", typeId: 12, parentId: null, displayOrder: 1, isActive: true },
+          { id: 2, name: "HOFD", typeId: 12, parentId: null, displayOrder: 2, isActive: true }
+        ],
+        error: null,
+        message: "Success",
+        metadata: null,
+        pagination: null,
+        success: true
+      };
+
+    case "financial_year":
+      return {
+        data: [
+          { id: 1, name: "2023-24", typeId: 13, parentId: null, displayOrder: 1, isActive: true },
+          { id: 2, name: "2022-23", typeId: 13, parentId: null, displayOrder: 2, isActive: true }
+        ],
+        error: null,
+        message: "Success",
+        metadata: null,
+        pagination: null,
+        success: true
+      };
+
+
+    case "financial_range":
+      return {
+        data: [
+          { id: 1, name: "1-5 Crores", typeId: 14, parentId: null, displayOrder: 1, isActive: true },
+          { id: 2, name: "6-20 Crores", typeId: 14, parentId: null, displayOrder: 2, isActive: true }
+        ],
+        error: null,
+        message: "Success",
+        metadata: null,
+        pagination: null,
+        success: true
+      };
+
+
     // -----------------------------------
     // DEFAULT
     // -----------------------------------
