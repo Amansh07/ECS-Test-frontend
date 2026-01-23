@@ -15,11 +15,12 @@ import deleteSvg from '../../assets/deleteAction.svg';
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { registrationValidationSchema } from "./validation";
 import UploadDocument from "../../components/UploadDocument";
+import { useNavigate } from "react-router-dom";
 
 const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = false, imgConfig, pdfConfig, activeStep, setActiveStep, nextButtonClicked, setNextButtonClicked, backButtonClicked, setBackButtonClicked, saveButtonClicked, setSaveButtonClicked, steps }) => {
   // ---------------- INITIAL FORM VALUES ----------------
   const initialValues = {
-    registeredUnder: "",
+    registeredUnder: 6,
     agency: "",
     blockId: "",
     districtId: "",
@@ -60,6 +61,8 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
       roaName: "",
     },
   };
+
+  const navigate = useNavigate();
 
   // ---------------- FORMIK ----------------
   const formik = useFormik({
@@ -108,6 +111,8 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
     setPendingAction("");
     setPendingRow(null);
     setShowValidationModal(false);
+    setImageFile(null);
+    setPdfFile(null);
     setValidationMessage("");
   };
 
@@ -203,6 +208,8 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
     setTimeout(() => {
       resetAllFormData();
     }, 300);
+
+    // navigate("/", { replace: true });
   };
 
 
@@ -345,7 +352,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
 
 
   useEffect(() => {
-    if(saveButtonClicked){
+    if (saveButtonClicked) {
       handleSave();
       setBackButtonClicked(false);
     }
@@ -665,11 +672,11 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                     touched={touched.companyDetails?.cin}
                     disabled={disabled}
                   />
-                  <div className="pt-6">
+                  {!disabled && <div className="pt-6">
                     <Button type="button" disabled={disabled} buttonClassName="px-4 py-2 bg-green-600 text-white rounded">
                       Fetch Data from MCA
                     </Button>
-                  </div>
+                  </div>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <TextField
@@ -759,6 +766,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
             value={values.mobileNumber || ""}
             onChange={handleChange}
             onBlur={handleBlur}
+            onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
             error={errors.mobileNumber}
             touched={touched.mobileNumber}
             disabled={disabled}
@@ -793,7 +801,8 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
               label="Turnover"
               required
               name="turnOver"
-              type="number"
+              // type="number"
+              onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
               placeholder="Enter Value"
               value={values.turnOver}
               onChange={handleChange}
@@ -806,7 +815,8 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
               label="Profit/Loss"
               required
               name="profitLoss"
-              type="number"
+              // type="number"
+              onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
               placeholder="Enter Value"
               value={values.profitLoss}
               onChange={handleChange}
@@ -892,14 +902,14 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
             Add Financial Details
           </Button> */}
 
-          <Button
+          {!disabled && <Button
             type="button"
             onClick={handleAddOrUpdateFinancialRowClick}
             buttonClassName="px-4 py-2 bg-green-600 text-white rounded mb-4"
           >
             {isUpdateMode ? "Update" : "Add"} Financial Details
           </Button>
-
+          }
           {/* Financial Table */}
           <Table
             columns={financialColumns}
@@ -1043,6 +1053,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                 name="pincode"
                 placeholder="Enter Pincode"
                 value={values.pincode}
+                onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={errors.pincode}
@@ -1053,66 +1064,58 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                 label="Number of Shareholders"
                 required
                 name="totalFarmers"
-                type="number"
                 placeholder="Enter Value"
                 value={values.totalFarmers}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
                 error={errors.totalFarmers}
                 touched={touched.totalFarmers}
                 disabled={disabled}
               />
+
               <TextField
                 label="Number of Female Shareholders"
                 required
                 name="femaleFarmers"
-                type="number"
                 placeholder="Enter Value"
                 value={values.femaleFarmers}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
                 error={errors.femaleFarmers}
                 touched={touched.femaleFarmers}
                 disabled={disabled}
               />
+
               <TextField
                 label="Number of Male Shareholders"
                 required
                 name="maleFarmers"
-                type="number"
                 placeholder="Enter Value"
                 value={values.maleFarmers}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
                 error={errors.maleFarmers}
                 touched={touched.maleFarmers}
                 disabled={disabled}
               />
-              <TextField
-                label="Percentage of Female Shareholders"
-                name="percentageOfFemaleFarmers"
-                type="number"
-                placeholder="Enter Value"
-                value={values.percentageOfFemaleFarmers}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={errors.percentageOfFemaleFarmers}
-                touched={touched.percentageOfFemaleFarmers}
-                disabled={true}
-              />
+
               <TextField
                 label="Total Land Owned by FPO Farmers(In Hectares)"
                 required
                 name="landOwnedByFpo"
-                type="number"
                 placeholder="Enter Value"
                 value={values.landOwnedByFpo}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
                 error={errors.landOwnedByFpo}
                 touched={touched.landOwnedByFpo}
                 disabled={disabled}
               />
+
               <TextField
                 label="Secondary FPO email"
                 type="email"

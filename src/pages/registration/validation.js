@@ -22,27 +22,48 @@ export const registrationValidationSchema = Yup.object().shape({
   pincode: Yup.string()
     .matches(/^\d{6}$/, "Pincode must be exactly 6 digits")
     .required("Pincode is required"),
-  totalFarmers: Yup.number()
+  totalFarmers: Yup.string()
     .required("Total shareholders are required")
-    .min(1, "Total shareholders must be at least 1"),
-  maleFarmers: Yup.number()
+    .matches(/^\d+$/, "Only digits are allowed")
+    .test(
+      "min-total",
+      "Total shareholders must be at least 1",
+      (value) => !value || Number(value) >= 1
+    ),
+
+  maleFarmers: Yup.string()
     .required("Male shareholders are required")
-    .min(0, "Male shareholders cannot be negative")
+    .matches(/^\d+$/, "Only digits are allowed")
+    .test(
+      "male-non-negative",
+      "Male shareholders cannot be negative",
+      (value) => !value || Number(value) >= 0
+    )
     .test(
       "male-less-than-total",
       "Male shareholders cannot exceed total shareholders",
       function (value) {
-        return value <= this.parent.totalFarmers;
+        const { totalFarmers } = this.parent;
+        if (!value || !totalFarmers) return true;
+        return Number(value) <= Number(totalFarmers);
       }
     ),
-  femaleFarmers: Yup.number()
+
+  femaleFarmers: Yup.string()
     .required("Female shareholders are required")
-    .min(0, "Female shareholders cannot be negative")
+    .matches(/^\d+$/, "Only digits are allowed")
+    .test(
+      "female-non-negative",
+      "Female shareholders cannot be negative",
+      (value) => !value || Number(value) >= 0
+    )
     .test(
       "female-less-than-total",
       "Female shareholders cannot exceed total shareholders",
       function (value) {
-        return value <= this.parent.totalFarmers;
+        const { totalFarmers } = this.parent;
+        if (!value || !totalFarmers) return true;
+        return Number(value) <= Number(totalFarmers);
       }
     )
     .test(
@@ -50,13 +71,20 @@ export const registrationValidationSchema = Yup.object().shape({
       "Sum of male and female shareholders must equal total shareholders",
       function () {
         const { maleFarmers, femaleFarmers, totalFarmers } = this.parent;
-        if (maleFarmers == null || femaleFarmers == null || totalFarmers == null) return true;
+        if (!maleFarmers || !femaleFarmers || !totalFarmers) return true;
         return Number(maleFarmers) + Number(femaleFarmers) === Number(totalFarmers);
       }
     ),
-  landOwnedByFpo: Yup.number()
+
+  landOwnedByFpo: Yup.string()
     .required("Land Owned by FPO is required")
-    .min(0, "Land cannot be negative"),
+    .matches(/^\d+$/, "Only digits are allowed")
+    .test(
+      "non-negative-land",
+      "Land cannot be negative",
+      (value) => !value || Number(value) >= 0
+    ),
+
   emailAddress: Yup.string().email("Invalid email").required("Email is required"),
   mobileNumber: Yup.string()
     .matches(/^\d{10}$/, "Mobile number must be exactly 10 digits")
@@ -75,34 +103,34 @@ export const registrationValidationSchema = Yup.object().shape({
     .required("FPO PAN number is required"),
 
   // Conditional validation for company
- companyDetails: Yup.lazy((value, options) => {
-  const registeredUnder = options.parent.registeredUnder;
-  if (registeredUnder === 6) {
+  companyDetails: Yup.lazy((value, options) => {
+    const registeredUnder = options.parent.registeredUnder;
+    if (registeredUnder === 6) {
+      return Yup.object().shape({
+        cin: Yup.string()
+          .required("CIN/LLPIN/FCRN is required")
+          .test(
+            "valid-cin-llpin-fcrn",
+            "Must be a valid CIN, LLPIN, or FCRN",
+            function (value) {
+              if (!value) return false;
+              return cinRegex.test(value) || llpinRegex.test(value) || fcrnRegex.test(value);
+            }
+          ),
+        companyName: Yup.string().required("Company name is required"),
+        companyStatus: Yup.string().required("Company status is required"),
+        incorporationDate: Yup.date().required("Incorporation date is required"),
+        rocName: Yup.string().required("ROC name is required"),
+      });
+    }
     return Yup.object().shape({
-      cin: Yup.string()
-        .required("CIN/LLPIN/FCRN is required")
-        .test(
-          "valid-cin-llpin-fcrn",
-          "Must be a valid CIN, LLPIN, or FCRN",
-          function (value) {
-            if (!value) return false;
-            return cinRegex.test(value) || llpinRegex.test(value) || fcrnRegex.test(value);
-          }
-        ),
-      companyName: Yup.string().required("Company name is required"),
-      companyStatus: Yup.string().required("Company status is required"),
-      incorporationDate: Yup.date().required("Incorporation date is required"),
-      rocName: Yup.string().required("ROC name is required"),
+      cin: Yup.string(),
+      companyName: Yup.string(),
+      companyStatus: Yup.string(),
+      incorporationDate: Yup.date(),
+      rocName: Yup.string(),
     });
-  }
-  return Yup.object().shape({
-    cin: Yup.string(),
-    companyName: Yup.string(),
-    companyStatus: Yup.string(),
-    incorporationDate: Yup.date(),
-    rocName: Yup.string(),
-  });
-}),
+  }),
 
 
   // Conditional validation for society
