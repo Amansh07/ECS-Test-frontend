@@ -235,7 +235,7 @@
 }
 
 .app-page-with-header {
-  padding-top: 100px !important;
+  padding-top: var(--app-header-h, 100px) !important;
   /* header + breadcrumb height */
   max-width: 100%;
 }

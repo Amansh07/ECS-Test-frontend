@@ -1,17 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import "./header.css";
 import { Button } from "../components/Buttons";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
-   const location = useLocation();
+  const location = useLocation();
 
-  const hideBreadcrumb =
-    location.pathname === "/login" || location.pathname === "/forgot-password";
+  const hideRoutes = ["/", "/login", "/forgot-password"];
+  const hideBreadcrumb = hideRoutes.includes(location.pathname);
+
+  const headerRef = useRef(null);
+
+  useEffect(() => {
+    function updateHeaderHeight() {
+      if (!headerRef.current) return;
+      const height = headerRef.current.offsetHeight;
+      document.documentElement.style.setProperty('--app-header-h', `${height}px`);
+    }
+
+    updateHeaderHeight();
+    window.addEventListener('resize', updateHeaderHeight);
+    return () => window.removeEventListener('resize', updateHeaderHeight);
+  }, [location.pathname, hideBreadcrumb, open]);
 
   return (
-    <header className="fpo-header" style={{ zIndex: open ? 100 : undefined }}>
+    <header ref={headerRef} className="fpo-header" style={{ zIndex: open ? 100 : undefined }}>
       {/* Top Black Bar */}
       <div className="flex justify-end items-center px-4 md:px-6 py-1 text-[10px] md:text-xs gap-3 bg-[#000000] text-primary-700 font-medium tracking-wide border-b border-white/10">
         <a href="#main-content" className="hover:underline hover:text-primary-500 transition-colors">Skip to Main Content</a>

@@ -124,8 +124,8 @@ export default function MainLayout() {
     { title: "Fertilizer Details", path: "fertilizer-details" },
     { title: "Insecticide/Pesticide Details", path: "insecticide-or-pesticide-details" },
     { title: "Machinery/Equipment Details", path: "machinery" },
-    {title:"Infrastructure Details",path:"infrastructure-form"},
-	{ title: "Infrastructure", path: "infrastructure" },
+    { title: "Infrastructure Details", path: "infrastructure-form" },
+    { title: "Infrastructure", path: "infrastructure" },
   ];
 
   const complianceTabs = [
@@ -161,28 +161,36 @@ export default function MainLayout() {
     };
   }
 
+
+  const hideSidebarRoutes = ["/"];
+  const shouldHideSidebar = hideSidebarRoutes.includes(location.pathname);
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
 
       <div className="pt-[var(--app-header-h)] pb-[var(--app-footer-h)] h-screen overflow-hidden">
-        <Button
-          type="button"
-          onClick={() => setMobileOpen(true)}
-          buttonClassName="lg:hidden fixed left-3 top-[calc(var(--app-header-h)+var(--app-gutter))] h-10 w-10 bg-text-light border border-stroke-200 shadow-sm"
-        >
-          ☰
-        </Button>
+        {!shouldHideSidebar && (
+          <Button
+            type="button"
+            onClick={() => setMobileOpen(true)}
+            buttonClassName="lg:hidden fixed left-3 top-[calc(var(--app-header-h)+var(--app-gutter))] h-10 w-10 bg-text-light border border-stroke-200 shadow-sm"
+          >
+            ☰
+          </Button>
+        )}
 
         <div className="flex h-full">
-          <LeftNav
-            mobileOpen={mobileOpen}
-            onCloseMobile={() => setMobileOpen(false)}
-            collapsed={collapsed}
-            onToggleCollapsed={() => setCollapsed((v) => !v)}
-          />
+          {!shouldHideSidebar && (
+            <LeftNav
+              mobileOpen={mobileOpen}
+              onCloseMobile={() => setMobileOpen(false)}
+              collapsed={collapsed}
+              onToggleCollapsed={() => setCollapsed((v) => !v)}
+            />
+          )}
 
-          <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+          <main className={`flex-1 overflow-y-auto ${location.pathname === '/' ? '' : 'p-4 lg:p-6'}`}>
             {tabsConfig && (
               <div className="mb-4 mt-16 lg:mt-0">
                 <TabsWithScroll

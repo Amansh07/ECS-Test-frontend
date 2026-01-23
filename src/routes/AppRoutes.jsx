@@ -9,7 +9,7 @@ import ProductionDetailsRoutes from "./ProductionDetailsRoutes";
 import FpoServicesRoutes from "./FpoServicesRoutes";
 import ComplianceRoutes from "./ComplianceRoutes";
 import Dashboard from "../pages/dashboard/Dashboard";
-
+import Homepage from "../pages/homepage/Homepage";
 
 // Force HMR update
 const AppRoutes = () => {
@@ -17,13 +17,12 @@ const AppRoutes = () => {
     <Routes>
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
-		
-	  </Route>
+      </Route>
       <Route element={<MainLayout />}>
         <Route path="/dashboard" element={<Dashboard />} />
-		<Route path="/" element={<Registration />} />
+        <Route path="/" element={<Homepage />} />
         <Route path="/registration" element={<Registration />} />
-		
+
         {MemberManagementRoutes()}
         {ProductionDetailsRoutes()}
         {ComplianceRoutes()}
