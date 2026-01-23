@@ -284,11 +284,10 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
 
 
   useEffect(() => {
-    // fetchDistricts();   // 👈 runs only once
+    fetchDistricts();
   }, []);
 
   const [hasVisitedStep2, setHasVisitedStep2] = useState(false);
-
 
   useEffect(() => {
     if (!nextButtonClicked) return;
