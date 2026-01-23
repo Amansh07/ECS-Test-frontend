@@ -40,16 +40,35 @@ export const AGMMeeting = () => {
         {
             id: 1,
             'Financial Year': '2024-2025',
-            'Meeting conducted in last one year': 'Yes',
+            // 'Meeting conducted in last one year': 'Yes',
             'AGM Count': 1000000,
             'Meeting Proof': 'MOM.pdf'
         },
         {
            id: 2,
             'Financial Year': '2022-2023',
-            'Meeting conducted in last one year': 'No',
+            // 'Meeting conducted in last one year': 'No',
             'AGM Count': 0,
             'Meeting Proof': 'MOM2.pdf'
+        }
+    ]);
+
+     const [deletedAgmList, setDeletedAgmList] = useState([
+        {
+            id: 1,
+            'Financial Year': '2024-2025',
+            // 'Meeting conducted in last one year': 'Yes',
+            'AGM Count': 1000000,
+            'Proof of Meeting (Documents)': 'MOM.pdf',
+            'Deleted On (Timestamp)': '20-01-2026 13:12:28'
+        },
+        {
+           id: 2,
+            'Financial Year': '2022-2023',
+            // 'Meeting conducted in last one year': 'No',
+            'AGM Count': 0,
+            'Proof of Meeting (Documents)': 'MOM2.pdf',
+            'Deleted On (Timestamp)': '20-01-2026 13:12:28'
         }
     ]);
 
@@ -385,6 +404,40 @@ export const AGMMeeting = () => {
                             <img src={deleteSvg} alt="Delete" className="w-6 h-6 cursor-pointer" onClick={() => handleDelete(row.id)} />
                         </div>
                     )}
+                    renderColumn={(col, value) => {
+                        if (col === "Meeting conducted in last one year") {
+                            return (
+                                <div className="flex justify-center">
+                                    <span className={`w-6 h-6 flex items-center justify-center rounded-full ${value ? 'bg-success-100 text-success' : 'bg-danger-100 text-danger'}`}>
+                                        {value ? '✓' : '✕'}
+                                    </span>
+                                </div>
+                            );
+                        }
+                        return value;
+                    }}
+                />
+            </div>
+
+            {/* Deleted List */}
+             <div className="bg-white p-6 rounded-lg shadow-sm border border-stroke-200">
+                <h3 className="text-lg font-semibold text-grey-900 mb-6">Deleted AGM Meeting Details</h3>
+                <Table
+
+                    columns={[
+                        'Financial Year',
+                        'AGM Count',
+                        'Proof of Meeting (Documents)',
+                        'Deleted On (Timestamp)'
+                    ]}
+                    data={deletedAgmList}
+                    // renderActions={(row) => (
+                    //     <div className="flex items-center justify-center gap-4">
+                    //         <img src={editSvg} alt="Edit" className="w-6 h-6 cursor-pointer" onClick={() => handleEdit(row)} />
+                    //         <img src={viewSvg} alt="View" className="w-6 h-6 cursor-pointer" />
+                    //         <img src={deleteSvg} alt="Delete" className="w-6 h-6 cursor-pointer" onClick={() => handleDelete(row.id)} />
+                    //     </div>
+                    // )}
                     renderColumn={(col, value) => {
                         if (col === "Meeting conducted in last one year") {
                             return (
