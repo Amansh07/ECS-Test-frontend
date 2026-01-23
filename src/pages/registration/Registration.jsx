@@ -77,8 +77,9 @@ export default function Registration() {
     }));
   };
 
-  const handleSubmit = () => {setSaveButtonClicked(Date.now());
-    // setIsConfirmModalOpen(true);
+  const handleSubmit = () => {
+    setSaveButtonClicked(Date.now());
+    setIsConfirmModalOpen(true);
   }
   const handleConfirmSubmit = () => {
     console.log("Final Submit Payload", values);
@@ -90,9 +91,9 @@ export default function Registration() {
     }, 300);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log("next button clicked in registration")
-  },[nextButtonClicked])
+  }, [nextButtonClicked])
 
   // ------------------------ STEPS ------------------------
   const steps = [
