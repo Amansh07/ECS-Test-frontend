@@ -1,20 +1,21 @@
 import React, { useState } from "react";
 
-export default function StepWizard({ title, steps = [], onComplete }) {
-    const [activeStep, setActiveStep] = useState(1);
+export default function StepWizard({ title, steps = [], onComplete, activeStep, setActiveStep, setNextButtonClicked, setBackButtonClicked, setSaveButtonClicked }) {
 
     const handleNext = () => {
-        if (activeStep < steps.length) {
-            setActiveStep((prev) => prev + 1);
-        } else {
+        console.log("clicked next button");
+        if (activeStep === 1) {
+            setActiveStep(2);
+        }
+        if (activeStep === 4) {
             if (onComplete) onComplete();
         }
+        setNextButtonClicked(Date.now());
     };
 
     const handleBack = () => {
-        if (activeStep > 1) {
-            setActiveStep((prev) => prev - 1);
-        }
+        console.log("clicked back button");
+        setBackButtonClicked(Date.now());
     };
 
     const currentStepItem = steps[activeStep - 1] || {};
@@ -118,13 +119,14 @@ export default function StepWizard({ title, steps = [], onComplete }) {
                                 Back
                             </button>
                         )}
-                        <button
-                            type="button"
-                            onClick={handleNext}
-                            className="px-6 py-2 rounded text-sm font-semibold bg-green-600 text-white hover:bg-green-700"
-                        >
-                            {activeStep === steps.length ? "Submit" : "Next"}
-                        </button>
+                            <button
+                                type="button"
+                                onClick={handleNext}
+                                className="px-6 py-2 rounded text-sm font-semibold bg-green-600 text-white hover:bg-green-700"
+                            >
+                                {activeStep === 4 ? "Submit" : "Next"}
+                            </button>
+
                     </div>
                 </div>
             </section>

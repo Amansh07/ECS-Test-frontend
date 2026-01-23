@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SelectUser from "./SelectUser";
 import RegistrationForm from "./RegistrationForm";
 import StepWizard from "../../components/StepWizard";
@@ -35,6 +35,10 @@ export default function Registration() {
   const [modalStatus, setModalStatus] = useState(true);
   const [modalMessage, setModalMessage] = useState("");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [activeStep, setActiveStep] = useState(1);
+  const [nextButtonClicked, setNextButtonClicked] = useState(null);
+  const [backButtonClicked, setBackButtonClicked] = useState(null);
+  const [saveButtonClicked, setSaveButtonClicked] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -73,7 +77,9 @@ export default function Registration() {
     }));
   };
 
-  const handleSubmit = () => setIsConfirmModalOpen(true);
+  const handleSubmit = () => {setSaveButtonClicked(Date.now());
+    // setIsConfirmModalOpen(true);
+  }
   const handleConfirmSubmit = () => {
     console.log("Final Submit Payload", values);
     setIsConfirmModalOpen(false);
@@ -83,6 +89,10 @@ export default function Registration() {
       setIsModalOpen(true);
     }, 300);
   };
+
+  useEffect(()=>{
+    console.log("next button clicked in registration")
+  },[nextButtonClicked])
 
   // ------------------------ STEPS ------------------------
   const steps = [
@@ -98,6 +108,14 @@ export default function Registration() {
           showForm={true}
           showDocuments={false} // Hide documents in step 2
           disabled={false}       // Editable
+          activeStep={activeStep}
+          setActiveStep={setActiveStep}
+          nextButtonClicked={nextButtonClicked}
+          setNextButtonClicked={setNextButtonClicked}
+          backButtonClicked={backButtonClicked}
+          setBackButtonClicked={setBackButtonClicked}
+          saveButtonClicked={saveButtonClicked}
+          setSaveButtonClicked={setSaveButtonClicked}
         />
       ),
     },
@@ -115,6 +133,14 @@ export default function Registration() {
           showForm={false}
           showDocuments={true}  // Show documents in step 3
           disabled={false}       // Editable
+          activeStep={activeStep}
+          setActiveStep={setActiveStep}
+          nextButtonClicked={nextButtonClicked}
+          setNextButtonClicked={setNextButtonClicked}
+          backButtonClicked={backButtonClicked}
+          setBackButtonClicked={setBackButtonClicked}
+          saveButtonClicked={saveButtonClicked}
+          setSaveButtonClicked={setSaveButtonClicked}
         />
       ),
     },
@@ -130,8 +156,16 @@ export default function Registration() {
           pdfConfig={pdfConfig}
           handleFileSelect={handleFileSelect}
           showForm={true}
-          showDocuments={true}  // Show documents in step 4
-          disabled={true}        // Disabled for review
+          showDocuments={true}
+          disabled={true}
+          activeStep={activeStep}
+          setActiveStep={setActiveStep}
+          nextButtonClicked={nextButtonClicked}
+          setNextButtonClicked={setNextButtonClicked}
+          backButtonClicked={backButtonClicked}
+          setBackButtonClicked={setBackButtonClicked}
+          saveButtonClicked={saveButtonClicked}
+          setSaveButtonClicked={setSaveButtonClicked}
         />
       ),
     },
@@ -143,6 +177,11 @@ export default function Registration() {
         title={values.registeredUnder === "cooperatives" ? "Cooperatives/Societies Act" : "FPC Companies Act"}
         steps={steps}
         onComplete={handleSubmit}
+        activeStep={activeStep}
+        setActiveStep={setActiveStep}
+        setNextButtonClicked={setNextButtonClicked}
+        setBackButtonClicked={setBackButtonClicked}
+        setSaveButtonClicked={setSaveButtonClicked}
       />
 
       <ConfirmationModal
