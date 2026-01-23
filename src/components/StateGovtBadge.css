@@ -1,0 +1,45 @@
+.state-govt-badge{
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px 8px 12px; /* left padding keeps border visually inside */
+  border-radius: 9999px;
+  color: #04260a;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+  /* box-shadow: 0 6px 18px rgba(0,0,0,0.08); */
+}
+
+.state-govt-icon{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.state-govt-icon-inner{
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.state-govt-text{
+  white-space: nowrap;
+  font-weight: 800 !important;
+  font-family: inherit;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* small responsive tweak */
+@media (max-width:640px){
+  .state-govt-badge{ padding:6px 12px 6px 10px; gap:8px; }
+  .state-govt-icon-inner{ width:28px;height:28px }
+  .state-govt-text{ font-size:12px; font-weight:800}
+}
