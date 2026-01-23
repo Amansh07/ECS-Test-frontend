@@ -20,6 +20,7 @@ import {
     getCapitalDetailsById
 } from '../../api/FpoCapitalUpdate';
 
+export const Capital = () => {
 const initialCapitalData = {
     totalEquity: '',
     isGrantReceived: '',
@@ -76,10 +77,7 @@ const initialCapitalData = {
         validateOnBlur: true,
     });
 
-    // ------------------- LOAD DATA -------------------
-    useEffect(() => {
-        fetchCapitalList();
-    }, []);
+    
 
     const fetchCapitalList = () => {
         const res = listCapitalDetails(1); // fpoId = 1
@@ -87,6 +85,10 @@ const initialCapitalData = {
             setCapitalList(res.data);
         }
     };
+    // ------------------- LOAD DATA -------------------
+    useEffect(() => {
+        fetchCapitalList();
+    }, []);
 
     /* ================= HANDLERS ================= */
     const handleReset = () => {

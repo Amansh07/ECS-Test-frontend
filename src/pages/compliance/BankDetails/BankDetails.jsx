@@ -18,6 +18,7 @@ import {
     getBankDetailsById 
 } from '../../../api/bankDetailsMock';
 
+export const BankDetails = () => {
 const initialValues = {
     ifscCode: '',
     bankName: '',
@@ -71,10 +72,7 @@ const initialValues = {
         validateOnChange: false,
     });
 
-    // ------------------- LOAD DATA -------------------
-    useEffect(() => {
-        fetchBankList();
-    }, []);
+   
 
     const fetchBankList = () => {
         const res = listBankDetails(1); // fpoId = 1
@@ -82,6 +80,10 @@ const initialValues = {
             setBankList(res.data);
         }
     };
+     // ------------------- LOAD DATA -------------------
+    useEffect(() => {
+        fetchBankList();
+    }, []);
 
     // ------------------- HANDLERS -------------------
     const handleReset = () => {
