@@ -75,27 +75,35 @@ export const registrationValidationSchema = Yup.object().shape({
     .required("FPO PAN number is required"),
 
   // Conditional validation for company
-  companyDetails: Yup.lazy((value, options) => {
-    const registeredUnder = options.parent.registeredUnder;
-    if (registeredUnder === 6) {
-      return Yup.object().shape({
-        cin: Yup.string()
-          .matches(cinRegex, "CIN number is invalid")
-          .required("CIN is required"),
-        companyName: Yup.string().required("Company name is required"),
-        companyStatus: Yup.string().required("Company status is required"),
-        incorporationDate: Yup.date().required("Incorporation date is required"),
-        rocName: Yup.string().required("ROC name is required"),
-      });
-    }
+ companyDetails: Yup.lazy((value, options) => {
+  const registeredUnder = options.parent.registeredUnder;
+  if (registeredUnder === 6) {
     return Yup.object().shape({
-      cin: Yup.string(),
-      companyName: Yup.string(),
-      companyStatus: Yup.string(),
-      incorporationDate: Yup.date(),
-      rocName: Yup.string(),
+      cin: Yup.string()
+        .required("CIN/LLPIN/FCRN is required")
+        .test(
+          "valid-cin-llpin-fcrn",
+          "Must be a valid CIN, LLPIN, or FCRN",
+          function (value) {
+            if (!value) return false;
+            return cinRegex.test(value) || llpinRegex.test(value) || fcrnRegex.test(value);
+          }
+        ),
+      companyName: Yup.string().required("Company name is required"),
+      companyStatus: Yup.string().required("Company status is required"),
+      incorporationDate: Yup.date().required("Incorporation date is required"),
+      rocName: Yup.string().required("ROC name is required"),
     });
-  }),
+  }
+  return Yup.object().shape({
+    cin: Yup.string(),
+    companyName: Yup.string(),
+    companyStatus: Yup.string(),
+    incorporationDate: Yup.date(),
+    rocName: Yup.string(),
+  });
+}),
+
 
   // Conditional validation for society
   societyDetails: Yup.lazy((value, options) => {
@@ -103,7 +111,6 @@ export const registrationValidationSchema = Yup.object().shape({
     if (registeredUnder === 7) {
       return Yup.object().shape({
         regdNo: Yup.string()
-          .matches(llpinRegex, "LLPIN/FCRN is invalid")
           .required("Registration number is required"),
         coopsocietyName: Yup.string().required("Cooperative/Society name is required"),
         doreg: Yup.date().required("Date of registration is required"),
