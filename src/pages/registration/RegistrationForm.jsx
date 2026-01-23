@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useFormik } from "formik";
+import { setNestedObjectValues, useFormik } from "formik";
 import * as Yup from "yup";
 import { AccordionGroup } from "../../components/Accordion";
 import { TextField, SelectField, RadioGroup } from "../../components/FormFields";
@@ -14,8 +14,9 @@ import PreviewModal from "../../components/PreviewModal";
 import deleteSvg from '../../assets/deleteAction.svg';
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { registrationValidationSchema } from "./validation";
+import UploadDocument from "../../components/UploadDocument";
 
-const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = false, imgConfig, pdfConfig }) => {
+const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = false, imgConfig, pdfConfig, activeStep, setActiveStep, nextButtonClicked, setNextButtonClicked, backButtonClicked, setBackButtonClicked, saveButtonClicked, setSaveButtonClicked, steps }) => {
   // ---------------- INITIAL FORM VALUES ----------------
   const initialValues = {
     registeredUnder: "",
@@ -110,10 +111,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
     setValidationMessage("");
   };
 
-
-
-  const handleSave = async () => {
-    // Validate the form manually
+  const validationCheck = async () => {
     const errors = await formik.validateForm();
 
     console.log("errors :", errors);
@@ -141,8 +139,18 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
       // Show validation modal
       setValidationMessage("Please complete all required fields before proceeding.");
       setShowValidationModal(true);
-      return;
+      return true;
     }
+  }
+
+
+
+  const handleSave = async () => {
+    // Validate the form manually
+
+    const hasError = await validationCheck();
+    if (hasError) return;   // ✅ STOP if invalid
+
 
     // Prepare payload
     const payload = {
@@ -246,6 +254,103 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
   const [pendingAction, setPendingAction] = useState("");
   const [pendingRow, setPendingRow] = useState(null);
 
+  const [imageFile, setImageFile] = useState(null);
+  const [pdfFile, setPdfFile] = useState(null);
+
+  const [districtOptions, setDistrictOptions] = useState([]);
+  const [districtLoading, setDistrictLoading] = useState(false);
+
+
+  const fetchDistricts = async () => {
+    try {
+      setDistrictLoading(true);
+
+      const res = await fetch("http://10.0.1.6:8082/api/v1/master/districts");
+      const json = await res.json();
+
+      if (json.success) {
+        setDistrictOptions(json.data || []);
+      } else {
+        setDistrictOptions([]);
+        console.error("District API failed:", json.message);
+      }
+    } catch (error) {
+      console.error("Error fetching districts:", error);
+      setDistrictOptions([]);
+    } finally {
+      setDistrictLoading(false);
+    }
+  };
+
+
+  useEffect(() => {
+    // fetchDistricts();   // 👈 runs only once
+  }, []);
+
+  const [hasVisitedStep2, setHasVisitedStep2] = useState(false);
+
+
+  useEffect(() => {
+    if (!nextButtonClicked) return;
+
+    const handleNextStep = async () => {
+
+      console.log("NEXT clicked at step:", activeStep);
+
+      // ---- STEP 2 SPECIAL CASE ----
+      if (activeStep === 2) {
+        // First time → skip validation
+        if (!hasVisitedStep2) {
+          setHasVisitedStep2(true);
+          // setActiveStep((prev) => prev + 1);
+          setNextButtonClicked(false);
+          return;
+        }
+
+        // Second time onwards → validate
+        const isError = await validationCheck();
+        console.log("Step 2 validation isError:", isError);
+
+        if (isError) {
+          setNextButtonClicked(false);
+          return; // ❌ stay on step 2
+        }
+
+        // No error → go next
+        setActiveStep((prev) => prev + 1);
+        setNextButtonClicked(false);
+        return;
+      }
+
+      // ---- NORMAL FLOW FOR OTHER STEPS ----
+      if (activeStep < 4) {
+        setActiveStep((prev) => prev + 1);
+      }
+
+      setNextButtonClicked(false);
+    };
+
+    handleNextStep();
+
+  }, [nextButtonClicked, activeStep, hasVisitedStep2]);
+
+  useEffect(() => {
+    if (!backButtonClicked) return;
+
+    if (activeStep > 1) {
+      setActiveStep((prev) => prev - 1);
+    }
+
+    setBackButtonClicked(false);
+  }, [backButtonClicked, activeStep]);
+
+
+  useEffect(() => {
+    if(saveButtonClicked){
+      handleSave();
+      setBackButtonClicked(false);
+    }
+  }, [saveButtonClicked])
 
   const validateFinancialFields = () => {
     const financialErrors = {};
@@ -392,12 +497,6 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
     { id: 2677, name: "Block 1" },
     { id: 2678, name: "Block 2" },
     { id: 2679, name: "Block 3" },
-  ];
-
-  const districtOptions = [
-    { id: 614, name: "District A" },
-    { id: 615, name: "District B" },
-    { id: 616, name: "District C" },
   ];
 
   const financialColumns = [
@@ -892,15 +991,19 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                 onBlur={handleBlur}
                 error={errors.districtId}
                 touched={touched.districtId}
-                disabled={disabled}
+                disabled={disabled || districtLoading}
               >
-                <option value="">Select District</option>
+                <option value="">
+                  {districtLoading ? "Loading districts..." : "Select District"}
+                </option>
+
                 {districtOptions.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.name}
                   </option>
                 ))}
               </SelectField>
+
 
               <SelectField
                 label="Block"
@@ -1093,7 +1196,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
       )}
 
       {/* ---------- DOCUMENT UPLOAD ---------- */}
-      {showDocuments && (
+      {/* {showDocuments && (
         <div className="mt-6 pt-6 border-t border-gray-200">
           <h3 className="text-sm font-semibold text-gray-800 mb-4">Documents</h3>
           <AddDocuments
@@ -1103,14 +1206,36 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
             disabled={disabled}
           />
         </div>
+      )} */}
+
+      {showDocuments && (
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <h3 className="text-sm font-semibold text-gray-800 mb-4">Documents</h3>
+
+          <div className="space-y-6">
+            {/* Image Upload */}
+            <UploadDocument
+              config={imgConfig || { allowedTypes: ["image/png", "image/jpeg"], maxSizeMB: 5 }}
+              onFileSelect={(file) => {
+                setImageFile(file);
+                console.log("Selected image:", file);
+              }}
+              disabled={disabled}
+            />
+
+            {/* PDF Upload */}
+            <UploadDocument
+              config={pdfConfig || { allowedTypes: ["application/pdf"], maxSizeMB: 10 }}
+              onFileSelect={(file) => {
+                setPdfFile(file);
+                console.log("Selected pdf:", file);
+              }}
+              disabled={disabled}
+            />
+          </div>
+        </div>
       )}
 
-      {/* ---------- SUBMIT ---------- */}
-      <div className="mt-6 flex justify-end">
-        <Button onClick={handleSave} buttonClassName="px-6 py-2 bg-blue-600 text-white rounded">
-          Submit
-        </Button>
-      </div>
       {/* Financial Preview Modal */}
       <PreviewModal
         isOpen={isFinancialPreviewOpen}
