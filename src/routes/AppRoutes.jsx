@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import AuthLayout from "../layouts/AuthLayout";
 import Registration from "../pages/registration/Registration";
-import Login from "../pages/login/login";
+import Login from "../pages/login/Login";
 import PrivateRoute from "./PrivateRoute";
 import MemberManagementRoutes from "./MemberManagementRoutes";
 import ProductionDetailsRoutes from "./ProductionDetailsRoutes";
