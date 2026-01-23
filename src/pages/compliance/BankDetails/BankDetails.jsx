@@ -25,8 +25,38 @@ const initialValues = {
     accountNumber: ''
 };
 
-export const BankDetails = () => {
-    const [bankList, setBankList] = useState([]);
+    const [bankList, setBankList] = useState([
+        {
+            id: 1,
+            'IFSC Code': 'SBIN0001234',
+            'Account Number': '123456789012',
+            'Bank Name': 'State Bank of India',
+            'Branch Name': 'Main Branch'
+        }
+    ]);
+
+
+    const [deletedBankList, setDeletedBankList] = useState([
+        {
+            id: 1,
+            'IFSC Code': 'SBIN0001234',
+            'Bank Name': 'State Bank of India',
+            'Branch Name': 'Main Branch',
+            'Account Number': '123456789012',
+            'Deleted On (Timestamp)':'20-01-2026 16:25:55'
+        },
+        {
+            id: 2,
+            'IFSC Code': 'SBIN0001234',
+            'Bank Name': 'State Bank of India',
+            'Branch Name': 'Main Branch',
+            'Account Number': '123456789012',
+            'Deleted On (Timestamp)':'20-01-2026 16:25:55'
+        }
+
+    ]);
+
+
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
@@ -262,6 +292,44 @@ export const BankDetails = () => {
                     )}
                 />
             </div>
+
+
+             {/* Deleted List */}
+                         <div className="bg-white p-6 rounded-lg shadow-sm border border-stroke-200">
+                            <h3 className="text-lg font-semibold text-grey-900 mb-6">Deleted AGM Meeting Details</h3>
+                            <Table
+            
+                                columns={[
+                        "IFSC Code",
+                         "Bank Name",
+                        "Branch Name",
+                        "Account Number",
+                       
+                        "Deleted On (Timestamp)"
+                        // "Actions"
+                    ]}
+                                data={deletedBankList}
+                                // renderActions={(row) => (
+                                //     <div className="flex items-center justify-center gap-4">
+                                //         <img src={editSvg} alt="Edit" className="w-6 h-6 cursor-pointer" onClick={() => handleEdit(row)} />
+                                //         <img src={viewSvg} alt="View" className="w-6 h-6 cursor-pointer" />
+                                //         <img src={deleteSvg} alt="Delete" className="w-6 h-6 cursor-pointer" onClick={() => handleDelete(row.id)} />
+                                //     </div>
+                                // )}
+                                // renderColumn={(col, value) => {
+                                //     if (col === "Meeting conducted in last one year") {
+                                //         return (
+                                //             <div className="flex justify-center">
+                                //                 <span className={`w-6 h-6 flex items-center justify-center rounded-full ${value ? 'bg-success-100 text-success' : 'bg-danger-100 text-danger'}`}>
+                                //                     {value ? '✓' : '✕'}
+                                //                 </span>
+                                //             </div>
+                                //         );
+                                //     }
+                                //     return value;
+                                // }}
+                            />
+                        </div>
 
             <ConfirmationModal
                 isOpen={isConfirmationOpen}

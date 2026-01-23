@@ -28,7 +28,7 @@ export const AnnualTurnover = () => {
             'Annual Turnover': '50,00,000',
             'Annual Profit': '10,00,000',
             'Total Dividend Paid': '2,00,000',
-            'Balance Sheet': true
+            'Balance Sheet': 'Balancesheet.pdf',
         },
         {
             id: 2,
@@ -36,7 +36,28 @@ export const AnnualTurnover = () => {
             'Annual Turnover': '45,00,000',
             'Annual Profit': '8,00,000',
             'Total Dividend Paid': '1,50,000',
-            'Balance Sheet': false
+            'Balance Sheet': 'Balancesheet.pdf'
+        }
+    ]);
+
+    const [deletedTurnoverList, setDeletedTurnoverList] = useState([
+        {
+            id: 1,
+            'Financial Year': '2023-24',
+            'Annual Turnover (in Rupees)': '50,00,000',
+            'Total Annual Profit (in Rupees)': '10,00,000',
+            'Total Dividend Paid (in Rupees)': '2,00,000',
+            'Uploaded Balance Sheet': 'Balancesheet.pdf',
+            'Deleted on (Timestamp)':'20-01-2026 22:05:55'
+        },
+        {
+            id: 2,
+            'Financial Year': '2023-24',
+            'Annual Turnover (in Rupees)': '50,00,000',
+            'Total Annual Profit (in Rupees)': '10,00,000',
+            'Total Dividend Paid (in Rupees)': '2,00,000',
+            'Uploaded Balance Sheet': 'Balancesheet.pdf',
+            'Deleted on (Timestamp)':'20-01-2026 22:05:55'
         }
     ]);
 
@@ -274,6 +295,44 @@ export const AnnualTurnover = () => {
                     }}
                 />
             </div>
+
+            {/* ARchived List */}
+                        <div className="bg-white p-6 rounded-lg shadow-sm border border-stroke-200" >
+                            <h3 className="text-lg font-semibold text-grey-900 mb-6">Deleted Annual Turnover Data</h3>
+                            <Table
+            
+                                columns={[
+                        "Financial Year",
+                        "Annual Turnover (in Rupees)",
+                        "Total Annual Profit (in Rupees)",
+                        "Total Dividend Paid (in Rupees)",
+                        "Uploaded Balance Sheet",
+                        "Deleted on (Timestamp)"
+                        // "Actions"
+                    ]}
+                                data={deletedTurnoverList}
+                                //   {/*  renderActions={(row) => (
+                                //     <div className="flex items-center justify-center gap-4">
+                                //      <img src={editSvg} alt="Edit" className="w-6 h-6 cursor-pointer" onClick={() => handleEdit(row)} />
+                                //         <img src={viewSvg} alt="View" className="w-6 h-6 cursor-pointer" /> 
+                                //         <img src={unarchive} alt="Delete" className="w-6 h-6 cursor-pointer" onClick={() => handleUnArchive(row)} />
+                                //     </div>
+                                // )}*/}
+                               renderColumn={(col, value) => {
+                        if (col === "Uploaded Balance Sheet") {
+                            return (
+                                <div className="flex justify-center">
+                                    <span className={`w-6 h-6 flex items-center justify-center rounded-full ${value ? 'bg-success-100 text-success' : 'bg-danger-100 text-danger'}`}>
+                                        {value ? '✓' : '✕'}
+                                    </span>
+                                </div>
+                            );
+                        }
+                        return value;
+                    }}
+                            />
+                        </div>
+            
 
             <ConfirmationModal
                 isOpen={isConfirmationOpen}

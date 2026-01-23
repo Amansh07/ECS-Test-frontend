@@ -26,8 +26,41 @@ const initialCapitalData = {
     grantReceived: ''
 };
 
-export const Capital = () => {
-    const [capitalList, setCapitalList] = useState([]);
+    //const [uploadedFile, setUploadedFile] = useState(null);
+    const [capitalList, setCapitalList] = useState([
+        {
+            id: 1,
+            'Total FPO Equity Capital(in Rupees)': 10000,
+            'Whether Equity Grant Received?': 'Yes',
+            'FPO Equity Grant Received(in Rupees)': 1000000
+        },
+        {
+           id: 2,
+            'Total FPO Equity Capital(in Rupees)': 20000,
+            'Whether Equity Grant Received?': 'No',
+            'FPO Equity Grant Received(in Rupees)': 0
+        }
+    ]);
+
+    const [deletedCapitalList, setDeletedCapitalList] = useState([
+        {
+            id: 1,
+            'Total FPO Equity Capital(in Rupees)': 10000,
+            'Whether Equity Grant Received?': 'Yes',
+            'FPO Equity Grant Received(in Rupees)': 1000000,
+            'Deleted on (Timestamp)':'19-01-2026 10:32:05'
+        },
+        {
+           id: 2,
+            'Total FPO Equity Capital(in Rupees)': 20000,
+            'Whether Equity Grant Received?': 'No',
+            'FPO Equity Grant Received(in Rupees)': 0,
+            'Deleted on (Timestamp)':'18-01-2026 11:47:45'
+        }
+    ]);
+
+
+
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
@@ -249,6 +282,41 @@ export const Capital = () => {
                             <img src={deleteSvg} alt="Delete" className="w-6 h-6 cursor-pointer" onClick={() => handleDelete(row.id)} />
                         </div>
                     )}
+                    renderColumn={(col, value) => {
+                        if (col === "Whether Equity Grant Received?") {
+                            return (
+                                <div className="flex justify-center">
+                                    <span className={`w-6 h-6 flex items-center justify-center rounded-full ${value ? 'bg-success-100 text-success' : 'bg-danger-100 text-danger'}`}>
+                                        {value ? '✓' : '✕'}
+                                    </span>
+                                </div>
+                            );
+                        }
+                        return value;
+                    }}
+                />
+            </div>
+
+            {/* Archived List */}
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-stroke-200">
+                <h3 className="text-lg font-semibold text-grey-900 mb-6">Deleted FPO Capital Details</h3>
+                <Table
+
+                    columns={[
+                        "Total FPO Equity Capital(in Rupees)",
+                        "Whether Equity Grant Received?",
+                        "FPO Equity Grant Received(in Rupees)",
+                       "Deleted on (Timestamp)"
+                        // "Actions"
+                    ]}
+                    data={deletedCapitalList}
+                    // renderActions={(row) => (
+                    //     <div className="flex items-center justify-center gap-4">
+                    //         <img src={editSvg} alt="Edit" className="w-6 h-6 cursor-pointer" onClick={() => handleEdit(row)} />
+                    //         <img src={viewSvg} alt="View" className="w-6 h-6 cursor-pointer" />
+                    //         <img src={deleteSvg} alt="Delete" className="w-6 h-6 cursor-pointer" onClick={() => handleDelete(row.id)} />
+                    //     </div>
+                    // )}
                     renderColumn={(col, value) => {
                         if (col === "Whether Equity Grant Received?") {
                             return (

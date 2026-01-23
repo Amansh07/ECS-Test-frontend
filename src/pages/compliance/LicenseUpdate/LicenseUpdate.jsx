@@ -24,6 +24,19 @@ export const LicenseUpdate = () => {
     const [uploadedFile, setUploadedFile] = useState(null);
     const [uploadedPreview, setUploadedPreview] = useState(null);
 
+    const [deletedLicenses, setDeletedLicenses] = useState([
+        {
+            id: 2,
+            'License Name': 'eNAM',
+            'Issued By': 'FPO AUthority',
+            'Issued Date': '01-12-2025',
+            'License Valid Till ': '15-01-2026',
+            'License Number': '23014562',
+			'Unlimited Validity of License?': true,
+            'Uploaded License':'license.jpeg',
+            'Deleted On (Timestamp)':'20-01-2026 14:02:59'
+        }
+    ]);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingId, setEditingId] = useState(null);
 
@@ -426,6 +439,48 @@ export const LicenseUpdate = () => {
                     )}
                 />
             </div>
+
+            {/* Deleted Licenses View Section */}
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+                <h3 className="text-lg font-semibold text-grey-900 mb-6">FPO License Update Detail View Table</h3>
+                <Table
+                    columns={[
+
+                        'License Name',
+                        'Issued By',
+                        'Issued Date',
+                        'License Valid Till ',
+                        'License Number',
+			            'Unlimited Validity of License?',
+                        'Uploaded License',
+                        'Deleted On (Timestamp)'
+        
+                    ]}
+                    data={deletedLicenses}
+                    // renderActions={(row) => (
+                    //     <div className="flex items-center justify-center gap-4">
+                    //         <img src={editSvg} alt="Edit" className="w-6 h-6 cursor-pointer" onClick={() => handleEdit(row)} />
+                    //         <img src={viewSvg} alt="View" className="w-6 h-6 cursor-pointer" />
+                    //         <img src={deleteSvg} alt="Delete" className="w-6 h-6 cursor-pointer" onClick={() => handleDelete(row.id)} />
+                    //     </div>
+                    // )}
+                    renderColumn={(col, value) => {
+                        console.log("col: "+col);
+                        console.log("value: "+value);
+                        if (col?.trim() === "Unlimited Validity of License?") {
+                            return (
+                                <div className="flex justify-center">
+                                    <span className={`w-6 h-6 flex items-center justify-center rounded-full ${value ? 'bg-success-100 text-success' : 'bg-danger-100 text-danger'}`}>
+                                        {value ? '✓' : '✕'}
+                                    </span>
+                                </div>
+                            );
+                        }
+                        return value;
+                    }}
+                />
+            </div>
+
 
             {/* Modals */}
             <PreviewModal

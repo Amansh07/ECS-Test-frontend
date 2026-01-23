@@ -30,6 +30,19 @@ export const Resources = () => {
   const [editingId, setEditingId] = useState(null);
   const [statusConfig, setStatusConfig] = useState({ success: true, message: '' });
   const [isStatusOpen, setIsStatusOpen] = useState(false);
+  const[deletedResources,setDeletedResources]=useState([
+    {
+            "Resource Member Name":'ABCD',
+            "Father's/ Husband's Name":'XYZ',
+            "Designation":'CEO',
+            "Gender":'Female',
+            "Email Address":'xyz@gmail.com',
+            "Mobile Number":'9012873465',
+            "District":'Aligarh',
+            "Block":'Aligarh',
+            "Deleted On (Timestamp)":'21-01-2026 16:27:33'
+    }
+  ]);
   const handleDelete = (id) => {
     setEditingId(id);
     setPendingAction('delete');
@@ -362,6 +375,46 @@ export const Resources = () => {
           }}
         />
       </div>
+
+          {/* Deleted Resources */}
+      <div className="bg-white p-6 rounded-lg shadow-sm">
+        <h2 className="text-base font-medium my-4 text-text-dark">Deleted Resource Members
+        </h2>
+        <Table
+          columns={[
+            "Resource Member Name",
+            "Father's/ Husband's Name",
+            "Designation",
+            "Gender",
+            "Email Address",
+            "Mobile Number",
+            "District",
+            "Block",
+            "Deleted On (Timestamp)"
+          ]}
+          data={deletedResources}
+          // renderActions={(row) => (
+          //   <div className="flex items-center justify-center gap-4">
+          //     <img src={editSvg} alt="Edit" className="w-6 h-6 cursor-pointer" onClick={() => handleEdit(row)} />
+          //     <img src={viewSvg} alt="View" className="w-6 h-6 cursor-pointer" />
+          //     <img src={deleteSvg} alt="Delete" className="w-6 h-6 cursor-pointer" onClick={() => handleDelete(row.id)} />
+          //   </div>
+          // )}
+          // renderColumn={(col, value) => {
+          //   if (col === "Resource Name") {
+          //     return (
+          //       <div className="flex justify-center">
+          //         <span className={`w-6 h-6 flex items-center justify-center rounded-full ${value ? 'bg-success-100 text-success' : 'bg-danger-100 text-danger'}`}>
+          //           {value ? '✓' : '✕'}
+          //         </span>
+          //       </div>
+          //     );
+          //   }
+          //   return value;
+          // }}
+        />
+      </div>
+
       <ConfirmationModal
         isOpen={isConfirmationOpen}
         onClose={() => setIsConfirmationOpen(false)}

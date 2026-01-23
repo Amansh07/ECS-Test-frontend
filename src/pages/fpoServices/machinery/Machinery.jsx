@@ -43,6 +43,21 @@ const initialValues = {
 
 export const Machinery = () => {
   const [machineryList, setMachineryList] = useState([]);
+    const [deletedMachineryList, setDeletedMachineryList] = useState([
+        {
+            'Machinery/ Equipment Category':'Irrigation Equipment',
+            'Machinery/ Equipment Name':'Sprinkler',
+            'Machinery/ Equipment Brand Name':'Ayug Agro Equipments',
+            'Unit':'Per Day',
+            'Rent (in Rupees)':'400',
+            'Quantity':'100',
+            'Address':'Pune, Maharashtra',
+            'Technical specifications of the Machinery':'Model Xc01, type - sprinkler',
+            'Uploaded Photo':'sprinkler.peg',
+            'Whether Govt.-assistance used in procurement of Equipment?':true,
+            'Deleted On (Timestamp)':'20-01-2026 22:30:00'
+        }
+    ]);
   const [uploadedImage, setUploadedImage] = useState(null);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [govAssistance, setGovAssistance] = useState(false);
@@ -537,6 +552,49 @@ export const Machinery = () => {
           />
         </div>
       </div>
+
+            {/* Deleted list */}
+            <div className='flex flex-col'>
+                <h3 className="text-base font-bold mb-4 text-grey-900">Deleted Machinery/Equipment List</h3>
+                <div className="bg-white p-0 rounded-lg shadow-sm border border-stroke-200 overflow-hidden">
+                    <Table
+                        columns={[
+                            'Machinery/ Equipment Category',
+                            'Machinery/ Equipment Name',
+                            'Machinery/ Equipment Brand Name',
+                            'Unit',
+                            'Rent (in Rupees)',
+                            'Quantity',
+                            'Address',
+                            'Technical specifications of the Machinery',
+                            'Uploaded Photo',
+                            'Whether Govt.-assistance used in procurement of Equipment?',
+                            'Deleted On (Timestamp)'
+                        ]}
+                        data={deletedMachineryList}
+                        renderColumn={(col, value) => {
+                                    if (col === "Whether Govt.-assistance used in procurement of Equipment?") {
+                                        return (
+                                            <div className="flex justify-center">
+                                                <span className={`w-6 h-6 flex items-center justify-center rounded-full ${value ? 'bg-success-100 text-success' : 'bg-danger-100 text-danger'}`}>
+                                                    {value ? '✓' : '✕'}
+                                                </span>
+                                            </div>
+                                        );
+                                    }
+                                    return value;
+                                }}
+                        // renderActions={(row) => (
+                        //     <div className="flex items-center justify-center gap-4">
+                        //         <img src={editSvg} alt="Edit" className="w-6 h-6 cursor-pointer" onClick={() => handleEdit(row)} />
+                        //         <img src={viewSvg} alt="View" className="w-6 h-6 cursor-pointer" />
+                        //         <img src={deleteSvg} alt="Delete" className="w-6 h-6 cursor-pointer" onClick={() => handleDelete(row.id)} />
+                        //     </div>
+                        // )}
+                    />
+                </div>
+            </div>
+
 
       <ConfirmationModal
         isOpen={isConfirmationOpen}

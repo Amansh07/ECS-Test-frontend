@@ -47,6 +47,7 @@ const initialValues = {
 
 export const Farmers = () => {
   const [farmersList, setFarmersList] = useState([]);
+  const [deletedFarmersList, setDeletedFarmersList] = useState([]);
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
@@ -105,7 +106,7 @@ export const Farmers = () => {
 
     if (pendingAction === 'add') {
       const newItem = {
-        id: Date.now(),
+        id: Date.now,
         ...formik.values,
       };
       setFarmersList(prev => [...prev, newItem]);
