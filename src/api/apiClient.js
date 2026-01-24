@@ -14,37 +14,26 @@ const apiClient = axios.create({
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/**
- * Request interceptor
- */
 apiClient.interceptors.request.use(
-  async (config) => {
-    try {
-      const token = await AuthService.getAccessToken();
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    } catch (err) {
-      console.error("Error getting token:", err);
-      // Instead of useErrorBoundary, just log or handle globally
-      // You can also throw it to be caught in response interceptor
-      throw err;
+  (config) => {
+    const token = AuthService.getAccessToken();
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-/**
- * Response interceptor
- */
 apiClient.interceptors.response.use(
   (response) => response.data,
   async (error) => {
     const originalRequest = error.config;
     const status = error?.response?.status;
 
-    // Retry GET requests once for server errors
+    // Retry GET once for 5xx
     if (
       status &&
       [500, 502, 503, 504].includes(status) &&
@@ -56,24 +45,21 @@ apiClient.interceptors.response.use(
       return apiClient(originalRequest);
     }
 
-    // Handle 401 (unauthorized)
     if (status === 401) {
-      try {
-        AuthService.signIn();
-      } catch (err) {
-        console.error("AuthService signIn failed:", err);
-        // Could trigger a global modal or notification here
-      }
+      AuthService.logout();
     }
 
-    return Promise.reject({
+    const apiError = {
       status,
       message:
         error?.response?.data?.message ||
         error?.message ||
-        "API Error",
+        "Something went wrong. Please try again.",
       data: error?.response?.data,
-    });
+    };
+
+    console.error("API Error:", apiError);
+    return Promise.reject(apiError);
   }
 );
 

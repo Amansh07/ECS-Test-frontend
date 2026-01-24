@@ -10,14 +10,14 @@ export default defineConfig({
       },
     }),
   ],
-  server: {
-    proxy: {
-      // proxy all requests starting with /api to your backend
-      '/api': {
-        target: 'http://10.0.1.6:8082',
-        changeOrigin: true,
-       secure: false,
-      },
-    },
-  },
+  // server: {
+  //   proxy: {
+  //     // proxy all requests starting with /api to your backend
+  //     '/api': {
+  //       target: 'http://10.0.1.6:8082',
+  //       changeOrigin: true,
+  //      secure: false,
+  //     },
+  //   },
+  // },
 })

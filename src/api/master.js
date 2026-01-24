@@ -1,18 +1,17 @@
-import axios from "axios";
+// src/api/masterApi.js
+import { masterApiClient } from "./clients"; // same client as login
 
-const BASE_URL = "http://10.0.1.6:8082";
+// Get all districts
+export const getDistricts = () => {
+  return masterApiClient.get("/api/v1/master/districts");
+};
 
-export const getDistricts = async () => {
-  try {
-    const response = await axios.get(
-      `${BASE_URL}/api/v1/master/districts`
-    );
+// Get blocks by districtId
+export const getBlocksByDistrictId = (districtId) => {
+  return masterApiClient.get(`/api/v1/master/blocks/district/${districtId}`);
+};
 
-    // Your actual array is inside response.data.data
-    return response.data.data;
-
-  } catch (error) {
-    console.error("Error fetching districts:", error);
-    throw error;
-  }
+// Get generic master data (e.g., agencies)
+export const getGeneral = (type) => {
+  return masterApiClient.get(`/api/v1/master/generic/${type}`);
 };

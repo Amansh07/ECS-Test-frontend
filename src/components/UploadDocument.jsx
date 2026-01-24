@@ -22,10 +22,11 @@ const UploadDocument = ({ config, onFileSelect, disabled = false }) => {
   const [finalImage, setFinalImage] = useState(null);
   const [croppedSize, setCroppedSize] = useState("");
 
-
   const inputId = useId();
+  const isDisabled = disabled === true;
 
   const handleFile = (file) => {
+    if (isDisabled) return;
     if (!file) return;
 
     const allowedTypes = config.allowedTypes;
@@ -64,22 +65,32 @@ const UploadDocument = ({ config, onFileSelect, disabled = false }) => {
   };
 
   const handleDrop = (e) => {
+    if (isDisabled) return;
     e.preventDefault();
     setIsDragging(false);
     handleFile(e.dataTransfer.files[0]);
   };
 
   const handleDragOver = (e) => {
+    if (isDisabled) return;
     e.preventDefault();
     setIsDragging(true);
   };
 
-  const handleDragLeave = () => setIsDragging(false);
-  const handleChange = (e) => handleFile(e.target.files[0]);
+  const handleDragLeave = () => {
+    if (isDisabled) return;
+    setIsDragging(false);
+  };
+
+  const handleChange = (e) => {
+    if (isDisabled) return;
+    handleFile(e.target.files[0]);
+  };
 
   const onCropComplete = useCallback((_, croppedAreaPixels) => {
+    if (isDisabled) return;
     setCroppedAreaPixels(croppedAreaPixels);
-  }, []);
+  }, [isDisabled]);
 
   const getCroppedImage = async () => {
     if (!imageSrc || !croppedAreaPixels) return null;
@@ -117,12 +128,12 @@ const UploadDocument = ({ config, onFileSelect, disabled = false }) => {
   };
 
   const handleConfirm = async () => {
+    if (isDisabled) return;
+
     const croppedFile = await getCroppedImage();
     if (croppedFile) {
       onFileSelect(croppedFile);
       setFinalImage(URL.createObjectURL(croppedFile));
-
-      // Set the size in KB/MB
       setCroppedSize(formatFileSize(croppedFile.size));
     }
 
@@ -134,8 +145,9 @@ const UploadDocument = ({ config, onFileSelect, disabled = false }) => {
     if (input) input.value = "";
   };
 
-
   const handleCancel = () => {
+    if (isDisabled) return;
+
     setModalOpen(false);
     setImageSrc(null);
     setFileName("");
@@ -155,21 +167,29 @@ const UploadDocument = ({ config, onFileSelect, disabled = false }) => {
     return `${mb.toFixed(2)} MB`;
   };
 
-
   return (
     <div>
-      {/* Upload OR Preview */}
       {!finalImage ? (
         <div
           className="w-full h-[84px] flex rounded-xl p-2 bg-[#F8FFE5] gap-5 cursor-pointer"
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          onClick={() => !disabled && document.getElementById(inputId).click()}
-          style={{ cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.7 : 1 }}
+          onClick={() => {
+            if (isDisabled) return;
+            document.getElementById(inputId).click();
+          }}
+          style={{
+            cursor: isDisabled ? "not-allowed" : "pointer",
+            opacity: isDisabled ? 0.7 : 1,
+            pointerEvents: isDisabled ? "none" : "auto"
+          }}
         >
           <div className="flex items-center">
-            <img src={config?.allowedTypes.includes("application/pdf") ? pdfUpload : uploadImg} alt="upload" />
+            <img
+              src={config?.allowedTypes.includes("application/pdf") ? pdfUpload : uploadImg}
+              alt="upload"
+            />
           </div>
           <div className="flex flex-col justify-center">
             <p className="font-medium text-sm text-[#121212]">{config.title}</p>
@@ -191,70 +211,69 @@ const UploadDocument = ({ config, onFileSelect, disabled = false }) => {
             />
           </div>
 
-          {/* This takes remaining width */}
           <div className="flex-1 bg-[#ffffff] h-[161px] rounded-md flex flex-col justify-between p-2">
-            {/* Top (40px) */}
             <div className="h-[40px] bg-transparent align-center flex gap-2">
               <div className="w-[25px] mt-[3px]">
-                <img
-                  src={trailingIcon}
-                  alt="trailing icon"
-                />
+                <img src={trailingIcon} alt="trailing icon" />
               </div>
               <div className="flex-1">
                 <p className="text-[14px] font-normal">{fileName}</p>
                 <p className="text-[12px] font-medium">{croppedSize}</p>
               </div>
               <div className="w-[60px] flex justify-around">
-                <div className="mt-[3px]">   <img
-                  src={tickMark}
-                  alt="tick icon"
-                /></div>
+                <div className="mt-[3px]">
+                  <img src={tickMark} alt="tick icon" />
+                </div>
 
-                <div className="mt-[3px]">   <img
-                  src={Delete}
-                  alt="delete icon"
-                  className="cursor-pointer"
-                  onClick={() => {
-                    setFinalImage(null);
-                    setFileName("");
-                    onFileSelect(null);
-                  }}
-                /></div>
-
+                {!isDisabled && <div className="mt-[3px]">
+                  <img
+                    src={Delete}
+                    alt="delete icon"
+                    className={`cursor-pointer ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
+                    onClick={() => {
+                      if (isDisabled) return;
+                      setFinalImage(null);
+                      setFileName("");
+                      onFileSelect(null);
+                    }}
+                  />
+                </div>}
               </div>
             </div>
 
-            {/* Bottom (32px) */}
-            <div className="flex h-[32px] bg-transparent justify-end">
-              <Button buttonClassName="w-[82px] text-[12px] font-medium border-[1px] text-[#253300] border-[#253300] rounded-[8px] h-[32px] flex items-center justify-center px-4 py-2 cursor-pointer" onClick={() => document.getElementById(inputId).click()} >
+            {!isDisabled && <div className="flex h-[32px] bg-transparent justify-end">
+              <Button
+                disabled={isDisabled}
+                buttonClassName="w-[82px] text-[12px] font-medium border-[1px] text-[#253300] border-[#253300] rounded-[8px] h-[32px] flex items-center justify-center px-4 py-2 cursor-pointer"
+                onClick={() => {
+                  if (isDisabled) return;
+                  document.getElementById(inputId).click();
+                }}
+              >
                 Add File
               </Button>
-            </div>
-
+            </div>}
           </div>
-
         </div>
-
       )}
 
       <input
         type="file"
         id={inputId}
         hidden
+        disabled={isDisabled}
         accept={config.allowedTypes}
         onChange={handleChange}
       />
 
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
-      {/* Image Crop Modal */}
       {modalOpen && isImageFile && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-[400px] p-4">
             <div className="flex justify-between mb-3">
               <h2 className="text-base font-medium">Upload Photograph</h2>
-              <Button onClick={handleCancel}>✕</Button>
+              <Button disabled={isDisabled} onClick={handleCancel}>✕</Button>
             </div>
 
             <div className="relative h-[350px] flex items-center justify-center bg-[#464646] rounded-[8px]">
@@ -266,7 +285,7 @@ const UploadDocument = ({ config, onFileSelect, disabled = false }) => {
                   aspect={1}
                   onCropChange={setCrop}
                   onCropComplete={onCropComplete}
-                  onZoomChange={setZoom}
+                  onZoomChange={(z) => !isDisabled && setZoom(z)}
                   showGrid={false}
                 />
               </div>
@@ -280,7 +299,8 @@ const UploadDocument = ({ config, onFileSelect, disabled = false }) => {
                 max={3}
                 step={0.1}
                 value={zoom}
-                onChange={(e) => setZoom(+e.target.value)}
+                disabled={isDisabled}
+                onChange={(e) => !isDisabled && setZoom(+e.target.value)}
                 className="flex-1 accent-[#709900]"
               />
               <img src={zoomIn} alt="+" className="h-6 w-6" />
@@ -288,12 +308,14 @@ const UploadDocument = ({ config, onFileSelect, disabled = false }) => {
 
             <div className="flex justify-end gap-2 mt-4">
               <Button
+                disabled={isDisabled}
                 buttonClassName="px-4 py-2 rounded-md border border-[#B7131A] text-[#B7131A]"
                 onClick={handleCancel}
               >
                 Cancel
               </Button>
               <Button
+                disabled={isDisabled}
                 buttonClassName="px-4 py-2 rounded-md bg-[#1B7A00] text-white"
                 onClick={handleConfirm}
               >

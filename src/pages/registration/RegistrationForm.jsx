@@ -16,6 +16,9 @@ import ConfirmationModal from "../../components/ConfirmationModal";
 import { registrationValidationSchema } from "./validation";
 import UploadDocument from "../../components/UploadDocument";
 import { useNavigate } from "react-router-dom";
+import { getDistricts, getBlocksByDistrictId, getGeneral } from "../../api/master";
+import { uploadBulkDocuments } from "../../api/upload";
+import { registerFPO } from "../../api/registration";
 
 const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = false, imgConfig, pdfConfig, activeStep, setActiveStep, nextButtonClicked, setNextButtonClicked, backButtonClicked, setBackButtonClicked, saveButtonClicked, setSaveButtonClicked, steps }) => {
   // ---------------- INITIAL FORM VALUES ----------------
@@ -147,14 +150,54 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
       return true;
     }
   }
+const handleUploadDocuments = async () => {
+  try {
+    const res = await uploadBulkDocuments({
+      fpoId: 1, // replace with dynamic fpoId
+      docTypes: [920, 921], // image + pdf
+      files: [imageFile, pdfFile],
+    });
 
+    if (res.success) {
+      console.log("Documents uploaded successfully:", res);
+      setValidationMessage("Documents uploaded successfully!");
+      setShowValidationModal(true);
+
+      return res;
+
+      // Optional: do something after successful upload
+      // e.g., navigate("/next-step");
+    } else {
+      setValidationMessage(res.message || "Upload failed.");
+      setShowValidationModal(true);
+      return false;
+    }
+
+  } catch (error) {
+    // Errors from axios / interceptor
+    setValidationMessage(error.message || "Something went wrong. Please try again.");
+    setShowValidationModal(true);
+    return false;
+  }
+};
 
 
   const handleSave = async () => {
     // Validate the form manually
 
     const hasError = await validationCheck();
-    if (hasError) return;   // ✅ STOP if invalid
+    if (hasError) return;   // STOP if invalid
+
+    const uploadRes = await handleUploadDocuments();
+
+    if (!uploadRes) {
+      return;
+    }
+
+    const docIds = uploadRes.results.map(item => item.documentId);
+
+    console.log("docIds:", docIds);
+    // ["gRwreiUWOvfT-V40Toax", "NYF5l6GYs27GRCLqBahd"]
 
 
     // Prepare payload
@@ -171,6 +214,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
       username: values.username,
       password: values.password,
       fpoPanNo: values.fpoPanNo,
+      docIds: docIds,
       landOwnedByFpo: parseFloat(values.landOwnedByFpo),
       totalFarmers: parseInt(values.totalFarmers, 10),
       maleFarmers: parseInt(values.maleFarmers, 10),
@@ -204,6 +248,26 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
     };
 
     console.log("Payload for API:", payload);
+
+    try {
+      const regRes = await registerFPO(payload);
+
+      if (regRes.success) {
+        console.log("User registered successfully");
+        setValidationMessage("Registration successful!");
+        setShowValidationModal(true);
+
+        // Optional: redirect or reset form
+        // navigate("/some-route");
+      } else {
+        setValidationMessage(regRes.message || "Registration failed.");
+        setShowValidationModal(true);
+      }
+    } catch (error) {
+      // Errors from axios / interceptor
+      setValidationMessage(error.message || "Something went wrong. Please try again.");
+      setShowValidationModal(true);
+    }
 
     setTimeout(() => {
       resetAllFormData();
@@ -265,33 +329,147 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
   const [pdfFile, setPdfFile] = useState(null);
 
   const [districtOptions, setDistrictOptions] = useState([]);
+  const [agencyOptions, setAgencyOptions] = useState([]);
+  const [blockOptions, setBlockOptions] = useState([]);
+  const [yearOptions, setYearOptions] = useState([]);
+  const [rangeOptions, setRangeOptions] = useState([]);
   const [districtLoading, setDistrictLoading] = useState(false);
+  const [agencyLoading, setAgencyLoading] = useState(false);
+  const [blockLoading, setBlockLoading] = useState(false);
+  const [yearLoading, setYearLoading] = useState(false);
+  const [rangeLoading, setRangeLoading] = useState(false);
+
+  useEffect(() => {
+    if (formik.values.districtId) {
+      fetchBlocks(formik.values.districtId);
+    } else {
+      setBlockOptions([]);
+    }
+  }, [formik.values.districtId]);
 
 
+  // --- FETCH DISTRICTS ---
   const fetchDistricts = async () => {
+    setDistrictLoading(true);
     try {
-      setDistrictLoading(true);
+      const res = await getDistricts(); // API call like login
 
-      const res = await fetch("http://10.0.1.6:8082/api/v1/master/districts");
-      const json = await res.json();
-
-      if (json.success) {
-        setDistrictOptions(json.data || []);
+      if (res.success) {
+        setDistrictOptions(res.data || []);
       } else {
         setDistrictOptions([]);
-        console.error("District API failed:", json.message);
+        setValidationMessage(res.message || "Failed to fetch districts");
+        setShowValidationModal(true);
       }
     } catch (error) {
-      console.error("Error fetching districts:", error);
       setDistrictOptions([]);
+      setValidationMessage(error?.message || "Error fetching districts");
+      setShowValidationModal(true);
     } finally {
       setDistrictLoading(false);
     }
   };
 
+  // --- FETCH BLOCKS BY DISTRICT ---
+  const fetchBlocks = async (districtId) => {
+    if (!districtId) {
+      setBlockOptions([]);
+      return;
+    }
+
+    setBlockLoading(true);
+    try {
+      const res = await getBlocksByDistrictId(districtId);
+
+      if (res.success) {
+        setBlockOptions(res.data || []);
+      } else {
+        setBlockOptions([]);
+        setValidationMessage(res.message || "Failed to fetch blocks");
+        setShowValidationModal(true);
+      }
+    } catch (error) {
+      setBlockOptions([]);
+      setValidationMessage(error?.message || "Error fetching blocks");
+      setShowValidationModal(true);
+    } finally {
+      setBlockLoading(false);
+    }
+  };
+
+  // --- FETCH AGENCIES ---
+  const loadAgencies = async () => {
+    setAgencyLoading(true);
+    try {
+      const res = await getGeneral("agency");
+
+      if (res.success) {
+        setAgencyOptions(res.data || []);
+      } else {
+        setAgencyOptions([]);
+        setValidationMessage(res.message || "Failed to fetch agencies");
+        setShowValidationModal(true);
+      }
+    } catch (error) {
+      setAgencyOptions([]);
+      setValidationMessage(error?.message || "Error fetching agencies");
+      setShowValidationModal(true);
+    } finally {
+      setAgencyLoading(false);
+    }
+  };
+
+  // --- FETCH FINANCIAL RANGE ---
+  const loadFinancialRange = async () => {
+    setRangeLoading(true);
+    try {
+      const res = await getGeneral("financial_range");
+
+      if (res.success) {
+        setRangeOptions(res.data || []);
+      } else {
+        setRangeOptions([]);
+        setValidationMessage(res.message || "Failed to fetch financial range");
+        setShowValidationModal(true);
+      }
+    } catch (error) {
+      setRangeOptions([]);
+      setValidationMessage(error?.message || "Error fetching financial range");
+      setShowValidationModal(true);
+    } finally {
+      setRangeLoading(false);
+    }
+  };
+
+  // --- FETCH FINANCIAL YEAR ---
+  const loadFinancialYear = async () => {
+    setYearLoading(true);
+    try {
+      const res = await getGeneral("financial_year");
+
+      if (res.success) {
+        setYearOptions(res.data || []);
+      } else {
+        setYearOptions([]);
+        setValidationMessage(res.message || "Failed to fetch financial year");
+        setShowValidationModal(true);
+      }
+    } catch (error) {
+      setYearOptions([]);
+      setValidationMessage(error?.message || "Error fetching financial year");
+      setShowValidationModal(true);
+    } finally {
+      setYearLoading(false);
+    }
+  };
+
+
 
   useEffect(() => {
     fetchDistricts();
+    loadAgencies();
+    loadFinancialRange();
+    loadFinancialYear();
   }, []);
 
   const [hasVisitedStep2, setHasVisitedStep2] = useState(false);
@@ -323,6 +501,21 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
         }
 
         // No error → go next
+        setActiveStep((prev) => prev + 1);
+        setNextButtonClicked(false);
+        return;
+      }
+
+      if (activeStep === 3) {
+        if (!imageFile || !pdfFile) {
+          setValidationMessage("Please upload both Image and PDF files to proceed.");
+          setShowValidationModal(true);
+          setNextButtonClicked(false);
+          return;
+        }
+
+        // Clear error and go next
+        setValidationMessage("");
         setActiveStep((prev) => prev + 1);
         setNextButtonClicked(false);
         return;
@@ -371,7 +564,6 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
 
     return financialErrors;
   };
-
 
 
   const handleAddOrUpdateFinancialRowClick = () => {
@@ -490,21 +682,6 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
     setIsFinancialPreviewOpen(true);
   };
 
-
-  // Mock options for Agency, Block, District
-  const agencyOptions = [
-    { id: 1, name: "Agency 1" },
-    { id: 2, name: "Agency 2" },
-    { id: 3, name: "Agency 3" },
-    { id: 4, name: "Agency 4" },
-  ];
-
-  const blockOptions = [
-    { id: 2677, name: "Block 1" },
-    { id: 2678, name: "Block 2" },
-    { id: 2679, name: "Block 3" },
-  ];
-
   const financialColumns = [
     "Financial Year",
     "Turnover",
@@ -515,22 +692,6 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
     "Audit Type",
     "Actions",
   ];
-
-  const handleAddFinancialRow = () => {
-    setFinancialData((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        financialYear: values.financialYear,
-        turnOver: parseFloat(values.turnOver),
-        profitLoss: parseFloat(values.profitLoss),
-        financialRange: values.financialRange,
-        auditApplicability: values.auditApplicability === "yes",
-        auditStatus: values.auditStatus === "done",
-        auditType: values.auditType,
-      },
-    ]);
-  };
 
   const isCoop = values.registeredUnder === 7;
   const detailsKey = isCoop ? "societyDetails" : "companyDetails";
@@ -791,11 +952,17 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
               onBlur={handleBlur}
               error={errors.financialYear}
               touched={touched.financialYear}
-              disabled={disabled}
+              disabled={disabled || yearLoading}
             >
-              <option value="">Select Year</option>
+              {/* <option value="">Select Year</option>
               <option value="2023-24">2023-24</option>
-              <option value="2022-23">2022-23</option>
+              <option value="2022-23">2022-23</option> */}
+              <option value="">{yearLoading ? "Year Loading..." : "Select Year"}</option>
+              {yearOptions.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
+              ))}
             </SelectField>
             <TextField
               label="Turnover"
@@ -834,11 +1001,17 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
               onBlur={handleBlur}
               error={errors.financialRange}
               touched={touched.financialRange}
-              disabled={disabled}
+              disabled={disabled || rangeLoading}
             >
-              <option value="">Select Range</option>
+              {/* <option value="">Select Range</option>
               <option value="1-5Crores">1-5 Crores</option>
-              <option value="6-20 Crores">6-20 Crores</option>
+              <option value="6-20 Crores">6-20 Crores</option> */}
+              <option value="">{rangeLoading ? "Range Loading..." : "Select Range"}</option>
+              {rangeOptions.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
+              ))}
             </SelectField>
           </div>
 
@@ -892,15 +1065,6 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
               <option value="statutory">Statutory Audit</option>
             </SelectField>
           </div>
-
-          {/* <Button
-            type="button"
-            buttonClassName="px-4 py-2 bg-green-600 text-white rounded mb-4"
-            onClick={handleAddFinancialRow}
-            disabled={disabled}
-          >
-            Add Financial Details
-          </Button> */}
 
           {!disabled && <Button
             type="button"
@@ -981,9 +1145,9 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                 onBlur={handleBlur}
                 error={errors.agency}
                 touched={touched.agency}
-                disabled={disabled}
+                disabled={disabled || agencyLoading}
               >
-                <option value="">Select Agency</option>
+                <option value="">{agencyLoading ? "Agency Loading..." : "Select Agency"}</option>
                 {agencyOptions.map((a) => (
                   <option key={a.id} value={a.id}>
                     {a.name}
@@ -1023,7 +1187,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                 onBlur={handleBlur}
                 error={errors.blockId}
                 touched={touched.blockId}
-                disabled={disabled}
+                disabled={disabled || blockLoading}
               >
                 <option value="">Select Block</option>
                 {blockOptions.map((b) => (
@@ -1211,8 +1375,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
       )} */}
 
       {showDocuments && (
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <h3 className="text-sm font-semibold text-gray-800 mb-4">Documents</h3>
+        <div className="pt-6 border-t border-gray-200">
 
           <div className="space-y-6">
             {/* Image Upload */}

@@ -1,52 +1,47 @@
-import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import AuthService from "../auth/AuthService";
-// import { useErrorBoundary } from "react-error-boundary";
 
+/**
+ * Simple JWT-based private route
+ */
 const PrivateRoute = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
-// const { showBoundary } = useErrorBoundary();
-  useEffect(() => {
-    let isMounted = true;
+  const location = useLocation();
 
-    const checkAuth = async () => {
-      
-      try {
-        const user = await AuthService.getUser();
-        if (!isMounted) return;
+  const token = AuthService.getAccessToken();
 
-        setIsAuthenticated(!!user && !user.expired);
-      } catch (error) {
-        // showBoundary(error); 
-        if (isMounted) setIsAuthenticated(false);
-      }
-    };
-
-    checkAuth();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  /**
-   * While checking auth → render nothing / loader
-   */
-  if (isAuthenticated === null) {
-    return null; // or a spinner
+  // Not logged in
+  if (!token) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ from: location }}
+      />
+    );
   }
 
-  /**
-   * Not authenticated → redirect to login
-   */
-  if (!isAuthenticated) {
-    AuthService.signIn();
-    return <Navigate to="/" replace />;
+  // OPTIONAL: Check JWT expiry
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const isExpired = payload.exp * 1000 < Date.now();
+
+    if (isExpired) {
+      AuthService.logout();
+      return (
+        <Navigate
+          to="/login"
+          replace
+          state={{ from: location }}
+        />
+      );
+    }
+  } catch (e) {
+    // Invalid token format
+    AuthService.logout();
+    return <Navigate to="/login" replace />;
   }
 
-  /**
-   * Authenticated → render protected content
-   */
+  // Authenticated
   return children;
 };
 

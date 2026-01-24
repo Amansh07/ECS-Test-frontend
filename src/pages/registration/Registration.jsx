@@ -79,7 +79,7 @@ export default function Registration() {
 
   const handleSubmit = () => {
     setSaveButtonClicked(Date.now());
-    setIsConfirmModalOpen(true);
+    // setIsConfirmModalOpen(true);
   }
   const handleConfirmSubmit = () => {
     console.log("Final Submit Payload", values);
