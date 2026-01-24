@@ -10,6 +10,7 @@ import FpoServicesRoutes from "./FpoServicesRoutes";
 import ComplianceRoutes from "./ComplianceRoutes";
 import Dashboard from "../pages/dashboard/Dashboard";
 import Homepage from "../pages/homepage/Homepage";
+import AdminDashboard from "../pages/adminDashboard/AdminDashboard";
 
 // Force HMR update
 const AppRoutes = () => {
@@ -20,6 +21,7 @@ const AppRoutes = () => {
       </Route>
       <Route element={<MainLayout />}>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/adminDashboard" element={<AdminDashboard />} />
         <Route path="/" element={<Homepage />} />
         <Route path="/registration" element={<Registration />} />
 

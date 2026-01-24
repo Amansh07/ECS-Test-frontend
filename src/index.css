@@ -203,104 +203,70 @@ body,
   --app-gutter: 24px;
   /* small spacing for hamburger */
 
-  --grad-001-bg: linear-gradient(
-    90deg,
-    #11998E 0%,
-    #38EF7D 100%
-  );
-  --grad-005-bg: linear-gradient(
-    90deg,
-    rgba(255, 248, 240, 1) 0%,
-    rgba(250, 243, 224, 1) 50%,
-    rgba(255, 248, 240, 1) 100%
-  );
-
-  --grad-007-bg: linear-gradient(
-    360deg,
-    #FFFFFF 0%,
-    #FFF8F0 50%,
-    #FFFFFF 100%
-  );
-  --grad-008-bg: linear-gradient(
-    360deg,
-    #2D4A2B 0%,
-    #253300 50%,
-    #2D4A2B 100%
-  );
-  --grad-12-bg: linear-gradient(
-    90deg,
-    rgba(233, 196, 106, 0.3) 0%,
-    rgba(244, 162, 97, 0.2) 50%,
-    rgba(0, 0, 0, 0) 100%
-  );
-  --grad-009-bg: linear-gradient(
-    180deg,
-    #1A4D2E,
-    #2F5233,
-    #0F2818
-  );
-
-  --grad-010-bg: linear-gradient(
-    180deg,
-    #FFFFFF,
-    #FFF8F0,
-    #FAF3E0
-  );
-
-  --grad-011-text: linear-gradient(
-    180deg,
-    #E76F51,
-    #F4A261,
-    #E9C46A
-  );
+  --grad-001-bg: linear-gradient(90deg,
+      #11998E 0%,
+      #38EF7D 100%);
+  --grad-002-bg: linear-gradient(90deg,
+      #1F3320 0%,
+      #0F1910 100%);
+  --grad-004: linear-gradient(90deg,
+      #C4FF0D 0%,
+      #B0E600 100%);
+  --grad-005-bg: linear-gradient(90deg,
+      rgba(255, 248, 240, 1) 0%,
+      rgba(250, 243, 224, 1) 50%,
+      rgba(255, 248, 240, 1) 100%);
+  --grad-007-bg: linear-gradient(360deg,
+      #FFFFFF 0%,
+      #FFF8F0 50%,
+      #FFFFFF 100%);
+  --grad-008-bg: linear-gradient(360deg,
+      #2D4A2B 0%,
+      #253300 50%,
+      #2D4A2B 100%);
+  --grad-12-bg: linear-gradient(90deg,
+      rgba(233, 196, 106, 0.3) 0%,
+      rgba(244, 162, 97, 0.2) 50%,
+      rgba(0, 0, 0, 0) 100%);
+  --grad-009-bg: linear-gradient(180deg,
+      #1A4D2E,
+      #2F5233,
+      #0F2818);
+  --grad-010-bg: linear-gradient(180deg,
+      #FFFFFF,
+      #FFF8F0,
+      #FAF3E0);
   --grad-012-bg: linear-gradient(180deg, #2D4A2B 0%, #253300 50%, #2D4A2B 100%);
 
-  --grad-004: linear-gradient(
-    90deg,
-    #C4FF0D 0%,
-    #B0E600 100%
-  );
+  --grad-011-text: linear-gradient(180deg,
+      #E76F51,
+      #F4A261,
+      #E9C46A);
 
-  --grad-card-1: linear-gradient(
-    135deg,
-    #2B7FFF 0%,
-    #155DFC 100%
-  );
-  --grad-card-2: linear-gradient(
-    135deg,
-    #00C950 0%,
-    #00A63E 100%
-  );
-  --grad-card-3: linear-gradient(
-    135deg,
-    #AD46FF 0%,
-    #9810FA 100%
-  );
-  --grad-card-4: linear-gradient(
-    135deg,
-    #FF6900 0%,
-    #F54900 100%
-  );
-  --grad-card-5: linear-gradient(
-    135deg,
-    #2BFF80 0%,
-    #15FCAB 100%
-  );
-  --grad-card-6: linear-gradient(
-    135deg,
-    #7F00C9 0%,
-    #1600A6 100%
-  );
-  --grad-card-7: linear-gradient(
-    135deg,
-    #FF46D4 0%,
-    #FA1052 100%
-  );
-  --grad-card-8: linear-gradient(
-    135deg,
-    #FFEA00 0%,
-    #F5BC00 100%
-  );
+  --grad-card-1: linear-gradient(135deg,
+      #2B7FFF 0%,
+      #155DFC 100%);
+  --grad-card-2: linear-gradient(135deg,
+      #00C950 0%,
+      #00A63E 100%);
+  --grad-card-3: linear-gradient(135deg,
+      #AD46FF 0%,
+      #9810FA 100%);
+  --grad-card-4: linear-gradient(135deg,
+      #FF6900 0%,
+      #F54900 100%);
+  --grad-card-5: linear-gradient(135deg,
+      #2BFF80 0%,
+      #15FCAB 100%);
+  --grad-card-6: linear-gradient(135deg,
+      #7F00C9 0%,
+      #1600A6 100%);
+  --grad-card-7: linear-gradient(135deg,
+      #FF46D4 0%,
+      #FA1052 100%);
+  --grad-card-8: linear-gradient(135deg,
+      #FFEA00 0%,
+      #F5BC00 100%);
 }
 
 @media (max-width: 640px) {
