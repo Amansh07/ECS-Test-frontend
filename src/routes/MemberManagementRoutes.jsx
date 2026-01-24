@@ -1,5 +1,5 @@
 import { Route } from "react-router-dom";
-import { Farmers } from "../pages/memberManagement/Farmers/Farmers";
+import { Farmers } from "../pages/memberManagement/farmers/Farmers";
 import { BoardMembers } from "../pages/memberManagement/boardMembers/BoardMembers";
 import { Resources } from "../pages/memberManagement/resources/Resources";
 import { Mentors } from "../pages/memberManagement/mentors/Mentors";

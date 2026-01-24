@@ -166,10 +166,10 @@ export default function MainLayout() {
   const shouldHideSidebar = hideSidebarRoutes.includes(location.pathname);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className={`min-h-screen ${shouldHideSidebar ? 'bg-white' : ''}`}>
       <Header />
 
-      <div className="pt-[var(--app-header-h)] pb-[var(--app-footer-h)] h-screen overflow-hidden">
+      <div className={`pt-[var(--app-header-h)] ${shouldHideSidebar ? 'overflow-y-auto' : 'pb-[var(--app-footer-h)] h-screen overflow-hidden'}`}>
         {!shouldHideSidebar && (
           <Button
             type="button"
@@ -207,7 +207,7 @@ export default function MainLayout() {
         </div>
       </div>
 
-      <Footer />
+      {!shouldHideSidebar && <Footer />}
     </div>
   );
 }
