@@ -11,12 +11,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import ValidationModal from "../../components/ValidationModal";
 import { login } from "../../api/authApi";
-
-// Validation Schema
-const loginValidationSchema = Yup.object({
-  username: Yup.string().required("Username is required"),
-  password: Yup.string().required("Password is required"),
-});
+import { loginValidationSchema } from "./validation";
 
 export default function Login() {
   const [captchaAnswer, setCaptchaAnswer] = useState(null);
@@ -106,6 +101,8 @@ export default function Login() {
             value={formik.values.username}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
+            error={formik.errors.username}
+            touched={formik.touched.username}
             imageSrc={mail}
           />
           <TextField
@@ -116,24 +113,14 @@ export default function Login() {
             value={formik.values.password}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
+            error={formik.errors.password}
+            touched={formik.touched.password}
             imageSrc={pass}
           />
         </div>
 
         {/* ERROR + FORGOT */}
-        <div className="h-[20px] flex justify-between items-center mt-[-10px] mb-[10px] p-1">
-          {formik.touched.username && formik.errors.username && (
-            <p className="flex items-center gap-1 text-sm text-error">
-              {formik.errors.username}
-            </p>
-          )}
-
-          {formik.touched.password && formik.errors.password && (
-            <p className="flex items-center gap-1 text-sm text-error">
-              {formik.errors.password}
-            </p>
-          )}
-
+        <div className="h-[20px] flex justify-end items-center mt-[-10px] mb-[10px] p-1">
           <p className="text-sm text-success cursor-pointer">
             <a href="/forgot-password"> Forgot Password </a>
           </p>
