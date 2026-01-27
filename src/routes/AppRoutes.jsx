@@ -11,6 +11,7 @@ import ComplianceRoutes from "./ComplianceRoutes";
 import Dashboard from "../pages/dashboard/Dashboard";
 import Homepage from "../pages/homepage/Homepage";
 import AdminDashboard from "../pages/adminDashboard/AdminDashboard";
+import ForgotPassword from "../pages/login/ForgotPassword";
 
 const AppRoutes = () => {
   return (
@@ -18,6 +19,9 @@ const AppRoutes = () => {
       {/* Public auth */}
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
+      </Route>
+      <Route element={<AuthLayout />}>
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Route>
 
       {/* Public main layout */}

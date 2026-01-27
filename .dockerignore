@@ -1,0 +1,20 @@
+# Ignore dependencies and build output
+node_modules
+build
+dist
+
+# Ignore Git files
+.git
+.gitignore
+
+# Ignore local development files
+.env.local
+.env.production
+.env.uat
+npm-debug.log
+
+
+# Ignore Docker files themselves
+Dockerfile
+.dockerignore
+
