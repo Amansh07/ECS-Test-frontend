@@ -8,10 +8,16 @@ dist
 .gitignore
 
 # Ignore local development files
-.env.local
-.env.production
-.env.uat
+# .env.local
+# .env.production
+# .env.uat
+.env*
 npm-debug.log
+
+
+
+# Explicitly allow the production one
+!.env.dev
 
 
 # Ignore Docker files themselves
