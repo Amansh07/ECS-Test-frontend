@@ -1,14 +1,15 @@
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import AuthService from "../auth/AuthService";
 
 /**
  * Simple JWT-based private route
  */
-const PrivateRoute = ({ children }) => {
+const PrivateRoute = () => {
   const location = useLocation();
 
   const token = AuthService.getAccessToken();
 
+  console.log(token, 'token')
   // Not logged in
   if (!token) {
     return (
@@ -42,7 +43,7 @@ const PrivateRoute = ({ children }) => {
   }
 
   // Authenticated
-  return children;
+  return <Outlet />;
 };
 
 export default PrivateRoute;
