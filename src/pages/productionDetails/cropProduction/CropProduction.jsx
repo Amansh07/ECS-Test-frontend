@@ -11,13 +11,14 @@ import { Button } from "../../../components/Buttons";
 import { AccordionGroup } from "../../../components/Accordion";
 import editSvg from "../../../assets/edit.svg";
 import viewSvg from "../../../assets/view.svg";
-import { uploadDocument } from "../../../api/uploadMock";
-import { getGeneralMasterByType, getCropsBySeason, getVarietyByCrop } from "../../../api/masterMock";
-import { listCropProduction, createCropProduction, updateCropProduction, getCropProductionById } from "../../../api/productionDetailsMock";
+// import { getGeneralMasterByType, getCropsBySeason, getVarietyByCrop } from "../../../api/masterMock";
 import { cropProductionValidationSchema } from "../validation";
 import ValidationModal from "../../../components/ValidationModal";
 // import { startRecording, stopRecordingAndTranscribe } from "../../../utils/speechToText";
-
+import {  } from "../../../api/productionDetails";
+import { uploadSingleDocument } from "../../../api/upload";
+import { createCropProduction, updateCropProduction, getCropProductionList, getCropProductionById } from "../../../api/productionDetails";
+import { getGeneral, getCropsBySeason, getVarietiesByCrop } from "../../../api/master";
 
 const initialCropProductionValues = {
   seasonId: "",
@@ -41,8 +42,12 @@ export const CropProduction = () => {
   const [publishOnEmart, setPublishOnEmart] = useState(false);
   const [rowPreviewData, setRowPreviewData] = useState(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
-  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const [statusConfig, setStatusConfig] = useState({ status: true, message: "" });
+  const [statusModal, setStatusModal] = useState({
+    isOpen: false,
+    status: true, // true = success, false = error
+    message: "",
+  });
+
   const [isUpdateMode, setIsUpdateMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [existingDocId, setExistingDocId] = useState(null);
@@ -69,47 +74,195 @@ export const CropProduction = () => {
   });
 
   // ------------------- LOAD DATA -------------------
+  // useEffect(() => {
+  //   const res = getGeneralMasterByType("Season");
+  //   if (res.success) setSeasons(res.data);
+  //   fetchProductionList();
+  // }, []);
+
   useEffect(() => {
-    const res = getGeneralMasterByType("Season");
-    if (res.success) setSeasons(res.data);
-    fetchProductionList();
+    const init = async () => {
+      try {
+        // -------- Seasons --------
+        const seasonRes = await getGeneral("Season");
+        if (seasonRes?.success) {
+          setSeasons(seasonRes.data);
+        } else {
+          throw new Error(seasonRes?.message || "Failed to load seasons");
+        }
+
+        // -------- Crop Production List --------
+        await fetchProductionList();
+
+      } catch (err) {
+        console.error("Init load failed:", err);
+
+        setStatusModal({
+          isOpen: true,
+          status: false,
+          message:
+            err?.response?.data?.message ||
+            err?.message ||
+            "Failed to load initial data. Please try again.",
+        });
+      }
+    };
+
+    init();
   }, []);
 
-  const fetchProductionList = () => {
-    const res = listCropProduction();
-    if (res.success) setProductionList(res.data);
+
+  // const fetchProductionList = () => {
+  //   const res = getCropProductionList();
+  //   if (res.success) setProductionList(res.data);
+  // };
+
+  const fetchProductionList = async () => {
+    try {
+      const res = await getCropProductionList({
+        fpoId: 1,   // replace with dynamic fpoId if available
+        page: 0,
+        size: 10,
+        sort: "asc",
+      });
+
+      if (res?.success) {
+        setProductionList(res.data);
+      } else {
+        throw new Error(res?.message || "Failed to fetch crop production list");
+      }
+
+    } catch (err) {
+      console.error("Fetch production list failed:", err);
+
+      setStatusModal({
+        isOpen: true,
+        status: false,
+        message:
+          err?.response?.data?.message ||
+          err?.message ||
+          "Unable to fetch crop production list. Please try again.",
+      });
+    }
   };
 
   // ------------------- LOAD CROPS & VARIETIES -------------------
-  useEffect(() => {
-    if (!formik.values.seasonId) {
-      setCrops([]);
-      setVarieties([]);
-      if (!isUpdateMode) {
-        formik.setFieldValue("cropId", "");
-        formik.setFieldValue("cropVarietyId", "");
-      }
-      return;
-    }
-    const res = getCropsBySeason(formik.values.seasonId);
-    if (res.success) {
-      setCrops(res.data);
-      if (!isUpdateMode) formik.setFieldValue("cropId", "");
-    }
-  }, [formik.values.seasonId, isUpdateMode]);
+  // useEffect(() => {
+  //   if (!formik.values.seasonId) {
+  //     setCrops([]);
+  //     setVarieties([]);
+  //     if (!isUpdateMode) {
+  //       formik.setFieldValue("cropId", "");
+  //       formik.setFieldValue("cropVarietyId", "");
+  //     }
+  //     return;
+  //   }
+  //   const res = getCropsBySeason(formik.values.seasonId);
+  //   if (res.success) {
+  //     setCrops(res.data);
+  //     if (!isUpdateMode) formik.setFieldValue("cropId", "");
+  //   }
+  // }, [formik.values.seasonId, isUpdateMode]);
 
   useEffect(() => {
-    if (!formik.values.cropId) {
-      setVarieties([]);
-      if (!isUpdateMode) formik.setFieldValue("cropVarietyId", "");
-      return;
-    }
-    const res = getVarietyByCrop(formik.values.cropId);
-    if (res.success) {
-      setVarieties(res.data);
-      if (!isUpdateMode) formik.setFieldValue("cropVarietyId", "");
-    }
+    const fetchCrops = async () => {
+      try {
+        if (!formik.values.seasonId) {
+          setCrops([]);
+          setVarieties([]);
+
+          if (!isUpdateMode) {
+            formik.setFieldValue("cropId", "");
+            formik.setFieldValue("cropVarietyId", "");
+          }
+          return;
+        }
+
+        const res = await getCropsBySeason(formik.values.seasonId);
+
+        if (!res?.success) {
+          throw new Error(res?.message || "Failed to fetch crops");
+        }
+
+        setCrops(res.data);
+
+        if (!isUpdateMode) {
+          formik.setFieldValue("cropId", "");
+          formik.setFieldValue("cropVarietyId", "");
+        }
+
+      } catch (err) {
+        console.error("Fetch crops failed:", err);
+
+        setStatusModal({
+          isOpen: true,
+          status: false,
+          message:
+            err?.response?.data?.message ||
+            err?.message ||
+            "Unable to fetch crops for selected season.",
+        });
+      }
+    };
+
+    fetchCrops();
+  }, [formik.values.seasonId, isUpdateMode]);
+
+
+  // useEffect(() => {
+  //   if (!formik.values.cropId) {
+  //     setVarieties([]);
+  //     if (!isUpdateMode) formik.setFieldValue("cropVarietyId", "");
+  //     return;
+  //   }
+  //   const res = getVarietyByCrop(formik.values.cropId);
+  //   if (res.success) {
+  //     setVarieties(res.data);
+  //     if (!isUpdateMode) formik.setFieldValue("cropVarietyId", "");
+  //   }
+  // }, [formik.values.cropId, isUpdateMode]);
+
+  useEffect(() => {
+    const fetchVarieties = async () => {
+      try {
+        if (!formik.values.cropId) {
+          setVarieties([]);
+
+          if (!isUpdateMode) {
+            formik.setFieldValue("cropVarietyId", "");
+          }
+          return;
+        }
+
+        const res = await getVarietiesByCrop(formik.values.cropId);
+
+        if (!res?.success) {
+          throw new Error(res?.message || "Failed to fetch varieties");
+        }
+
+        setVarieties(res.data);
+
+        if (!isUpdateMode) {
+          formik.setFieldValue("cropVarietyId", "");
+        }
+
+      } catch (err) {
+        console.error("Fetch varieties failed:", err);
+
+        setStatusModal({
+          isOpen: true,
+          status: false,
+          message:
+            err?.response?.data?.message ||
+            err?.message ||
+            "Unable to fetch varieties for selected crop.",
+        });
+      }
+    };
+
+    fetchVarieties();
   }, [formik.values.cropId, isUpdateMode]);
+
 
   // ------------------- CLEAR ERRORS ON VALUE CHANGE -------------------
   useEffect(() => {
@@ -125,27 +278,27 @@ export const CropProduction = () => {
   }, [formik.values]);
 
   // Start / stop recording for a specific field
-// const handleMicClick = async (fieldName) => {
-//   if (!isRecording) {
-//     // Start recording
-//     try {
-//       await startRecording();
-//       setIsRecording(true);
-//     } catch (err) {
-//       console.error("Failed to start recording:", err);
-//     }
-//   } else {
-//     // Stop recording & get transcript
-//     try {
-//       const transcript = await stopRecordingAndTranscribe();
-//       formik.setFieldValue(fieldName, transcript); // populate field
-//     } catch (err) {
-//       console.error("Transcription failed:", err);
-//     } finally {
-//       setIsRecording(false);
-//     }
-//   }
-// };
+  // const handleMicClick = async (fieldName) => {
+  //   if (!isRecording) {
+  //     // Start recording
+  //     try {
+  //       await startRecording();
+  //       setIsRecording(true);
+  //     } catch (err) {
+  //       console.error("Failed to start recording:", err);
+  //     }
+  //   } else {
+  //     // Stop recording & get transcript
+  //     try {
+  //       const transcript = await stopRecordingAndTranscribe();
+  //       formik.setFieldValue(fieldName, transcript); // populate field
+  //     } catch (err) {
+  //       console.error("Transcription failed:", err);
+  //     } finally {
+  //       setIsRecording(false);
+  //     }
+  //   }
+  // };
 
 
   // ------------------- HANDLERS -------------------
@@ -190,13 +343,47 @@ export const CropProduction = () => {
       return; // stop execution if errors exist
     }
 
+    // let docId = existingDocId;
+    // if (uploadedFile) {
+    //   const uploadRes = await uploadDocument({ file: uploadedFile, docType: 923 });
+    //   if (uploadRes.status === 200 && uploadRes.data.success) {
+    //     docId = uploadRes.data.documentId;
+    //   }
+    // }
+
     let docId = existingDocId;
+
     if (uploadedFile) {
-      const uploadRes = await uploadDocument({ file: uploadedFile, fpoId: 1, docType: 1 });
-      if (uploadRes.status === 200 && uploadRes.data.success) {
-        docId = uploadRes.data.documentId;
+      try {
+        const uploadRes = await uploadSingleDocument({
+          fpoId: 1,
+          docType: 923,
+          file: uploadedFile,
+        });
+
+        // Based on your axios unwrap pattern, adjust if needed
+        if (uploadRes?.success) {
+          docId = uploadRes.documentId;
+        } else {
+          throw new Error(uploadRes?.message || "Document upload failed");
+        }
+
+      } catch (err) {
+        console.error("Document Upload Failed:", err);
+
+        setStatusModal({
+          isOpen: true,
+          status: false,
+          message:
+            err?.message ||
+            "Failed to upload document. Please try again.",
+        });
+
+        setIsPreviewModalOpen(false);
+        return; // STOP submission if upload fails
       }
     }
+
 
     const payload = {
       ...formik.values,
@@ -205,25 +392,53 @@ export const CropProduction = () => {
       cropVarietyId: parseInt(formik.values.cropVarietyId),
       productionQuantity: parseFloat(formik.values.productionQuantity),
       harvestedSurplus: parseFloat(formik.values.harvestedSurplus),
+      estimatedOrHarvestedId: parseInt(formik.values.estimatedOrHarvestedId),
       emartPublish: publishOnEmart,
       docId,
       fpoId: 1,
     };
 
-    if (isUpdateMode && editingId) {
-      await updateCropProduction(editingId, payload); // ✅ update
-    } else {
-      await createCropProduction(payload); // ✅ create
+    try {
+      let res;
+
+      if (isUpdateMode && editingId) {
+        res = await updateCropProduction(editingId, payload);
+      } else {
+        res = await createCropProduction(payload);
+      }
+
+      // Optional: backend success check
+      if (res?.success === false) {
+        throw new Error(res?.message || "Operation failed");
+      }
+
+      setStatusModal({
+        isOpen: true,
+        status: true,
+        message: isUpdateMode
+          ? "Crop Production Updated Successfully"
+          : "Crop Production Added Successfully",
+      });
+
+      setIsPreviewModalOpen(false);
+      resetAll();
+      fetchProductionList();
+
+    } catch (error) {
+      console.error("Crop Production API Error:", error);
+
+      setStatusModal({
+        isOpen: true,
+        status: false,
+        message:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Failed to save crop production. Please try again.",
+      });
+
+      setIsPreviewModalOpen(false);
     }
 
-    setStatusConfig({
-      status: true,
-      message: isUpdateMode
-        ? "Crop Production Updated Successfully"
-        : "Crop Production Added Successfully",
-    });
-    setIsPreviewModalOpen(false);
-    setIsStatusModalOpen(true);
 
     resetAll();
     fetchProductionList();
@@ -241,25 +456,79 @@ export const CropProduction = () => {
   };
 
   // ------------------- EDIT HANDLER -------------------
+  // const handleEdit = async (row) => {
+  //   setIsUpdateMode(true);
+  //   setEditingId(row.id);
+
+  //   const res = await getCropProductionById(row.id); // ✅ getById
+  //   if (res.status === 200 && res.data.success && res.data.data) {
+  //     const data = res.data.data;
+  //     setExistingDocId(data.docId || null);
+  //     setPublishOnEmart(data.emartPublish || false);
+
+  //     setCrops(getCropsBySeason(data.seasonId).data);
+  //     setVarieties(getVarietyByCrop(data.cropId).data);
+
+  //     formik.setValues({
+  //       seasonId: data.seasonId?.toString() || "",
+  //       cropId: data.cropId?.toString() || "",
+  //       cropVarietyId: data.cropVarietyId?.toString() || "",
+  //       productionQuantity: data.productionQuantity != null ? data.productionQuantity.toString() : "",
+  //       harvestedSurplus: data.harvestedSurplus != null ? data.harvestedSurplus.toString() : "",
+  //       dateOfHarvesting: data.dateOfHarvesting || "",
+  //       estimatedOrHarvestedId: data.estimatedOrHarvestedId || "",
+  //       description: data.description || "",
+  //     });
+
+  //     setUploadedFile(null);
+  //     setPreviewImage(data.docId ? `/mock/uploads/${data.docId}.jpg` : null);
+  //   }
+  // };
+
   const handleEdit = async (row) => {
-    setIsUpdateMode(true);
-    setEditingId(row.id);
+    try {
+      setIsUpdateMode(true);
+      setEditingId(row.id);
 
-    const res = await getCropProductionById(row.id); // ✅ getById
-    if (res.status === 200 && res.data.success && res.data.data) {
-      const data = res.data.data;
+      // -------- Get production by ID --------
+      const res = await getCropProductionById(row.id);
+
+      if (!res?.success || !res?.data) {
+        throw new Error(res?.message || "Failed to fetch crop production details");
+      }
+
+      const data = res.data;
+
       setExistingDocId(data.docId || null);
-      setPublishOnEmart(data.emartPublish || false);
+      setPublishOnEmart(!!data.emartPublish);
 
-      setCrops(getCropsBySeason(data.seasonId).data);
-      setVarieties(getVarietyByCrop(data.cropId).data);
+      // -------- Fetch crops by season --------
+      const cropsRes = await getCropsBySeason(data.seasonId);
+      if (!cropsRes?.success) {
+        throw new Error(cropsRes?.message || "Failed to fetch crops");
+      }
+      setCrops(cropsRes.data);
 
+      // -------- Fetch varieties by crop --------
+      const varietiesRes = await getVarietiesByCrop(data.cropId);
+      if (!varietiesRes?.success) {
+        throw new Error(varietiesRes?.message || "Failed to fetch varieties");
+      }
+      setVarieties(varietiesRes.data);
+
+      // -------- Set form values --------
       formik.setValues({
         seasonId: data.seasonId?.toString() || "",
         cropId: data.cropId?.toString() || "",
         cropVarietyId: data.cropVarietyId?.toString() || "",
-        productionQuantity: data.productionQuantity != null ? data.productionQuantity.toString() : "",
-        harvestedSurplus: data.harvestedSurplus != null ? data.harvestedSurplus.toString() : "",
+        productionQuantity:
+          data.productionQuantity != null
+            ? data.productionQuantity.toString()
+            : "",
+        harvestedSurplus:
+          data.harvestedSurplus != null
+            ? data.harvestedSurplus.toString()
+            : "",
         dateOfHarvesting: data.dateOfHarvesting || "",
         estimatedOrHarvestedId: data.estimatedOrHarvestedId || "",
         description: data.description || "",
@@ -267,8 +536,21 @@ export const CropProduction = () => {
 
       setUploadedFile(null);
       setPreviewImage(data.docId ? `/mock/uploads/${data.docId}.jpg` : null);
+
+    } catch (err) {
+      console.error("Edit load failed:", err);
+
+      setStatusModal({
+        isOpen: true,
+        status: false,
+        message:
+          err?.response?.data?.message ||
+          err?.message ||
+          "Failed to load crop production for editing.",
+      });
     }
   };
+
 
   // ------------------- TABLE COLUMNS -------------------
   const columns = [
@@ -419,18 +701,18 @@ export const CropProduction = () => {
           />
         </div>
 
-       <div className="relative">
-  <TextArea
-    label="Description"
-    name="description"
-    placeholder="Enter Description"
-    value={formik.values.description}
-    onChange={formik.handleChange}
-    onBlur={formik.handleBlur}
-    error={formik.errors.description}
-    touched={formik.touched.description}
-  />
-  {/* <button
+        <div className="relative">
+          <TextArea
+            label="Description"
+            name="description"
+            placeholder="Enter Description"
+            value={formik.values.description}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.errors.description}
+            touched={formik.touched.description}
+          />
+          {/* <button
     type="button"
     onClick={() => handleMicClick("description")}
     className="absolute right-2 top-8 p-2 bg-gray-200 rounded-full"
@@ -438,7 +720,7 @@ export const CropProduction = () => {
   >
     {isRecording ? "⏹️" : "🎤"}
   </button> */}
-</div>
+        </div>
 
 
         <div className="mb-6">
@@ -536,15 +818,6 @@ export const CropProduction = () => {
         />
       </div>
 
-      {/* MODALS */}
-      {/* <PreviewModal
-        isOpen={isPreviewModalOpen}
-        onClose={() => setIsPreviewModalOpen(false)}
-        onConfirm={handlePreviewConfirm}
-        data={previewData}
-        image={previewImage}
-      /> */}
-
       <PreviewModal
         isOpen={isPreviewModalOpen}
         title={previewTitle}
@@ -559,10 +832,12 @@ export const CropProduction = () => {
       />
 
       <StatusModal
-        isOpen={isStatusModalOpen}
-        onClose={() => setIsStatusModalOpen(false)}
-        status={statusConfig.status}
-        message={statusConfig.message}
+        isOpen={statusModal.isOpen}
+        onClose={() =>
+          setStatusModal((prev) => ({ ...prev, isOpen: false }))
+        }
+        status={statusModal.status}
+        message={statusModal.message}
       />
 
       <ValidationModal

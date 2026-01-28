@@ -17,7 +17,7 @@ import { registrationValidationSchema } from "./validation";
 import UploadDocument from "../../components/UploadDocument";
 import { useNavigate } from "react-router-dom";
 import { getDistricts, getBlocksByDistrictId, getGeneral } from "../../api/master";
-import { uploadBulkDocuments, uploadBulkDocumentsRegistration } from "../../api/upload";
+import {  uploadBulkDocumentsRegistration } from "../../api/upload";
 import { registerFPO } from "../../api/registration";
 import { temprorayToken } from "../../api/authApi";
 import StatusModal from "../../components/StatusModal";
@@ -177,15 +177,14 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
 
       if (res.success) {
         console.log("Documents uploaded successfully:", res);
-        setStatusModal({
-          isOpen: true,
-          status: true, // false = error, true = success
-          message: "Documents uploaded successfully",
-        });
-
+        // setStatusModal({
+        //   isOpen: true,
+        //   status: true, // false = error, true = success
+        //   message: "Documents uploaded successfully",
+        // });
 
         return res;
-
+        
         // Optional: do something after successful upload
         // e.g., navigate("/next-step");
       } else {

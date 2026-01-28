@@ -15,3 +15,19 @@ export const getBlocksByDistrictId = (districtId) => {
 export const getGeneral = (type) => {
   return masterApiClient.get(`/api/v1/master/generic/${type}`);
 };
+
+// ---------------- GET CROPS BY SEASON ----------------
+export const getCropsBySeason = (seasonId) => {
+  return masterApiClient.get(
+    `/api/v1/agri-master/getCropBySeason/${seasonId}`
+  );
+};
+
+// ---------------- GET VARIETIES BY CROP ----------------
+export const getVarietiesByCrop = (cropId) => {
+  return masterApiClient.get(
+    `/api/v1/agri-master/getVarietyByCrop/${cropId}`
+  );
+};
+
+
