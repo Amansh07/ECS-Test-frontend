@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
 import { SelectField, RadioGroup, TextArea } from '../../components/FormFields';
 import { Button } from '../../components/Buttons';
 import Table from '../../components/Table';
@@ -9,6 +8,12 @@ import ConfirmationModal from '../../components/ConfirmationModal';
 import StatusModal from '../../components/StatusModal';
 import Loader from '../../components/Loader';
 import Toggle from '../../components/Toggle';
+import {
+    getWorkflowStats,
+    getWorkflowActions,
+    processWorkflowAction,
+    getFPORegistrationList
+} from '../../api/workflow';
 
 
 // ----------------------------------------------------------------------
@@ -167,20 +172,20 @@ const AdminDashboard = () => {
                 sendNotification: values.notification
             };
 
-            const response = await axios.post('http://10.0.1.6:8085/api/workflow/process', payload);
+            const response = await processWorkflowAction(payload);
 
-            if (response.data && response.data.success) {
+            if (response && response.success) {
                 setStatusModal({
                     isOpen: true,
                     status: true,
-                    message: response.data.message || 'Workflow action processed successfully'
+                    message: response.message || 'Workflow action processed successfully'
                 });
                 // Refresh data
                 fetchStats();
                 fetchTableData();
                 handleReset();
             } else {
-                throw new Error(response.data?.message || 'Operation failed');
+                throw new Error(response?.message || 'Operation failed');
             }
         } catch (error) {
             console.error('Workflow API Error:', error);
@@ -197,9 +202,10 @@ const AdminDashboard = () => {
     const fetchStats = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.get('http://10.0.1.6:8085/api/workflow/stats');
-            if (response.data.success && response.data.data) {
-                setStats(response.data.data);
+            const data = await getWorkflowStats();
+            if (data.success && data.data) {
+                console.log(data.data);
+                setStats(data.data);
             }
         } catch (error) {
             console.error('Error fetching workflow stats:', error);
@@ -209,14 +215,14 @@ const AdminDashboard = () => {
         }
     };
 
-    const fetchTableData = async () => {
+    const fetchTableData = async (statusId = 1) => {
         setIsLoading(true);
         try {
-            const response = await axios.get('http://10.0.1.6:8083/api/v1/fpo/registration/list?page=0&size=10');
-            console.log(response.data, 'res');
-            if (response.data.success && response.data.data) {
+            const data = await getFPORegistrationList(0, 10, statusId);
+            console.log(data, 'res');
+            if (data.success && data.data) {
                 // Map API response to table format
-                const mappedData = response.data.data.map(item => ({
+                const mappedData = data.data.map(item => ({
                     id: item.id,
                     blockId: item.blockId,
                     fpoName: item.companyDetails?.companyName || item.societyDetails?.societyName || 'N/A',
@@ -243,7 +249,8 @@ const AdminDashboard = () => {
 
     // Fetch FPO registration list on component mount
     useEffect(() => {
-        fetchTableData();
+        // Default to Pending (statusId: 2)
+        fetchTableData(1);
     }, []);
 
     // Sync formik values to selectedRow whenever they change
@@ -260,9 +267,17 @@ const AdminDashboard = () => {
     // Handlers
     // ----------------------------------------------------------------------
     const handleTileClick = (tile) => {
+        if (activeTile === tile) return; // Prevent API call if clicking the same tile
+
         setActiveTile(tile);
         // Deactivate form when switching tiles
         handleReset();
+
+        let statusId = 1; // Default Pending
+        if (tile === 'approved') statusId = 2;
+        else if (tile === 'rejected') statusId = 3;
+
+        fetchTableData(statusId);
     };
 
     const handleEdit = async (row) => {
@@ -280,9 +295,9 @@ const AdminDashboard = () => {
         // Fetch workflow actions for this row
         setIsLoading(true);
         try {
-            const response = await axios.get(`http://10.0.1.6:8085/api/workflow/actions/${row.id}`);
-            if (response.data && response.data.success && Array.isArray(response.data.data)) {
-                setWorkflowActions(response.data.data);
+            const data = await getWorkflowActions(row.id);
+            if (data && data.success && Array.isArray(data.data)) {
+                setWorkflowActions(data.data);
             }
         } catch (error) {
             console.error("Error fetching workflow actions:", error);
@@ -307,18 +322,20 @@ const AdminDashboard = () => {
 
     const renderActions = (row) => (
         <div className="flex items-center justify-center gap-2">
-            <button
-                type="button"
-                onClick={() => handleEdit(row)}
-                className="w-8 h-8 flex items-center justify-center rounded border border-green-600 text-green-600 hover:bg-green-50 transition-colors"
-                title="Edit"
-            >
-                {/* Pencil Icon */}
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-            </button>
+            {activeTile === 'pending' && (
+                <button
+                    type="button"
+                    onClick={() => handleEdit(row)}
+                    className="w-8 h-8 flex items-center justify-center rounded border border-green-600 text-green-600 hover:bg-green-50 transition-colors"
+                    title="Edit"
+                >
+                    {/* Pencil Icon */}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                </button>
+            )}
             <button
                 type="button"
                 className="w-8 h-8 flex items-center justify-center rounded border border-yellow-600 text-yellow-600 hover:bg-yellow-50 transition-colors"

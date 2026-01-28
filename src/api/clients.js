@@ -2,19 +2,26 @@ import { createApiClient } from "./createApiClient";
 
 // ENV
 const LOGIN_API = import.meta.env.VITE_API_LOGIN_URL;
-const REGISTRATION_API = import.meta.env.VITE_API_REGISTRATION_URL;
-const MASTER_API = import.meta.env.VITE_API_MASTER_URL;
+const API_8083 = import.meta.env.VITE_API_REGISTRATION_URL;
+const API_8082 = import.meta.env.VITE_API_MASTER_URL;
+const API_8085 = import.meta.env.VITE_API_8085_URL;
 const UPLOAD_API = import.meta.env.VITE_API_UPLOAD_URL;
 
 // 8082 — Main API (with auth)
 export const masterApiClient = createApiClient({
-  baseURL: MASTER_API,
+  baseURL: API_8082,
   withAuth: true,
 });
 
 // 8083 — Alt API (with auth)
-export const registrationApiClient = createApiClient({
-  baseURL: REGISTRATION_API,
+export const api8083Client = createApiClient({
+  baseURL: API_8083,
+  withAuth: true,
+});
+
+// 8085 — Alt API (with auth)
+export const api8085Client = createApiClient({
+  baseURL: API_8085,
   withAuth: true,
 });
 

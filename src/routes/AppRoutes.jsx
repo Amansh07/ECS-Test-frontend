@@ -27,12 +27,12 @@ const AppRoutes = () => {
       {/* Public main layout */}
       <Route element={<MainLayout />}>
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/adminDashboard" element={<AdminDashboard />} />
         <Route path="/" element={<Homepage />} />
         <Route path="/registration" element={<Registration />} />
 
         {/* PROTECTED: Member Management ONLY */}
         <Route element={<PrivateRoute />}>
+          <Route path="/adminDashboard" element={<AdminDashboard />} />
           {MemberManagementRoutes()}
         </Route>
 
