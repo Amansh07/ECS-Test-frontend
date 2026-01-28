@@ -125,7 +125,7 @@ export default function MainLayout() {
     { title: "Insecticide/Pesticide Details", path: "insecticide-or-pesticide-details" },
     { title: "Machinery/Equipment Details", path: "machinery" },
     { title: "Infrastructure Details", path: "infrastructure-form" },
-    { title: "Infrastructure", path: "infrastructure" },
+	{ title: "Storage / Processing Units", path: "infrastructure" },
   ];
 
   const complianceTabs = [
