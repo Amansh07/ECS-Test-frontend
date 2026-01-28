@@ -1,44 +1,54 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef } from "react";
+import captcha from "../assets/captcha.jpeg";
 
-export default function Captcha({
-  onVerify,
-  refreshTrigger = 0,
-}) {
+export default function Captcha({ onVerify, a = 0, b = 0 }) {
   const canvasRef = useRef(null);
+  const bgImageRef = useRef(null);
 
-  const [a, setA] = useState(0);
-  const [b, setB] = useState(0);
-
-  // Generate new captcha
-  const generateCaptcha = () => {
-    const num1 = Math.floor(Math.random() * 9) + 1;
-    const num2 = Math.floor(Math.random() * 9) + 1;
-    setA(num1);
-    setB(num2);
-  };
-
+  // Load background image once
   useEffect(() => {
-    generateCaptcha();
-  }, [refreshTrigger]);
+    const img = new Image();
+    img.src = captcha;
+    img.onload = () => {
+      bgImageRef.current = img;
+    };
+  }, []);
 
-  // Draw captcha
+  // Draw captcha whenever props a or b change
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
-
     const width = canvas.width;
     const height = canvas.height;
 
     ctx.clearRect(0, 0, width, height);
 
-    // Background
-    ctx.fillStyle = "#000000";
+    // -------- Background Image (TOP CROP) --------
+    if (bgImageRef.current) {
+      const img = bgImageRef.current;
+      const sourceHeight = img.height * 0.4; // top 40%
+      ctx.drawImage(
+        img,
+        0, 0,
+        img.width,
+        sourceHeight,
+        0, 0,
+        width,
+        height
+      );
+    } else {
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(0, 0, width, height);
+    }
+
+    // Dark overlay
+    ctx.fillStyle = "rgba(0,0,0,0.25)";
     ctx.fillRect(0, 0, width, height);
 
     // Noise lines
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 6; i++) {
       ctx.strokeStyle = "#ffffff33";
       ctx.beginPath();
       ctx.moveTo(Math.random() * width, Math.random() * height);
@@ -46,16 +56,64 @@ export default function Captcha({
       ctx.stroke();
     }
 
-    // Text
-    ctx.font = "bold 20px Arial";
-    ctx.fillStyle = "#ffffff";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(`${a} + ${b} = ?`, width / 2, height / 2);
-  }, [a, b]);
+    const text = `${a}+${b}=?`;
 
-  // Expose correct answer
-  useEffect(() => {
+    ctx.font = "bold 22px Arial";
+
+    let totalWidth = 0;
+    const gaps = [];
+    for (let i = 0; i < text.length; i++) {
+      const gap = 6 + Math.random() * 16;
+      gaps.push(gap);
+      totalWidth += ctx.measureText(text[i]).width + gap;
+    }
+
+    let currentX = (width - totalWidth) / 2;
+
+    // Draw each character
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      const isOperator = char === "+" || char === "=" || char === "?";
+
+      const fontSize = isOperator
+        ? 20 + Math.random() * 4
+        : 16 + Math.random() * 14;
+
+      const y = isOperator
+        ? height / 2
+        : height / 2 + (Math.random() * 18 - 9);
+
+      const rotation = isOperator ? 0 : (Math.random() - 0.5) * 0.7;
+
+      ctx.save();
+      ctx.translate(currentX, y);
+      ctx.rotate(rotation);
+
+      ctx.font = `400 ${fontSize}px Arial`;
+      ctx.fillStyle = "#ffffff";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+
+      if (!isOperator) {
+        ctx.filter = "blur(0.5px)";
+        ctx.shadowColor = "#ffffff";
+        ctx.shadowBlur = 2;
+      } else {
+        ctx.filter = "none";
+        ctx.shadowBlur = 0;
+      }
+
+      ctx.fillText(char, 0, 0);
+
+      ctx.filter = "none";
+      ctx.shadowBlur = 0;
+      ctx.restore();
+
+      const charWidth = ctx.measureText(char).width;
+      currentX += charWidth + gaps[i];
+    }
+
+    // Expose correct answer
     onVerify?.(a + b);
   }, [a, b, onVerify]);
 

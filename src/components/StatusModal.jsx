@@ -74,7 +74,7 @@ export default function StatusModal({ isOpen, onClose, status, message }) {
                         onClick={onClose}
                         className="w-[140px] rounded-md bg-[#253300] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#1a2400] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 transition-colors ml-auto block"
                     >
-                        Continue
+                        Close
                     </button>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 import { createApiClient } from "./createApiClient";
 
 // ENV
-const LOGIN_API = import.meta.env.VITE_API_LOGIN_URL;
+const AUTH_API = import.meta.env.VITE_API_AUTH_URL;
 const REGISTRATION_API = import.meta.env.VITE_API_REGISTRATION_URL;
 const MASTER_API = import.meta.env.VITE_API_MASTER_URL;
 const UPLOAD_API = import.meta.env.VITE_API_UPLOAD_URL;
@@ -20,7 +20,7 @@ export const registrationApiClient = createApiClient({
 
 // 8086 — Login/Auth API (NO auth header)
 export const authApiClient = createApiClient({
-  baseURL: LOGIN_API,
+  baseURL: AUTH_API,
   withAuth: false,
 });
 

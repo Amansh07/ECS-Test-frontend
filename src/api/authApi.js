@@ -12,3 +12,19 @@ export const login = async (username, password) => {
 
   return response;
 };
+
+// ---------------- CAPTCHA GENERATE ----------------
+export const generateCaptcha = async () => {
+  const response = await authApiClient.get("/api/v1/captcha/generate");
+  return response;
+};
+
+// ---------------- CAPTCHA VERIFY ----------------
+export const verifyCaptchaApi = async (captchaId, userAnswer) => {
+  const response = await authApiClient.post("/api/v1/captcha/verify", {
+    captchaId,
+    userAnswer,
+  });
+
+  return response;
+};

@@ -16,6 +16,8 @@ import { getGeneralMasterByType, getCropsBySeason, getVarietyByCrop } from "../.
 import { listCropProduction, createCropProduction, updateCropProduction, getCropProductionById } from "../../../api/productionDetailsMock";
 import { cropProductionValidationSchema } from "../validation";
 import ValidationModal from "../../../components/ValidationModal";
+// import { startRecording, stopRecordingAndTranscribe } from "../../../utils/speechToText";
+
 
 const initialCropProductionValues = {
   seasonId: "",
@@ -49,6 +51,8 @@ export const CropProduction = () => {
   const [showValidationModal, setShowValidationModal] = useState(false);
   const [validationTitle, setValidationTitle] = useState("");
   const [validationMessage, setValidationMessage] = useState("");
+
+  const [isRecording, setIsRecording] = useState(false);
 
 
   const uploadConfig = {
@@ -119,6 +123,30 @@ export const CropProduction = () => {
     });
     if (hasChanges) formik.setErrors(newErrors);
   }, [formik.values]);
+
+  // Start / stop recording for a specific field
+// const handleMicClick = async (fieldName) => {
+//   if (!isRecording) {
+//     // Start recording
+//     try {
+//       await startRecording();
+//       setIsRecording(true);
+//     } catch (err) {
+//       console.error("Failed to start recording:", err);
+//     }
+//   } else {
+//     // Stop recording & get transcript
+//     try {
+//       const transcript = await stopRecordingAndTranscribe();
+//       formik.setFieldValue(fieldName, transcript); // populate field
+//     } catch (err) {
+//       console.error("Transcription failed:", err);
+//     } finally {
+//       setIsRecording(false);
+//     }
+//   }
+// };
+
 
   // ------------------- HANDLERS -------------------
   const handleFileSelect = (file) => {
@@ -391,16 +419,27 @@ export const CropProduction = () => {
           />
         </div>
 
-        <TextArea
-          label="Description"
-          name="description"
-          placeholder="Enter Description"
-          value={formik.values.description}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={formik.errors.description}
-          touched={formik.touched.description}
-        />
+       <div className="relative">
+  <TextArea
+    label="Description"
+    name="description"
+    placeholder="Enter Description"
+    value={formik.values.description}
+    onChange={formik.handleChange}
+    onBlur={formik.handleBlur}
+    error={formik.errors.description}
+    touched={formik.touched.description}
+  />
+  {/* <button
+    type="button"
+    onClick={() => handleMicClick("description")}
+    className="absolute right-2 top-8 p-2 bg-gray-200 rounded-full"
+    title={isRecording ? "Stop Recording" : "Start Recording"}
+  >
+    {isRecording ? "⏹️" : "🎤"}
+  </button> */}
+</div>
+
 
         <div className="mb-6">
           <AccordionGroup

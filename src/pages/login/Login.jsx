@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import indianEmblem from "../../assets/indianEmblem.svg";
 import { TextField } from "../../components/FormFields";
 import mail from "../../assets/mail.svg";
@@ -8,10 +8,10 @@ import verify from "../../assets/verify.svg";
 import Captcha from "../../components/Captcha";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
-import * as Yup from "yup";
-import ValidationModal from "../../components/ValidationModal";
-import { login } from "../../api/authApi";
+import StatusModal from "../../components/StatusModal"; // <-- import StatusModal
+import { login, generateCaptcha, verifyCaptchaApi } from "../../api/authApi";
 import { loginValidationSchema } from "./validation";
+import AuthService from "../../auth/AuthService";
 
 export default function Login() {
   const [captchaAnswer, setCaptchaAnswer] = useState(null);
@@ -22,43 +22,143 @@ export default function Login() {
   const [apiError, setApiError] = useState("");
   const [showModal, setShowModal] = useState(false);
 
+  const [captchaId, setCaptchaId] = useState(null);
+  const [firstNumber, setFirstNumber] = useState(null);
+  const [secondNumber, setSecondNumber] = useState(null);
+
   const navigate = useNavigate();
+  const mountedRef = useRef(true);
 
-  const verifyCaptcha = () => {
-    if (!userValue) return;
+  // ---------------- Status Modal ----------------
+  const [statusModal, setStatusModal] = useState({
+    isOpen: false,
+    status: false, // true = success, false = error
+    message: "",
+  });
 
-    if (Number(userValue) === captchaAnswer) {
-      setIsCaptchaVerified(true);
+  // ---------------- Redirect if logged in ----------------
+  useEffect(() => {
+    const token = AuthService.getAccessToken();
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        const isExpired = payload.exp * 1000 < Date.now();
+        if (!isExpired) navigate("/member-management", { replace: true });
+        else AuthService.logout();
+      } catch {
+        AuthService.logout();
+      }
+    }
+  }, [navigate]);
+
+  // ---------------- Base64 Decode Helper ----------------
+  const decodeCaptchaNumber = (encoded) => {
+    try {
+      const decodedStr = atob(encoded);
+      const digitsOnly = decodedStr.replace(/\D/g, "");
+      return parseInt(digitsOnly, 10);
+    } catch {
+      return null;
+    }
+  };
+
+  // ---------------- GET CAPTCHA ----------------
+  const fetchCaptcha = async () => {
+    try {
+      const response = await generateCaptcha();
+      const data = response.data;
+
+      const decodedA = decodeCaptchaNumber(data.firstNumber);
+      const decodedB = decodeCaptchaNumber(data.secondNumber);
+
+      setCaptchaId(data.captchaId);
+      setFirstNumber(decodedA);
+      setSecondNumber(decodedB);
+      setCaptchaAnswer(decodedA + decodedB);
+      setIsCaptchaVerified(false);
       setCaptchaError(false);
-      alert("Captcha Verified");
-    } else {
+      setUserValue("");
+    } catch (error) {
+      setStatusModal({
+      isOpen: true,
+      status: false, // false = error
+      message: error?.message || "Failed to generate captcha.",
+    });
+    }
+  };
+
+  // ---------------- INITIAL CAPTCHA ON MOUNT ----------------
+  useEffect(() => {
+    if (!mountedRef.current) return;
+    mountedRef.current = false;
+    fetchCaptcha();
+  }, []);
+
+  // ---------------- CAPTCHA RELOAD ----------------
+  useEffect(() => {
+    if (refreshKey === 0) return;
+    fetchCaptcha();
+  }, [refreshKey]);
+
+  // ---------------- VERIFY CAPTCHA ----------------
+  const verifyCaptcha = async () => {
+    if (!userValue || !captchaId) return;
+
+    try {
+      const response = await verifyCaptchaApi(captchaId, Number(userValue));
+      if (response.success) {
+        setIsCaptchaVerified(true);
+        setCaptchaError(false);
+      } else throw new Error("Wrong Captcha");
+    } catch (error) {
       setCaptchaError(true);
       setIsCaptchaVerified(false);
-      alert("Wrong Captcha");
+      setStatusModal({
+        isOpen: true,
+        status: false,
+        message: error?.message || "Unable to verify Captcha.",
+      });
       setRefreshKey((k) => k + 1);
       setUserValue("");
     }
   };
 
+  // ---------------- FORMIK ----------------
   const formik = useFormik({
     initialValues: { username: "", password: "" },
     validationSchema: loginValidationSchema,
     onSubmit: async (values, { setSubmitting }) => {
       if (!isCaptchaVerified) {
-        setApiError("Please verify captcha before login.");
-        setShowModal(true);
+        setStatusModal({
+          isOpen: true,
+          status: false,
+          message: "Please verify captcha before login.",
+        });
         return;
       }
 
       try {
-        await login(values.username, values.password);
+        const res = await login(values.username, values.password);
+        AuthService.setTokens(res);
 
-        // Successful login → redirect
-        navigate("/member-management");
+        // Show success StatusModal
+        setStatusModal({
+          isOpen: true,
+          status: true,
+          message: "Login successful! Redirecting...",
+        });
+
+        // Redirect after 3 seconds
+        setTimeout(() => {
+          setStatusModal({ isOpen: false, status: true, message: "" });
+          navigate("/member-management", { replace: true });
+        }, 3000);
       } catch (error) {
-        // API error is returned from createApiClient
-        setApiError(error?.message || "Login failed. Please try again.");
-        setShowModal(true);
+        setStatusModal({
+          isOpen: true,
+          status: false,
+          message: error?.message || "Login failed. Please try again.",
+        });
       } finally {
         setSubmitting(false);
       }
@@ -67,25 +167,27 @@ export default function Login() {
 
   return (
     <>
-      {/* Modal for showing API / Validation errors */}
-      <ValidationModal
-        isOpen={showModal}
-        title="Login Error"
-        message={apiError}
-        onClose={() => setShowModal(false)}
+      {/* Status Modal */}
+      <StatusModal
+        isOpen={statusModal.isOpen}
+        onClose={() =>
+          setStatusModal((prev) => ({ ...prev, isOpen: false }))
+        }
+        status={statusModal.status}
+        message={statusModal.message}
       />
 
+      {/* LOGIN FORM */}
       <div
         className="
-        max-w-[395px] max-h-[524px]
         border-l-[9px] border-t-[9px] border-b-[9px] border-r-0
         rounded-tl-[40px] rounded-bl-[40px]
-        p-6 flex flex-col
+        p-4 flex flex-col
         bg-white
       "
       >
         {/* HEADER */}
-        <div className="h-[140px] flex flex-col items-center justify-center gap-[20px] mt-[-20px]">
+        <div className="flex flex-col items-center justify-center gap-[10px] mt-[-10px] mb-[7px]">
           <img src={indianEmblem} alt="indian Emblem logo" />
           <p className="text-center font-medium text-[22px] text-primary">
             Welcome to FPO Shakti
@@ -119,31 +221,28 @@ export default function Login() {
           />
         </div>
 
-        {/* ERROR + FORGOT */}
-        <div className="h-[20px] flex justify-end items-center mt-[-10px] mb-[10px] p-1">
+        {/* FORGOT */}
+        <div className="h-[20px] flex justify-end items-center mt-[-10px] p-1">
           <p className="text-sm text-success cursor-pointer">
             <a href="/forgot-password"> Forgot Password </a>
           </p>
         </div>
 
-        {/* CAPTCHA IMAGE */}
-        <div className="h-[67px] flex gap-[10px] py-[10px]">
-          <div className="w-[303px] h-[43px] rounded-lg overflow-hidden">
+        {/* CAPTCHA */}
+        <div className="h-[55px] flex gap-[10px] py-[10px] mb-[5px]">
+          <div className="h-[43px] rounded-lg overflow-hidden">
             <Captcha
               refreshTrigger={refreshKey}
-              onVerify={(answer) => setCaptchaAnswer(answer)}
+              onVerify={() => { }}
+              a={firstNumber}
+              b={secondNumber}
             />
           </div>
 
           <button
-            onClick={() => {
-              setRefreshKey((k) => k + 1);
-              setUserValue("");
-              setIsCaptchaVerified(false);
-              setCaptchaError(false);
-            }}
+            onClick={() => setRefreshKey((k) => k + 1)}
             className="
-              w-[34px] h-[40px]
+              w-[34px] h-[43px]
               rounded-lg
               border border-primary
               flex items-center justify-center
@@ -160,7 +259,7 @@ export default function Login() {
         </div>
 
         {/* CAPTCHA INPUT + VERIFY */}
-        <div className="h-[67px] flex gap-[10px] py-[10px]">
+        <div className="flex gap-[10px] py-[10px]">
           <div className="w-[232px] h-[43px] rounded-lg">
             <TextField
               required
@@ -184,26 +283,32 @@ export default function Login() {
               disabled:opacity-50
             "
           >
-            <div className="w-[12px] h-[12px]">
-              <img
-                src={verify}
-                alt="verify logo"
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <p className="font-medium text-sm">Verify</p>
+            {isCaptchaVerified && (
+              <div className="w-[12px] h-[12px]">
+                <img
+                  src={verify}
+                  alt="verify logo"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            )}
+            <p className="font-medium text-sm">
+              {isCaptchaVerified ? "Verified" : "Verify"}
+            </p>
           </button>
         </div>
 
         {/* ACTION BUTTONS */}
         <div className="h-[50px] flex justify-end gap-[10px]">
-          <button className="
-            h-[48px] w-[102px]
+          <button
+            className="
+            w-[102px]
             border border-primary
             rounded-lg
             font-medium text-[16px]
             text-primary
-          ">
+          "
+          >
             Signup
           </button>
 
@@ -212,7 +317,7 @@ export default function Login() {
             onClick={formik.handleSubmit}
             disabled={!isCaptchaVerified || formik.isSubmitting}
             className="
-              h-[48px] w-[92px]
+              w-[92px]
               bg-primary
               text-white
               text-[16px]

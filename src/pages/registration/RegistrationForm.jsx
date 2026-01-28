@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { getDistricts, getBlocksByDistrictId, getGeneral } from "../../api/master";
 import { uploadBulkDocuments } from "../../api/upload";
 import { registerFPO } from "../../api/registration";
+import StatusModal from "../../components/StatusModal";
 
 const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = false, imgConfig, pdfConfig, activeStep, setActiveStep, nextButtonClicked, setNextButtonClicked, backButtonClicked, setBackButtonClicked, saveButtonClicked, setSaveButtonClicked, steps }) => {
   // ---------------- INITIAL FORM VALUES ----------------
@@ -64,6 +65,13 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
       roaName: "",
     },
   };
+
+  const [statusModal, setStatusModal] = useState({
+    isOpen: false,
+    status: true, // true = success, false = error
+    message: "",
+  });
+
 
   const navigate = useNavigate();
 
@@ -117,6 +125,12 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
     setImageFile(null);
     setPdfFile(null);
     setValidationMessage("");
+    setStatusModal({
+      isOpen: false,
+      status: true, // false = error, true = success
+      message: "",
+    });
+
   };
 
   const validationCheck = async () => {
@@ -150,36 +164,49 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
       return true;
     }
   }
-const handleUploadDocuments = async () => {
-  try {
-    const res = await uploadBulkDocuments({
-      fpoId: 1, // replace with dynamic fpoId
-      docTypes: [920, 921], // image + pdf
-      files: [imageFile, pdfFile],
-    });
+  const handleUploadDocuments = async () => {
+    try {
+      const res = await uploadBulkDocuments({
+        fpoId: 1, // replace with dynamic fpoId
+        docTypes: [920, 921], // image + pdf
+        files: [imageFile, pdfFile],
+      });
 
-    if (res.success) {
-      console.log("Documents uploaded successfully:", res);
-      setValidationMessage("Documents uploaded successfully!");
-      setShowValidationModal(true);
+      if (res.success) {
+        console.log("Documents uploaded successfully:", res);
+        setStatusModal({
+          isOpen: true,
+          status: true, // false = error, true = success
+          message: "Documents uploaded successfully",
+        });
 
-      return res;
 
-      // Optional: do something after successful upload
-      // e.g., navigate("/next-step");
-    } else {
-      setValidationMessage(res.message || "Upload failed.");
-      setShowValidationModal(true);
+        return res;
+
+        // Optional: do something after successful upload
+        // e.g., navigate("/next-step");
+      } else {
+        setStatusModal({
+          isOpen: true,
+          status: false, // false = error, true = success
+          message: res.message || "Upload Failed",
+        });
+
+        return false;
+      }
+
+    } catch (error) {
+      // Errors from axios / interceptor
+
+      setStatusModal({
+        isOpen: true,
+        status: false, // false = error, true = success
+        message: error.message || "Something went wrong. Please try again.",
+      });
+
       return false;
     }
-
-  } catch (error) {
-    // Errors from axios / interceptor
-    setValidationMessage(error.message || "Something went wrong. Please try again.");
-    setShowValidationModal(true);
-    return false;
-  }
-};
+  };
 
 
   const handleSave = async () => {
@@ -254,19 +281,35 @@ const handleUploadDocuments = async () => {
 
       if (regRes.success) {
         console.log("User registered successfully");
-        setValidationMessage("Registration successful!");
-        setShowValidationModal(true);
+        // setValidationMessage("Registration successful!");
+        // setShowValidationModal(true);
+
+        setStatusModal({
+          isOpen: true,
+          status: true, // false = error, true = success
+          message: "Registration successful!",
+        });
 
         // Optional: redirect or reset form
         // navigate("/some-route");
       } else {
-        setValidationMessage(regRes.message || "Registration failed.");
-        setShowValidationModal(true);
+        // setValidationMessage(regRes.message || "Registration failed.");
+        // setShowValidationModal(true);
+        setStatusModal({
+          isOpen: true,
+          status: false, // false = error, true = success
+          message: regRes.message || "Registration failed."
+        });
       }
     } catch (error) {
       // Errors from axios / interceptor
-      setValidationMessage(error.message || "Something went wrong. Please try again.");
-      setShowValidationModal(true);
+      // setValidationMessage(error.message || "Something went wrong. Please try again.");
+      // setShowValidationModal(true);
+      setStatusModal({
+        isOpen: true,
+        status: false, // false = error, true = success
+        message: error.message || "Something went wrong. Please try again."
+      });
     }
 
     setTimeout(() => {
@@ -347,29 +390,6 @@ const handleUploadDocuments = async () => {
     }
   }, [formik.values.districtId]);
 
-
-  // --- FETCH DISTRICTS ---
-  const fetchDistricts = async () => {
-    setDistrictLoading(true);
-    try {
-      const res = await getDistricts(); // API call like login
-
-      if (res.success) {
-        setDistrictOptions(res.data || []);
-      } else {
-        setDistrictOptions([]);
-        setValidationMessage(res.message || "Failed to fetch districts");
-        setShowValidationModal(true);
-      }
-    } catch (error) {
-      setDistrictOptions([]);
-      setValidationMessage(error?.message || "Error fetching districts");
-      setShowValidationModal(true);
-    } finally {
-      setDistrictLoading(false);
-    }
-  };
-
   // --- FETCH BLOCKS BY DISTRICT ---
   const fetchBlocks = async (districtId) => {
     if (!districtId) {
@@ -385,91 +405,83 @@ const handleUploadDocuments = async () => {
         setBlockOptions(res.data || []);
       } else {
         setBlockOptions([]);
-        setValidationMessage(res.message || "Failed to fetch blocks");
-        setShowValidationModal(true);
+        // setValidationMessage(res.message || "Failed to fetch blocks");
+        // setShowValidationModal(true);
+        setStatusModal({
+          isOpen: true,
+          status: false, // false = error, true = success
+          message: res.message || "Failed to fetch blocks"
+        });
       }
     } catch (error) {
       setBlockOptions([]);
-      setValidationMessage(error?.message || "Error fetching blocks");
-      setShowValidationModal(true);
+      // setValidationMessage(error?.message || "Error fetching blocks");
+      // setShowValidationModal(true);
+      setStatusModal({
+        isOpen: true,
+        status: false, // false = error, true = success
+        message: error?.message || "Error fetching blocks"
+      });
     } finally {
       setBlockLoading(false);
     }
   };
 
-  // --- FETCH AGENCIES ---
-  const loadAgencies = async () => {
-    setAgencyLoading(true);
-    try {
-      const res = await getGeneral("agency");
-
-      if (res.success) {
-        setAgencyOptions(res.data || []);
-      } else {
-        setAgencyOptions([]);
-        setValidationMessage(res.message || "Failed to fetch agencies");
-        setShowValidationModal(true);
-      }
-    } catch (error) {
-      setAgencyOptions([]);
-      setValidationMessage(error?.message || "Error fetching agencies");
-      setShowValidationModal(true);
-    } finally {
-      setAgencyLoading(false);
-    }
-  };
-
-  // --- FETCH FINANCIAL RANGE ---
-  const loadFinancialRange = async () => {
-    setRangeLoading(true);
-    try {
-      const res = await getGeneral("financial_range");
-
-      if (res.success) {
-        setRangeOptions(res.data || []);
-      } else {
-        setRangeOptions([]);
-        setValidationMessage(res.message || "Failed to fetch financial range");
-        setShowValidationModal(true);
-      }
-    } catch (error) {
-      setRangeOptions([]);
-      setValidationMessage(error?.message || "Error fetching financial range");
-      setShowValidationModal(true);
-    } finally {
-      setRangeLoading(false);
-    }
-  };
-
-  // --- FETCH FINANCIAL YEAR ---
-  const loadFinancialYear = async () => {
-    setYearLoading(true);
-    try {
-      const res = await getGeneral("financial_year");
-
-      if (res.success) {
-        setYearOptions(res.data || []);
-      } else {
-        setYearOptions([]);
-        setValidationMessage(res.message || "Failed to fetch financial year");
-        setShowValidationModal(true);
-      }
-    } catch (error) {
-      setYearOptions([]);
-      setValidationMessage(error?.message || "Error fetching financial year");
-      setShowValidationModal(true);
-    } finally {
-      setYearLoading(false);
-    }
-  };
-
-
-
   useEffect(() => {
-    fetchDistricts();
-    loadAgencies();
-    loadFinancialRange();
-    loadFinancialYear();
+    const loadAllMasters = async () => {
+      try {
+        const results = await Promise.allSettled([
+          getDistricts(),
+          getGeneral("agency"),
+          getGeneral("financial_range"),
+          getGeneral("financial_year"),
+        ]);
+
+        const [districtRes, agencyRes, rangeRes, yearRes] = results;
+
+        if (districtRes.status === "fulfilled" && districtRes.value.success) {
+          setDistrictOptions(districtRes.value.data || []);
+        }
+
+        if (agencyRes.status === "fulfilled" && agencyRes.value.success) {
+          setAgencyOptions(agencyRes.value.data || []);
+        }
+
+        if (rangeRes.status === "fulfilled" && rangeRes.value.success) {
+          setRangeOptions(rangeRes.value.data || []);
+        }
+
+        if (yearRes.status === "fulfilled" && yearRes.value.success) {
+          setYearOptions(yearRes.value.data || []);
+        }
+
+        const anyFailed = results.some(
+          (r) => r.status === "rejected" || (r.value && !r.value.success)
+        );
+
+        if (anyFailed) {
+          // setValidationMessage(
+          //   "Some master data failed to load. Please refresh the page or contact support."
+          // );
+          // setShowValidationModal(true);
+          setStatusModal({
+            isOpen: true,
+            status: false, // false = error, true = success
+            message: "Some master data failed to load. Please refresh the page or contact support."
+          });
+        }
+      } catch (err) {
+        // setValidationMessage("Failed to load required data.");
+        // setShowValidationModal(true);
+        setStatusModal({
+          isOpen: true,
+          status: false, // false = error, true = success
+          message: "Failed to load required data."
+        });
+      }
+    };
+
+    loadAllMasters();
   }, []);
 
   const [hasVisitedStep2, setHasVisitedStep2] = useState(false);
@@ -1438,6 +1450,13 @@ const handleUploadDocuments = async () => {
         title="Validation Required"
         message={validationMessage}
         onClose={() => setShowValidationModal(false)}
+      />
+
+      <StatusModal
+        isOpen={statusModal.isOpen}
+        status={statusModal.status}
+        message={statusModal.message}
+        onClose={() => setStatusModal(prev => ({ ...prev, isOpen: false }))}
       />
 
     </>

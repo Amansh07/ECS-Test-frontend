@@ -9,7 +9,7 @@ export default function AuthLayout() {
       <Header />
 
      <main
-        className="flex items-center justify-end min-h-screen bg-cover bg-center bg-no-repeat"
+        className="flex items-center justify-end min-h-screen bg-cover bg-center bg-no-repeat pt-[50px]"
         style={{ backgroundImage: `url(${loginBackground})` }}
       >
         <Outlet />
