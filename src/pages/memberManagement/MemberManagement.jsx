@@ -45,7 +45,7 @@ export const MemberManagement = () => {
             </div>
 
             {/* TEXT SIDE */}
-            <div className="flex-1 p-4">
+            <div className="flex-1 p-4 rounded-tr-2xl rounded-br-2xl bg-white">
               <p className="text-[14px] font-medium text-text-dark">{card.title}</p>
               <p className="text-[12px] font-normal text-text-hint">{card.description}</p>
             </div>

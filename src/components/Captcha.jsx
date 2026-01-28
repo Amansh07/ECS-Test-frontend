@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import captcha from "../assets/captcha.jpeg";
 
-export default function Captcha({ onVerify, a = 0, b = 0 }) {
+export default function Captcha({ a = 0, b = 0 }) {
   const canvasRef = useRef(null);
   const bgImageRef = useRef(null);
 
@@ -14,7 +14,7 @@ export default function Captcha({ onVerify, a = 0, b = 0 }) {
     };
   }, []);
 
-  // Draw captcha whenever props a or b change
+  // Draw only when a or b change
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -25,10 +25,11 @@ export default function Captcha({ onVerify, a = 0, b = 0 }) {
 
     ctx.clearRect(0, 0, width, height);
 
-    // -------- Background Image (TOP CROP) --------
+    // Background (top crop)
     if (bgImageRef.current) {
       const img = bgImageRef.current;
-      const sourceHeight = img.height * 0.4; // top 40%
+      const sourceHeight = img.height * 0.4;
+
       ctx.drawImage(
         img,
         0, 0,
@@ -39,15 +40,15 @@ export default function Captcha({ onVerify, a = 0, b = 0 }) {
         height
       );
     } else {
-      ctx.fillStyle = "#000000";
+      ctx.fillStyle = "#000";
       ctx.fillRect(0, 0, width, height);
     }
 
-    // Dark overlay
+    // Overlay
     ctx.fillStyle = "rgba(0,0,0,0.25)";
     ctx.fillRect(0, 0, width, height);
 
-    // Noise lines
+    // Noise
     for (let i = 0; i < 6; i++) {
       ctx.strokeStyle = "#ffffff33";
       ctx.beginPath();
@@ -57,11 +58,11 @@ export default function Captcha({ onVerify, a = 0, b = 0 }) {
     }
 
     const text = `${a}+${b}=?`;
-
     ctx.font = "bold 22px Arial";
 
     let totalWidth = 0;
     const gaps = [];
+
     for (let i = 0; i < text.length; i++) {
       const gap = 6 + Math.random() * 16;
       gaps.push(gap);
@@ -70,7 +71,6 @@ export default function Captcha({ onVerify, a = 0, b = 0 }) {
 
     let currentX = (width - totalWidth) / 2;
 
-    // Draw each character
     for (let i = 0; i < text.length; i++) {
       const char = text[i];
       const isOperator = char === "+" || char === "=" || char === "?";
@@ -90,17 +90,13 @@ export default function Captcha({ onVerify, a = 0, b = 0 }) {
       ctx.rotate(rotation);
 
       ctx.font = `400 ${fontSize}px Arial`;
-      ctx.fillStyle = "#ffffff";
-      ctx.textAlign = "left";
+      ctx.fillStyle = "#fff";
       ctx.textBaseline = "middle";
 
       if (!isOperator) {
         ctx.filter = "blur(0.5px)";
-        ctx.shadowColor = "#ffffff";
+        ctx.shadowColor = "#fff";
         ctx.shadowBlur = 2;
-      } else {
-        ctx.filter = "none";
-        ctx.shadowBlur = 0;
       }
 
       ctx.fillText(char, 0, 0);
@@ -109,13 +105,9 @@ export default function Captcha({ onVerify, a = 0, b = 0 }) {
       ctx.shadowBlur = 0;
       ctx.restore();
 
-      const charWidth = ctx.measureText(char).width;
-      currentX += charWidth + gaps[i];
+      currentX += ctx.measureText(char).width + gaps[i];
     }
-
-    // Expose correct answer
-    onVerify?.(a + b);
-  }, [a, b, onVerify]);
+  }, [a, b]);
 
   return (
     <canvas
