@@ -6,6 +6,7 @@ import companyLogo from "../assets/logo1.png";
 import indianEmblem from "../assets/logo2.png";
 import Breadcrumb from "../components/Breadcrumb";
 import { useNavigate } from "react-router-dom";
+import AuthService from "../auth/AuthService";
 
 export default function Header() {
 	const [open, setOpen] = useState(false);
@@ -25,10 +26,8 @@ export default function Header() {
 
 	const handleLogout = () => {
 		AuthService.logout();     // clears tokens
-		console.log("handlelogout called ");
 		navigate("/login", { replace: true }); // optional, since logout already redirects
 	};
-
 
 	useEffect(() => {
 		function updateHeaderHeight() {
