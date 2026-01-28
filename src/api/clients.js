@@ -1,7 +1,7 @@
 import { createApiClient } from "./createApiClient";
 
 // ENV
-const LOGIN_API = import.meta.env.VITE_API_LOGIN_URL;
+const AUTH_API = import.meta.env.VITE_API_AUTH_URL;
 const API_8083 = import.meta.env.VITE_API_REGISTRATION_URL;
 const API_8082 = import.meta.env.VITE_API_MASTER_URL;
 const API_8085 = import.meta.env.VITE_API_8085_URL;
