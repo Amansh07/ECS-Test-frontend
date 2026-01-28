@@ -24,14 +24,14 @@ export const Compliance = () => {
                         to={`/compliance/${card.path}`}
                         className="w-[348px] h-[96px] shadow-md flex rounded-2xl hover:shadow-lg transition-shadow duration-200"
                     >
-                        <div className="w-[96px] bg-[#F8FFE5] flex items-center justify-center rounded-tl-2xl rounded-bl-2xl">
+                        <div className="w-[96px] bg-primary-50 flex items-center justify-center rounded-tl-2xl rounded-bl-2xl">
                             <div className="w-[46px] h-[46px]">
                                 <img src={card.icon} alt={`${card.title} icon`} />
                             </div>
                         </div>
-                        <div className="flex-1 p-4">
-                            <p className="text-[14px] font-medium text-[#212121]">{card.title}</p>
-                            <p className="text-[12px] font-normal text-[#212121]">{card.description}</p>
+                        <div className="flex-1 p-4 rounded-tr-2xl rounded-br-2xl bg-white">
+                            <p className="text-[14px] font-medium text-text-dark">{card.title}</p>
+                            <p className="text-[12px] font-normal text-text-hint">{card.description}</p>
                         </div>
                     </Link>
                 ))}
