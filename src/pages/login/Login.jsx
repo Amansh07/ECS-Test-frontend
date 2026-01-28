@@ -80,10 +80,10 @@ export default function Login() {
       setUserValue("");
     } catch (error) {
       setStatusModal({
-      isOpen: true,
-      status: false, // false = error
-      message: error?.message || "Failed to generate captcha.",
-    });
+        isOpen: true,
+        status: false, // false = error
+        message: error?.message || "Failed to generate captcha.",
+      });
     }
   };
 
@@ -106,7 +106,7 @@ export default function Login() {
 
     try {
       const response = await verifyCaptchaApi(captchaId, Number(userValue));
-      if (response.success) {
+      if (response.success && response.data) {
         setIsCaptchaVerified(true);
         setCaptchaError(false);
       } else throw new Error("Wrong Captcha");
@@ -232,11 +232,10 @@ export default function Login() {
         <div className="h-[55px] flex gap-[10px] py-[10px] mb-[5px]">
           <div className="h-[43px] rounded-lg overflow-hidden">
             <Captcha
-              refreshTrigger={refreshKey}
-              onVerify={() => { }}
               a={firstNumber}
               b={secondNumber}
             />
+
           </div>
 
           <button
