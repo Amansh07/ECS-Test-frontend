@@ -13,6 +13,15 @@ export const login = async (username, password) => {
   return response;
 };
 
+export const temprorayToken = async () => {
+  const response = await authApiClient.post("api/v1/auth/temp-token", "");
+
+  // response is already unwrapped
+  // AuthService.setTokens(response);
+
+  return response;
+};
+
 // ---------------- CAPTCHA GENERATE ----------------
 export const generateCaptcha = async () => {
   const response = await authApiClient.get("/api/v1/captcha/generate");

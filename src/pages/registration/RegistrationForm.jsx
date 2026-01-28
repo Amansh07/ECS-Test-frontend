@@ -17,8 +17,9 @@ import { registrationValidationSchema } from "./validation";
 import UploadDocument from "../../components/UploadDocument";
 import { useNavigate } from "react-router-dom";
 import { getDistricts, getBlocksByDistrictId, getGeneral } from "../../api/master";
-import { uploadBulkDocuments } from "../../api/upload";
+import { uploadBulkDocuments, uploadBulkDocumentsRegistration } from "../../api/upload";
 import { registerFPO } from "../../api/registration";
+import { temprorayToken } from "../../api/authApi";
 import StatusModal from "../../components/StatusModal";
 
 const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = false, imgConfig, pdfConfig, activeStep, setActiveStep, nextButtonClicked, setNextButtonClicked, backButtonClicked, setBackButtonClicked, saveButtonClicked, setSaveButtonClicked, steps }) => {
@@ -166,8 +167,10 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
   }
   const handleUploadDocuments = async () => {
     try {
-      const res = await uploadBulkDocuments({
-        fpoId: 1, // replace with dynamic fpoId
+      const token = await temprorayToken();
+
+      const res = await uploadBulkDocumentsRegistration({
+        token: token.data.token, // get Temp Token
         docTypes: [920, 921], // image + pdf
         files: [imageFile, pdfFile],
       });
@@ -291,7 +294,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
         });
 
         // Optional: redirect or reset form
-        // navigate("/some-route");
+        navigate("/");
       } else {
         // setValidationMessage(regRes.message || "Registration failed.");
         // setShowValidationModal(true);
@@ -922,6 +925,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <TextField
             label="Email Address"
+            required
             name="emailAddress"
             type="email"
             placeholder="Email Address"
@@ -934,6 +938,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
           />
           <TextField
             label="Contact Number"
+            required
             name="mobileNumber"
             placeholder="Contact Number"
             value={values.mobileNumber || ""}
@@ -1294,6 +1299,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
 
               <TextField
                 label="Secondary FPO email"
+                required
                 type="email"
                 name="secondaryEmail"
                 placeholder="Enter Email"
@@ -1306,6 +1312,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
               />
               <TextField
                 label="Secondary FPO Contact Number"
+                required
                 type="text"
                 name="secondaryMobile"
                 placeholder="Enter Contact Number"
