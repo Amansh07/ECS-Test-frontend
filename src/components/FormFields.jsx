@@ -139,9 +139,9 @@
 // }
 
 
-import React from "react";
+import { useState } from "react";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
-/* ================= TEXT FIELD ================= */
 export function TextField({
   label,
   required,
@@ -150,8 +150,12 @@ export function TextField({
   imageSrc,
   error,
   touched,
+  type,
   ...inputProps
 }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPassword = type === "password";
+
   return (
     <div className="mb-4">
       {label && (
@@ -172,14 +176,32 @@ export function TextField({
 
         <input
           {...inputProps}
+          type={isPassword && showPassword ? "text" : type} 
           onBlur={inputProps.onBlur}
           className={`
             registration-input
             ${imageSrc ? "pl-10" : ""}
+            ${isPassword ? "pr-10" : ""}   /* space for icon */
             ${touched && error ? "border-red-500" : ""}
             ${inputClassName}
           `}
         />
+
+        {/* Show/Hide Icon */}
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            tabIndex={-1}
+          >
+            {showPassword ? (
+              <AiOutlineEyeInvisible size={18} />
+            ) : (
+              <AiOutlineEye size={18} />
+            )}
+          </button>
+        )}
       </div>
 
       {touched && error && (
@@ -188,6 +210,7 @@ export function TextField({
     </div>
   );
 }
+
 
 /* ================= TEXT AREA ================= */
 export function TextArea({
@@ -276,6 +299,7 @@ export function RadioGroup({
   value,
   onChange,
   onBlur,
+  disabled,
   error,
   touched,
 }) {
@@ -301,6 +325,7 @@ export function RadioGroup({
               checked={value === opt.value}
               onChange={onChange}
               onBlur={onBlur}
+              disabled={disabled}
             />
             <span>{opt.label}</span>
           </label>

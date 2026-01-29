@@ -17,7 +17,7 @@ import { registrationValidationSchema } from "./validation";
 import UploadDocument from "../../components/UploadDocument";
 import { useNavigate } from "react-router-dom";
 import { getDistricts, getBlocksByDistrictId, getGeneral } from "../../api/master";
-import {  uploadBulkDocumentsRegistration } from "../../api/upload";
+import { uploadBulkDocumentsRegistration } from "../../api/upload";
 import { registerFPO } from "../../api/registration";
 import { temprorayToken } from "../../api/authApi";
 import StatusModal from "../../components/StatusModal";
@@ -134,12 +134,50 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
 
   };
 
+  // const validationCheck = async () => {
+  //   const errors = await formik.validateForm();
+
+  //   console.log("errors :", errors);
+
+  //   // Helper: mark all fields (nested 1 level) as touched
+  //   const markAllTouched = (values) => {
+  //     const touched = {};
+  //     Object.keys(values).forEach((key) => {
+  //       if (values[key] && typeof values[key] === "object" && !Array.isArray(values[key])) {
+  //         touched[key] = {};
+  //         Object.keys(values[key]).forEach((subKey) => {
+  //           touched[key][subKey] = true;
+  //         });
+  //       } else {
+  //         touched[key] = true;
+  //       }
+  //     });
+  //     return touched;
+  //   };
+
+  //   if (Object.keys(errors).length > 0) {
+  //     // Mark all fields as touched so errors show
+  //     formik.setTouched(markAllTouched(formik.values));
+
+  //     // Show validation modal
+  //     setValidationMessage("Please complete all required fields before proceeding.");
+  //     setShowValidationModal(true);
+  //     return true;
+  //   }
+  // }
+
   const validationCheck = async () => {
     const errors = await formik.validateForm();
+    let financialError = false;
 
-    console.log("errors :", errors);
+    // Check if financialData is empty
+    if (financialData.length === 0) {
+      financialError = true;
+    }
 
-    // Helper: mark all fields (nested 1 level) as touched
+    console.log("errors :", errors, "financialError:", financialError);
+
+    // Mark all fields (nested 1 level) as touched
     const markAllTouched = (values) => {
       const touched = {};
       Object.keys(values).forEach((key) => {
@@ -155,16 +193,33 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
       return touched;
     };
 
-    if (Object.keys(errors).length > 0) {
+    if (Object.keys(errors).length > 0 || financialError) {
       // Mark all fields as touched so errors show
       formik.setTouched(markAllTouched(formik.values));
 
+      // Set financial error state
+      setHasFinancialError(financialError);
+
       // Show validation modal
-      setValidationMessage("Please complete all required fields before proceeding.");
+      setValidationMessage(
+        financialError
+          ? "Please add at least one financial detail before proceeding."
+          : "Please complete all required fields before proceeding."
+      );
       setShowValidationModal(true);
-      return true;
+
+      return true; // validation failed
     }
-  }
+
+    // Clear financial error if everything is fine
+    setHasFinancialError(false);
+
+    return false; // validation passed
+  };
+
+
+
+
   const handleUploadDocuments = async () => {
     try {
       const token = await temprorayToken();
@@ -184,7 +239,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
         // });
 
         return res;
-        
+
         // Optional: do something after successful upload
         // e.g., navigate("/next-step");
       } else {
@@ -213,7 +268,6 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
 
   const handleSave = async () => {
     // Validate the form manually
-
     const hasError = await validationCheck();
     if (hasError) return;   // STOP if invalid
 
@@ -292,6 +346,10 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
           message: "Registration successful!",
         });
 
+        setTimeout(() => {
+          resetAllFormData();
+        }, 300);
+
         // Optional: redirect or reset form
         navigate("/");
       } else {
@@ -314,16 +372,23 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
       });
     }
 
-    setTimeout(() => {
-      resetAllFormData();
-    }, 300);
-
     // navigate("/", { replace: true });
   };
 
-
   const { values, handleChange, handleBlur, setFieldValue, setFieldTouched, touched, errors } = formik;
 
+  useEffect(() => {
+    if (values.auditApplicability === "no") {
+      if (values.auditStatus !== "notdone") {
+        formik.setFieldValue("auditStatus", "notdone");
+      }
+      if (values.auditType !== "na") {
+        formik.setFieldValue("auditType", "na");
+      }
+    } else {
+      formik.setFieldValue("auditStatus", "");
+    }
+  }, [values.auditApplicability]);
 
   useEffect(() => {
     const total = parseFloat(values.totalFarmers);
@@ -383,6 +448,26 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
   const [blockLoading, setBlockLoading] = useState(false);
   const [yearLoading, setYearLoading] = useState(false);
   const [rangeLoading, setRangeLoading] = useState(false);
+
+  const [hasFinancialError, setHasFinancialError] = useState(false);
+  const [isNextInSecondClicked, setIsNextInSecondClicked] = useState(false);
+  const [sameAsPrimary, setSameAsPrimary] = useState(false);
+
+  const handleSameAsPrimaryChange = (e) => {
+    const checked = e.target.checked;
+    setSameAsPrimary(checked);
+
+    if (checked) {
+      // Copy primary values
+      setFieldValue("secondaryEmail", values.emailAddress || "");
+      setFieldValue("secondaryMobile", values.mobileNumber || "");
+    } else {
+      // Clear secondary fields
+      setFieldValue("secondaryEmail", "");
+      setFieldValue("secondaryMobile", "");
+    }
+  };
+
 
   useEffect(() => {
     if (formik.values.districtId) {
@@ -504,7 +589,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
           setNextButtonClicked(false);
           return;
         }
-
+        setIsNextInSecondClicked(true);
         // Second time onwards → validate
         const isError = await validationCheck();
         console.log("Step 2 validation isError:", isError);
@@ -719,7 +804,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
       content: (
         <>
           <p className="registration-help-text">
-            Registered FPO into the system and after approval credentials will be communicated via mail/SMS.
+            Register FPO into the system and after approval credentials will be communicated via mail/SMS.
           </p>
 
           <div className="mb-4">
@@ -839,14 +924,26 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                     label="CIN / LLPIN / FCRN"
                     required
                     name={`${detailsKey}.cin`}
-                    placeholder="Enter CIN / LLPIN / FCRN"
+                    placeholder="Enter CIN"
                     value={values[detailsKey]?.cin || ""}
-                    onChange={handleNestedChange}
+                    maxLength={21}   // hard UI limit
+                    onChange={(e) => {
+                      let value = e.target.value
+                        .toUpperCase()
+                        .replace(/[^A-Z0-9]/g, ""); // only A-Z & 0-9
+
+                      // enforce 21 char max manually (extra safety)
+                      if (value.length > 21) value = value.slice(0, 21);
+
+                      setFieldValue(`${detailsKey}.cin`, value);
+                    }}
                     onBlur={handleNestedBlur}
                     error={errors.companyDetails?.cin}
                     touched={touched.companyDetails?.cin}
                     disabled={disabled}
                   />
+
+
                   {!disabled && <div className="pt-6">
                     <Button type="button" disabled={disabled} buttonClassName="px-4 py-2 bg-green-600 text-white rounded">
                       Fetch Data from MCA
@@ -871,6 +968,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                     required
                     name={`${detailsKey}.incorporationDate`}
                     type="date"
+                    max={new Date().toISOString().split("T")[0]}   // ✅ today
                     placeholder="(dd/mm/yyyy)"
                     value={values[detailsKey]?.incorporationDate || ""}
                     onChange={handleNestedChange}
@@ -879,6 +977,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                     touched={touched.companyDetails?.incorporationDate}
                     disabled={disabled}
                   />
+
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <SelectField
@@ -943,7 +1042,12 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
             value={values.mobileNumber || ""}
             onChange={handleChange}
             onBlur={handleBlur}
-            onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
+            onInput={(e) => {
+              // Allow only digits and max 10 characters
+              e.target.value = e.target.value
+                .replace(/\D/g, '')
+                .slice(0, 10);
+            }}
             error={errors.mobileNumber}
             touched={touched.mobileNumber}
             disabled={disabled}
@@ -956,140 +1060,143 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
       id: "financial-details",
       title: "Financial Details of Company",
       isInitiallyOpen: false,
+      hasError: hasFinancialError,
       content: (
         <div className="mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <SelectField
-              label="Financial Year"
-              required
-              name="financialYear"
-              value={values.financialYear}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.financialYear}
-              touched={touched.financialYear}
-              disabled={disabled || yearLoading}
-            >
-              {/* <option value="">Select Year</option>
+          {!disabled && <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <SelectField
+                label="Financial Year"
+                required
+                name="financialYear"
+                value={values.financialYear}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={errors.financialYear}
+                touched={touched.financialYear}
+                disabled={disabled || yearLoading}
+              >
+                {/* <option value="">Select Year</option>
               <option value="2023-24">2023-24</option>
               <option value="2022-23">2022-23</option> */}
-              <option value="">{yearLoading ? "Year Loading..." : "Select Year"}</option>
-              {yearOptions.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.name}
-                </option>
-              ))}
-            </SelectField>
-            <TextField
-              label="Turnover"
-              required
-              name="turnOver"
-              // type="number"
-              onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
-              placeholder="Enter Value"
-              value={values.turnOver}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.turnOver}
-              touched={touched.turnOver}
-              disabled={disabled}
-            />
-            <TextField
-              label="Profit/Loss"
-              required
-              name="profitLoss"
-              // type="number"
-              onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
-              placeholder="Enter Value"
-              value={values.profitLoss}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.profitLoss}
-              touched={touched.profitLoss}
-              disabled={disabled}
-            />
-            <SelectField
-              label="Financial Range"
-              required
-              name="financialRange"
-              value={values.financialRange}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.financialRange}
-              touched={touched.financialRange}
-              disabled={disabled || rangeLoading}
-            >
-              {/* <option value="">Select Range</option>
+                <option value="">{yearLoading ? "Year Loading..." : "Select Year"}</option>
+                {yearOptions.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.name}
+                  </option>
+                ))}
+              </SelectField>
+              <TextField
+                label="Turnover"
+                required
+                name="turnOver"
+                // type="number"
+                onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
+                placeholder="Enter Value"
+                value={values.turnOver}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={errors.turnOver}
+                touched={touched.turnOver}
+                disabled={disabled}
+              />
+              <TextField
+                label="Profit/Loss"
+                required
+                name="profitLoss"
+                // type="number"
+                onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
+                placeholder="Enter Value"
+                value={values.profitLoss}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={errors.profitLoss}
+                touched={touched.profitLoss}
+                disabled={disabled}
+              />
+              <SelectField
+                label="Financial Range"
+                required
+                name="financialRange"
+                value={values.financialRange}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={errors.financialRange}
+                touched={touched.financialRange}
+                disabled={disabled || rangeLoading}
+              >
+                {/* <option value="">Select Range</option>
               <option value="1-5Crores">1-5 Crores</option>
               <option value="6-20 Crores">6-20 Crores</option> */}
-              <option value="">{rangeLoading ? "Range Loading..." : "Select Range"}</option>
-              {rangeOptions.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.name}
-                </option>
-              ))}
-            </SelectField>
-          </div>
+                <option value="">{rangeLoading ? "Range Loading..." : "Select Range"}</option>
+                {rangeOptions.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.name}
+                  </option>
+                ))}
+              </SelectField>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <RadioGroup
-              label="Audit Status Applicability"
-              required
-              name="auditApplicability"
-              value={values.auditApplicability}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.auditApplicability}
-              touched={touched.auditApplicability}
-              options={[
-                { value: "yes", label: "Yes" },
-                { value: "no", label: "No" },
-              ]}
-              disabled={disabled}
-            />
-            <RadioGroup
-              label="Audit Status"
-              required
-              name="auditStatus"
-              value={values.auditStatus}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.auditStatus}
-              touched={touched.auditStatus}
-              options={[
-                { value: "done", label: "Done" },
-                { value: "notdone", label: "Not Done" },
-              ]}
-              disabled={disabled}
-            />
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <RadioGroup
+                label="Audit Status Applicability"
+                required
+                name="auditApplicability"
+                value={values.auditApplicability}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={errors.auditApplicability}
+                touched={touched.auditApplicability}
+                options={[
+                  { value: "yes", label: "Yes" },
+                  { value: "no", label: "No" },
+                ]}
+                disabled={disabled}
+              />
+              <RadioGroup
+                label="Audit Status"
+                required
+                name="auditStatus"
+                value={values.auditStatus}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={errors.auditStatus}
+                touched={touched.auditStatus}
+                options={[
+                  { value: "done", label: "Done" },
+                  { value: "notdone", label: "Not Done" },
+                ]}
+                disabled={disabled || values.auditApplicability === "no"}
+              />
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <SelectField
-              label="Type"
-              required
-              name="auditType"
-              value={values.auditType}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.auditType}
-              touched={touched.auditType}
-              disabled={disabled}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <SelectField
+                label="Type"
+                required
+                name="auditType"
+                value={values.auditType}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={errors.auditType}
+                touched={touched.auditType}
+                disabled={disabled || values.auditApplicability === "no"}
+              >
+                <option value="na">Not Applicable</option>
+                <option value="internal">Internal Audit</option>
+                <option value="statutory">Statutory Audit</option>
+              </SelectField>
+            </div>
+
+            {!disabled && <Button
+              type="button"
+              onClick={handleAddOrUpdateFinancialRowClick}
+              buttonClassName="px-4 py-2 bg-green-600 text-white rounded mb-4"
             >
-              <option value="na">Not Applicable</option>
-              <option value="internal">Internal Audit</option>
-              <option value="statutory">Statutory Audit</option>
-            </SelectField>
-          </div>
-
-          {!disabled && <Button
-            type="button"
-            onClick={handleAddOrUpdateFinancialRowClick}
-            buttonClassName="px-4 py-2 bg-green-600 text-white rounded mb-4"
-          >
-            {isUpdateMode ? "Update" : "Add"} Financial Details
-          </Button>
-          }
+              {isUpdateMode ? "Update" : "Add"} Financial Details
+            </Button>
+            }
+          </>}
           {/* Financial Table */}
           <Table
             columns={financialColumns}
@@ -1141,6 +1248,19 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
       ),
     },
   ];
+
+  useEffect(() => {
+
+    // If there is no financial data, show error
+    if (financialData.length === 0) {
+      if (isNextInSecondClicked) {
+        setHasFinancialError(true);
+      }
+    } else {
+      // Clear error if user adds at least one row
+      setHasFinancialError(false);
+    }
+  }, [financialData, isNextInSecondClicked]);
 
   return (
     <>
@@ -1233,7 +1353,12 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                 name="pincode"
                 placeholder="Enter Pincode"
                 value={values.pincode}
-                onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
+                onInput={(e) => {
+                  // Allow only digits and max 10 characters
+                  e.target.value = e.target.value
+                    .replace(/\D/g, '')
+                    .slice(0, 6);
+                }}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={errors.pincode}
@@ -1246,9 +1371,15 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                 name="totalFarmers"
                 placeholder="Enter Value"
                 value={values.totalFarmers}
-                onChange={handleChange}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, '');
+                  setFieldValue("totalFarmers", val);
+
+                  // Update male automatically
+                  const female = parseInt(values.femaleFarmers || 0, 10);
+                  setFieldValue("maleFarmers", val ? Math.max(val - female, 0) : 0);
+                }}
                 onBlur={handleBlur}
-                onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
                 error={errors.totalFarmers}
                 touched={touched.totalFarmers}
                 disabled={disabled}
@@ -1260,9 +1391,15 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                 name="femaleFarmers"
                 placeholder="Enter Value"
                 value={values.femaleFarmers}
-                onChange={handleChange}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, '');
+                  setFieldValue("femaleFarmers", val);
+
+                  // Update male automatically
+                  const total = parseInt(values.totalFarmers || 0, 10);
+                  setFieldValue("maleFarmers", total ? Math.max(total - val, 0) : 0);
+                }}
                 onBlur={handleBlur}
-                onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
                 error={errors.femaleFarmers}
                 touched={touched.femaleFarmers}
                 disabled={disabled}
@@ -1272,14 +1409,9 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                 label="Number of Male Shareholders"
                 required
                 name="maleFarmers"
-                placeholder="Enter Value"
-                value={values.maleFarmers}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
-                error={errors.maleFarmers}
-                touched={touched.maleFarmers}
-                disabled={disabled}
+                placeholder="Auto-calculated"
+                value={values.maleFarmers || 0}
+                disabled
               />
 
               <TextField
@@ -1296,8 +1428,21 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                 disabled={disabled}
               />
 
+              <div className="mb-4 flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="sameAsPrimary"
+                  checked={sameAsPrimary}
+                  onChange={handleSameAsPrimaryChange}
+                  disabled={disabled}
+                />
+                <label htmlFor="sameAsPrimary" className="text-sm">
+                  Same as primary email and contact
+                </label>
+              </div>
+
               <TextField
-                label="Secondary FPO email"
+                label="Secondary FPO Email"
                 required
                 type="email"
                 name="secondaryEmail"
@@ -1307,8 +1452,9 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                 onBlur={handleBlur}
                 error={errors.secondaryEmail}
                 touched={touched.secondaryEmail}
-                disabled={disabled}
+                disabled={disabled || sameAsPrimary}
               />
+
               <TextField
                 label="Secondary FPO Contact Number"
                 required
@@ -1320,7 +1466,10 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                 onBlur={handleBlur}
                 error={errors.secondaryMobile}
                 touched={touched.secondaryMobile}
-                disabled={disabled}
+                onInput={(e) => {
+                  e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                }}
+                disabled={disabled || sameAsPrimary}
               />
               <TextField
                 label="Username"
@@ -1329,12 +1478,17 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                 name="username"
                 placeholder="Enter Text"
                 value={values.username}
-                onChange={handleChange}
+                onChange={(e) => {
+                  // Remove spaces
+                  const value = e.target.value.replace(/\s/g, "");
+                  setFieldValue("username", value);
+                }}
                 onBlur={handleBlur}
                 error={errors.username}
                 touched={touched.username}
                 disabled={disabled}
               />
+
               <TextField
                 label="Password"
                 required
@@ -1342,12 +1496,17 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                 name="password"
                 placeholder="Enter Password"
                 value={values.password}
-                onChange={handleChange}
+                onChange={(e) => {
+                  let value = e.target.value.replace(/\s/g, ""); // Remove spaces
+                  if (value.length > 20) value = value.slice(0, 20); // Limit to 20 chars
+                  setFieldValue("password", value);
+                }}
                 onBlur={handleBlur}
                 error={errors.password}
                 touched={touched.password}
                 disabled={disabled}
               />
+
               <TextField
                 label="Confirm Password"
                 required
@@ -1355,25 +1514,41 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                 name="confirmPassword"
                 placeholder="Confirm Password"
                 value={values.confirmPassword}
-                onChange={handleChange}
+                onChange={(e) => {
+                  let value = e.target.value.replace(/\s/g, ""); // Remove spaces
+                  if (value.length > 20) value = value.slice(0, 20); // Limit to 20 chars
+                  setFieldValue("confirmPassword", value);
+                }}
                 onBlur={handleBlur}
                 error={errors.confirmPassword}
                 touched={touched.confirmPassword}
                 disabled={disabled}
               />
+
               <TextField
                 label="FPO PAN"
                 required
                 type="text"
                 name="fpoPanNo"
                 placeholder="Enter PAN Number"
-                value={values.fpoPanNo}
-                onChange={handleChange}
+                value={values.fpoPanNo || ""}
+                maxLength={10}   // ✅ hard limit
+                onChange={(e) => {
+                  let value = e.target.value
+                    .toUpperCase()
+                    .replace(/[^A-Z0-9]/g, ""); // ✅ only A-Z & 0-9
+
+                  if (value.length > 10) value = value.slice(0, 10);
+
+                  setFieldValue("fpoPanNo", value);
+                }}
                 onBlur={handleBlur}
                 error={errors.fpoPanNo}
                 touched={touched.fpoPanNo}
                 disabled={disabled}
               />
+
+
             </div>
           </div>
         </>
@@ -1429,7 +1604,6 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
         onConfirm={handleFinancialPreviewConfirm}
         confirmText={isUpdateMode ? "Update" : "Add"}
       />
-
 
       <ConfirmationModal
         isOpen={isConfirmationOpen}

@@ -17,7 +17,7 @@ export const masterApiClient = createApiClient({
 // 8083 — Alt API (with auth)
 export const api8083Client = createApiClient({
   baseURL: API_8083,
-  withAuth: true,
+  withAuth: false,
 });
 
 // 8084 — Alt API (with auth)

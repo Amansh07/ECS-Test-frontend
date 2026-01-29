@@ -104,6 +104,8 @@ export default function Header() {
 						Skip to Main Content
 					</a>
 
+					<span className="opacity-50">|</span>
+
 					{/* Language Switcher */}
 					<div className="relative" ref={langRef}>
 						<button

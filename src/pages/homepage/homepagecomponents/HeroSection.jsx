@@ -2,6 +2,7 @@ import React from 'react'
 import StateGovtBadge from '../../../components/StateGovtBadge'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../../components/Buttons';
+import AuthService from '../../../auth/AuthService';
 
 const HeroSection = () => {
     const chips = [
@@ -15,6 +16,8 @@ const HeroSection = () => {
     const handleRoute = () => {
         navigate("/registration");
     };
+    const token = AuthService.getAccessToken();
+    const isLoggedIn = !!token;
     return (
         <div className='bg-grad-005-bg pb-4'>
             <div className='flex'>
@@ -72,12 +75,12 @@ const HeroSection = () => {
                         </div>
 
                         <div className="mt-10 flex flex-wrap items-center gap-4">
-                            <Button buttonClassName="flex items-center gap-3 bg-grad-009-bg hover:bg-primary-800 text-white px-6 py-3 rounded-[14px] shadow-2xl" onClick={handleRoute}>
+                            {!isLoggedIn && <Button buttonClassName="flex items-center gap-3 bg-grad-009-bg hover:bg-primary-800 text-white px-6 py-3 rounded-[14px] shadow-2xl" onClick={handleRoute}>
                                 <span className="font-semibold">Register Your FPO</span>
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
                                     <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
-                            </Button>
+                            </Button>}
 
                             <Button buttonClassName="flex items-center gap-3 bg-white px-6 py-3 rounded-[14px] shadow-md border border-[#F4A261]">
                                 <span className="bg-grad-011-text bg-clip-text text-transparent font-semibold">View Dashboard</span>
