@@ -14,10 +14,15 @@ export const masterApiClient = createApiClient({
   withAuth: true,
 });
 
+export const registrationClient = createApiClient({
+  baseURL: API_8083,
+  withAuth: false,
+});
+
 // 8083 — Alt API (with auth)
 export const api8083Client = createApiClient({
   baseURL: API_8083,
-  withAuth: false,
+  withAuth: true,
 });
 
 // 8084 — Alt API (with auth)

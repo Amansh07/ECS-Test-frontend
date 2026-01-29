@@ -16,6 +16,7 @@
     "file-saver": "^2.0.5",
     "formik": "^2.4.9",
     "jspdf": "^4.0.0",
+    "ldrs": "^1.1.9",
     "oidc-client-ts": "^3.4.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
