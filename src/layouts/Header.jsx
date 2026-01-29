@@ -66,6 +66,7 @@ export default function Header() {
 	const handleLogout = () => {
 		AuthService.logout();     // clears tokens
 		navigate("/login", { replace: true }); // optional, since logout already redirects
+		localStorage.removeItem("role");
 	};
 
 	useEffect(() => {

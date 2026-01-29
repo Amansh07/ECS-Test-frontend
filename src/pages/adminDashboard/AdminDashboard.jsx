@@ -8,27 +8,26 @@ import ConfirmationModal from '../../components/ConfirmationModal';
 import StatusModal from '../../components/StatusModal';
 import Loader from '../../components/Loader';
 import Toggle from '../../components/Toggle';
+import WorkflowActionModal from '../../components/WorkflowActionModal';
 import {
     getWorkflowStats,
     getWorkflowActions,
     processWorkflowAction,
     getFPORegistrationList
 } from '../../api/workflow';
+import RegistrationForm from '../registration/RegistrationForm';
+import { getGeneral } from '../../api/master';
+
 
 
 // ----------------------------------------------------------------------
 // Dashboard Tile Component
 // ----------------------------------------------------------------------
-const DashboardTile = ({ icon, count, title, isActive, onClick }) => {
+const DashboardTile = ({ icon, count, title, isActive, onClick, tileClasses }) => {
     return (
         <div
             onClick={onClick}
-            className={`
-                relative flex items-center p-6 rounded-lg cursor-pointer transition-all duration-300 shadow-md
-                ${isActive ? 'bg-primary-800 shadow-2xl shadow-green-950' : 'bg-primary-700'}
-                hover:bg-primary-800
-                text-white gap-6 overflow-hidden h-[120px]
-            `}
+            className={tileClasses}
         >
             <div className={`
                 flex items-center justify-center w-14 h-14 rounded-xl bg-white text-primary-900 shrink-0
@@ -58,6 +57,7 @@ const AdminDashboard = () => {
     const [activeTile, setActiveTile] = useState('pending');
     // We track if the form is "active" (i.e. user clicked edit on a row)
     const [isFormActive, setIsFormActive] = useState(false);
+    const [isActionModalOpen, setIsActionModalOpen] = useState(false);
     // Store the entire selected row object
     const [selectedRow, setSelectedRow] = useState(null);
     // Workflow statistics from API
@@ -90,6 +90,7 @@ const AdminDashboard = () => {
     const [workflowActions, setWorkflowActions] = useState([]);
 
     const [isLoading, setIsLoading] = useState(false);
+    const [rejectionReasons, setRejectionReasons] = useState([]);
 
     // ----------------------------------------------------------------------
     // Formik Configuration
@@ -184,6 +185,7 @@ const AdminDashboard = () => {
                 fetchStats();
                 fetchTableData();
                 handleReset();
+                setIsActionModalOpen(false);
             } else {
                 throw new Error(response?.message || 'Operation failed');
             }
@@ -212,6 +214,17 @@ const AdminDashboard = () => {
         }
         finally {
             setIsLoading(false);
+        }
+    };
+
+    const fetchRejectionReasons = async () => {
+        try {
+            const response = await getGeneral('rejection_reason');
+            if (response && response.success) {
+                setRejectionReasons(response.data);
+            }
+        } catch (error) {
+            console.error('Error fetching rejection reasons:', error);
         }
     };
 
@@ -312,6 +325,7 @@ const AdminDashboard = () => {
         setIsFormActive(false);
         setSelectedRow(null);
         formik.resetForm();
+        setIsActionModalOpen(false);
     };
 
 
@@ -322,22 +336,23 @@ const AdminDashboard = () => {
 
     const renderActions = (row) => (
         <div className="flex items-center justify-center gap-2">
-            {activeTile === 'pending' && (
+            {/* {activeTile === 'pending' && (
                 <button
                     type="button"
                     onClick={() => handleEdit(row)}
                     className="w-8 h-8 flex items-center justify-center rounded border border-green-600 text-green-600 hover:bg-green-50 transition-colors"
                     title="Edit"
                 >
-                    {/* Pencil Icon */}
+                    
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                     </svg>
                 </button>
-            )}
+            )} */}
             <button
                 type="button"
+                onClick={() => handleEdit(row)}
                 className="w-8 h-8 flex items-center justify-center rounded border border-yellow-600 text-yellow-600 hover:bg-yellow-50 transition-colors"
                 title="View"
             >
@@ -347,17 +362,17 @@ const AdminDashboard = () => {
                     <circle cx="12" cy="12" r="3"></circle>
                 </svg>
             </button>
-            <button
+            {/* <button
                 type="button"
                 className="w-8 h-8 flex items-center justify-center rounded border border-red-600 text-red-600 hover:bg-red-50 transition-colors"
                 title="Delete"
             >
-                {/* Trash Icon */}
+                Trash Icon
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="3 6 5 6 21 6"></polyline>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                 </svg>
-            </button>
+            </button> */}
         </div>
     );
 
@@ -379,6 +394,12 @@ const AdminDashboard = () => {
                 <DashboardTile
                     title="Approved Registrations"
                     count={stats.totalApproved}
+                    tileClasses={`
+                relative flex items-center p-6 rounded-lg cursor-pointer transition-all duration-300 shadow-md
+                ${activeTile === 'approved' ? 'bg-primary-800 shadow-2xl shadow-green-950' : 'bg-primary-600'}
+                hover:bg-primary-800
+                text-white gap-6 overflow-hidden h-[120px]
+            `}
                     isActive={activeTile === 'approved'}
                     onClick={() => handleTileClick('approved')}
                     icon={
@@ -392,6 +413,12 @@ const AdminDashboard = () => {
                     title="Pending for registration"
                     count={stats.totalPending}
                     isActive={activeTile === 'pending'}
+                    tileClasses={`
+                relative flex items-center p-6 rounded-lg cursor-pointer transition-all duration-300 shadow-md
+                ${activeTile === 'pending' ? 'bg-warning-800 shadow-2xl shadow-orange-950' : 'bg-warning-500'}
+                hover:bg-warning-800
+                text-white gap-6 overflow-hidden h-[120px]
+            `}
                     onClick={() => handleTileClick('pending')}
                     icon={
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -405,6 +432,12 @@ const AdminDashboard = () => {
                     title="Rejected/ Deactivated Resistration"
                     count={stats.totalRejected}
                     isActive={activeTile === 'rejected'}
+                    tileClasses={`
+                relative flex items-center p-6 rounded-lg cursor-pointer transition-all duration-300 shadow-md
+                ${activeTile === 'rejected' ? 'bg-danger-800 shadow-2xl shadow-red-950' : 'bg-danger-600'}
+                hover:bg-danger-800
+                text-white gap-6 overflow-hidden h-[120px]
+            `}
                     onClick={() => handleTileClick('rejected')}
                     icon={
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -418,134 +451,22 @@ const AdminDashboard = () => {
 
             <div className="w-full h-px bg-gray-200 mb-10"></div>
 
-            {/* Form Section - Only visible for 'Pending' layout */}
-            {activeTile === 'pending' && (
-                <div className={`
-                    bg-white rounded-lg p-8 shadow-sm border border-gray-100 mb-10 transition-opacity duration-300
-                    ${!isFormActive ? 'opacity-50 pointer-events-none grayscale-[0.5]' : 'opacity-100'}
-                `}>
-                    <h2 className="text-xl font-semibold mb-6">
-                        View Form {isFormActive && selectedRow?.fpoName && <span className="text-primary-700">({selectedRow.fpoName})</span>}
-                    </h2>
+            {/* Form Section - Only visible when form is active (View clicked) */}
+            {isFormActive && (
+                <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-100 mb-10 transition-all duration-300">
+                    <div className='mb-4'>
+                        <span>FPO Name : </span> <span className='font-semibold text-primary-800'>{selectedRow?.fpoName}</span>
+                    </div>
+                    <RegistrationForm disabled={true} />
 
-                    {/* Formik Form */}
-                    <form onSubmit={formik.handleSubmit}>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
-                            <RadioGroup
-                                label="Approve/Reject FPO"
-                                required
-                                name="action"
-                                value={formik.values.action}
-                                onChange={(e) => {
-                                    const val = Number(e.target.value);
-                                    formik.setFieldValue('action', val);
-
-                                    // Clear rejection reason if Approve is selected
-                                    const actionObj = workflowActions.find(a => a.actionId === val);
-                                    if (actionObj?.actionName?.toLowerCase() === 'approve') {
-                                        formik.setFieldValue('rejectionReason', '');
-                                        formik.setFieldTouched('rejectionReason', false);
-                                    }
-                                }}
-                                options={workflowActions.map(action => ({
-                                    label: action.actionName,
-                                    value: action.actionId
-                                }))}
-                                error={formik.touched.action && formik.errors.action}
-                                touched={formik.touched.action}
-                            />
-
-                            <SelectField
-                                label="Rejection Reason"
-                                name="rejectionReason"
-                                value={formik.values.rejectionReason}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={formik.touched.rejectionReason && formik.errors.rejectionReason}
-                                touched={formik.touched.rejectionReason}
-                                disabled={(() => {
-                                    if (!formik.values.action) return true;
-                                    const actionObj = workflowActions.find(a => a.actionId === Number(formik.values.action));
-                                    return actionObj?.actionName?.toLowerCase() !== 'reject';
-                                })()}
-                                selectClassName={(() => {
-                                    if (!formik.values.action) return "bg-gray-100 cursor-not-allowed";
-                                    const actionObj = workflowActions.find(a => a.actionId === Number(formik.values.action));
-                                    return actionObj?.actionName?.toLowerCase() !== 'reject' ? "bg-gray-100 cursor-not-allowed" : "";
-                                })()}
-                                required={(() => {
-                                    if (!formik.values.action) return false;
-                                    const actionObj = workflowActions.find(a => a.actionId === Number(formik.values.action));
-                                    return actionObj?.actionName?.toLowerCase() === 'reject';
-                                })()}
-                            >
-                                <option value="">Select Rejection Reason</option>
-                                <option value="reason1">Reason 1</option>
-                                <option value="reason2">Reason 2</option>
-                            </SelectField>
-                        </div>
-
-                        <div className="mb-6">
-                            <TextArea
-                                label="Add comment"
-                                name="comment"
-                                placeholder="Enter Text"
-                                value={formik.values.comment}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={formik.touched.comment && formik.errors.comment}
-                                touched={formik.touched.comment}
-                                rows={4}
-                                maxLength={100}
-                                required
-                            />
-                            <div className="text-right text-xs text-gray-500 mt-1">
-                                {formik.values.comment.length}/100
-                            </div>
-                        </div>
-
-                        <div className="w-full h-px bg-gray-100 mb-6"></div>
-
-                        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                            <div className="flex items-center gap-4 bg-gray-50 px-4 py-3 rounded-md w-full md:w-auto flex-1">
-                                <span className="text-sm font-medium text-gray-700">Send notification</span>
-                                <div className="ml-auto">
-                                    <Toggle
-                                        checked={formik.values.notification}
-                                        onChange={(val) => formik.setFieldValue('notification', val)}
-                                        disabled={!isFormActive}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-4 w-full md:w-auto justify-end">
-                                <Button
-                                    type="button"
-                                    onClick={handleReset}
-                                    disabled={!isFormActive}
-                                    buttonClassName={`
-                                        px-6 py-2.5 rounded border border-gray-300 font-medium transition-colors
-                                        ${!isFormActive ? 'text-gray-400 bg-gray-100 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50'}
-                                    `}
-                                >
-                                    ⟳ Reset Form
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    disabled={!isFormActive || !formik.isValid || !formik.dirty}
-                                    buttonClassName={`
-                                        px-8 py-2.5 rounded font-medium transition-colors shadow-sm
-                                        ${(!isFormActive || !formik.isValid || !formik.dirty)
-                                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                            : 'bg-primary-700 text-white hover:bg-primary-800'
-                                        }
-                                    `}
-                                >
-                                    Save
-                                </Button>
-                            </div>
-                        </div>
-                    </form>
+                    <div className="mt-8 flex justify-center">
+                        <Button
+                            onClick={() => setIsActionModalOpen(true)}
+                            buttonClassName="bg-primary-700 text-white hover:bg-primary-800 px-10 py-3 rounded-md font-semibold shadow-lg transition-all hover:scale-105"
+                        >
+                            Take Action
+                        </Button>
+                    </div>
                 </div>
             )}
 
@@ -573,6 +494,16 @@ const AdminDashboard = () => {
                 onClose={() => setStatusModal(prev => ({ ...prev, isOpen: false }))}
                 status={statusModal.status}
                 message={statusModal.message}
+            />
+
+            <WorkflowActionModal
+                isOpen={isActionModalOpen}
+                onClose={() => setIsActionModalOpen(false)}
+                formik={formik}
+                workflowActions={workflowActions}
+                rejectionReasons={rejectionReasons}
+                fetchRejectionReasons={fetchRejectionReasons}
+                title={`Take Action ${selectedRow?.fpoName ? `(${selectedRow.fpoName})` : ''}`}
             />
 
             {isLoading && <Loader text="Processing request..." />}
