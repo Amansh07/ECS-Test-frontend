@@ -24,7 +24,7 @@ export default function Login() {
   const [captchaId, setCaptchaId] = useState(null);
   const [firstNumber, setFirstNumber] = useState(null);
   const [secondNumber, setSecondNumber] = useState(null);
-  const [isLoginLoading, setIsLoginLoading]= useState(false);
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
 
   const navigate = useNavigate();
   const mountedRef = useRef(true);
@@ -156,11 +156,11 @@ export default function Login() {
         AuthService.setTokens(res);
 
         // Show success StatusModal
-        setStatusModal({
-          isOpen: true,
-          status: true,
-          message: "Login successful! Redirecting...",
-        });
+        // setStatusModal({
+        //   isOpen: true,
+        //   status: true,
+        //   message: "Login successful! Redirecting...",
+        // });
 
         localStorage.setItem("role", res.data.roles[3]);
         // Redirect after 3 seconds
@@ -347,7 +347,7 @@ export default function Login() {
           </button>
         </div>
       </div>
-        {isLoginLoading && <Loader text="Logging in..." />}
+      {isLoginLoading && <Loader text="Logging in..." />}
     </>
   );
 }
