@@ -121,7 +121,7 @@ const HeroSection = () => {
                         <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(0deg, rgba(26, 77, 46, 0.8) 0%, rgba(26, 77, 46, 0.2) 50%, rgba(0, 0, 0, 0) 100%)' }} />
 
                         {/* Success Story card placed inside image container so it never overflows */}
-                        <div className="absolute left-6 right-6 md:left-8 md:right-8 bottom-6 md:bottom-8 z-40 rounded-[18px] p-6 bg-white shadow-2xl border-4 border-white max-w-none mx-auto" role="region" aria-label="Success story">
+                        <div className="absolute left-6 right-6 md:left-8 md:right-8 bottom-6 md:bottom-8 rounded-[18px] p-6 bg-white shadow-2xl border-4 border-white max-w-none mx-auto" role="region" aria-label="Success story">
                             <div className="relative flex items-start gap-4">
                                 <div className="flex-1 min-w-0">
                                     <div className="text-[14px] text-primary-800 font-medium">Success Story</div>
@@ -140,7 +140,7 @@ const HeroSection = () => {
                     </div>
 
                     {/* Top-right stat card overlay positioned relative to the parent so it can overflow the image */}
-                    <div className="absolute top-0 right-0 translate-x-[-70%] translate-y-[70%] z-50 rounded-[18px] p-4 w-[140px] md:w-[180px] md:p-5 text-black shadow-2xl border-4 border-white bg-grad-011-text" aria-hidden>
+                    <div className="absolute top-0 right-0 translate-x-[-70%] translate-y-[70%] rounded-[18px] p-4 w-[140px] md:w-[180px] md:p-5 text-black shadow-2xl border-4 border-white bg-grad-011-text" aria-hidden>
                         <div className="flex items-start gap-2">
                             <img
                                 src="/src/assets/StarHomepage.svg"
@@ -154,7 +154,7 @@ const HeroSection = () => {
                     </div>
 
                     {/* Mid-Left image card overlay positioned relative to the parent so it can overflow the image */}
-                    <div className="absolute -rotate-[6deg] translate-x-[-150%] translate-y-[-20%] z-50 rounded-[18px] w-[167.06px] md:w-[167.06px] h-[167.06px] md:h-[167.06px] text-black shadow-2xl border-4 border-white overflow-hidden" aria-hidden>
+                    <div className="absolute -rotate-[6deg] translate-x-[-150%] translate-y-[-20%] rounded-[18px] w-[167.06px] md:w-[167.06px] h-[167.06px] md:h-[167.06px] text-black shadow-2xl border-4 border-white overflow-hidden" aria-hidden>
                         <img
                             src="/src/assets/farmingImage.jpg"
                             alt="farming"
@@ -165,7 +165,7 @@ const HeroSection = () => {
                     </div>
 
                     {/* Bottom Success Story card positioned relative to the parent so it can overflow the image */}
-                    <div className="absolute z-50 translate-y-[230%] translate-x-[-40%] rounded-[18px] px-[36px] bg-grad-012-bg shadow-2xl border-4 border-white" role="region" aria-label="Registrations this year">
+                    <div className="absolute translate-y-[230%] translate-x-[-40%] rounded-[18px] px-[36px] bg-grad-012-bg shadow-2xl border-4 border-white" role="region" aria-label="Registrations this year">
                         <div className="relative flex items-center gap-6 px-[30px] py-[36px]">
                             <div className="flex-shrink-0">
                                 <div className="w-[56px] h-[56px] rounded-[14px] bg-[#E8B689] flex items-center justify-center">

@@ -159,10 +159,12 @@ export default function Login() {
           message: "Login successful! Redirecting...",
         });
 
+        localStorage.setItem("role", res.data.roles[3]);
         // Redirect after 3 seconds
         setTimeout(() => {
           setStatusModal({ isOpen: false, status: true, message: "" });
-          navigate("/member-management", { replace: true });
+          if (res.data.roles[3] === "Admin") navigate("/adminDashboard", { replace: true });
+          else navigate("/member-management", { replace: true });
         }, 3000);
       } catch (error) {
         setStatusModal({

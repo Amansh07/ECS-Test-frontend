@@ -8,12 +8,16 @@ import complianceMenu from "../assets/ComplianceMenu.svg";
 import ProductionDetailsMenu from "../assets/ProductionDetailsMenu.svg";
 
 const navItems = [
-  { to: "/registration", label: "Registration", icon: "📝" },
+  // { to: "/registration", label: "Registration", icon: "📝" },
   { to: "/production-details", label: "Production Details", icon: "", src: ProductionDetailsMenu },
   { to: "/compliance", label: "Compliance", icon: "", src: complianceMenu },
   { to: "/fpo-services", label: "FPO Services", icon: "", src: FpoServices },
   { to: "/member-management", label: "Member Management", icon: "", src: memberManagement },
-  { to: "/fpograding", label: "FPO Grading", icon: "", src: fpograding },
+  // { to: "/fpograding", label: "FPO Grading", icon: "", src: fpograding },
+];
+
+const adminNavItems = [
+  { to: "/adminDashboard", label: "Dashboard", icon: "", src: complianceMenu },
 ];
 
 const linkBase =
@@ -27,6 +31,7 @@ export default function LeftNav({
   collapsed,
   onToggleCollapsed,
 }) {
+  const role = localStorage.getItem("role");
   return (
     <>
       {/* ---------- Mobile overlay (only between header & footer) ---------- */}
@@ -78,7 +83,23 @@ export default function LeftNav({
 
         {/* Nav list */}
         <nav className="p-3 space-y-1 overflow-y-auto">
-          {navItems.map((item) => (
+          {role === "Admin" ? adminNavItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                [
+                  linkBase,
+                  isActive ? linkActive : linkIdle,
+                  collapsed ? "justify-center px-2" : "",
+                ].join(" ")
+              }
+              title={collapsed ? item.label : undefined}
+            >
+              <span className="text-lg">{item.icon ? item.icon : <img src={item.src} alt={item.src} />}</span>
+              <span className={collapsed ? "hidden" : ""}>{item.label}</span>
+            </NavLink>
+          )) : navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
