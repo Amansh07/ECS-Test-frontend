@@ -645,14 +645,30 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
 
   }, [nextButtonClicked, activeStep, hasVisitedStep2]);
 
+  // useEffect(() => {
+  //   if (!backButtonClicked) return;
+
+  //   if (activeStep > 1) {
+  //     setActiveStep((prev) => prev - 1);
+  //   }
+
+  //   setBackButtonClicked(false);
+  // }, [backButtonClicked, activeStep]);
+
+
   useEffect(() => {
     if (!backButtonClicked) return;
 
-    if (activeStep > 1) {
+    // Step 2 → Step 1 requires confirmation
+    if (activeStep === 2) {
+      setPendingAction("back");           // mark this as back action
+      setIsConfirmationOpen(true);        // open modal
+    } else if (activeStep > 1) {
+      // Normal back flow for other steps
       setActiveStep((prev) => prev - 1);
     }
 
-    setBackButtonClicked(false);
+    setBackButtonClicked(false);          // reset click
   }, [backButtonClicked, activeStep]);
 
 
@@ -728,6 +744,30 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
     setIsConfirmationOpen(true);
   };
 
+  // const handleConfirm = () => {
+  //   if (pendingAction === "add" || pendingAction === "update") {
+  //     setFinancialData((prev) =>
+  //       pendingAction === "update"
+  //         ? prev.map((row) => (row.id === pendingRow.id ? pendingRow : row))
+  //         : [...prev, pendingRow]
+  //     );
+
+  //     // Reset form fields
+  //     ["financialYear", "turnOver", "profitLoss", "financialRange", "auditApplicability", "auditStatus", "auditType"]
+  //       .forEach((field) => formik.setFieldValue(field, ""));
+
+  //     setIsUpdateMode(false);
+  //     setEditingFinancialId(null);
+  //   } else if (pendingAction === "delete") {
+  //     setFinancialData((prev) => prev.filter((row) => row.id !== pendingRow.id));
+  //   }
+
+  //   // Close modal and clear pending
+  //   setIsConfirmationOpen(false);
+  //   setPendingAction("");
+  //   setPendingRow(null);
+  // };
+
   const handleConfirm = () => {
     if (pendingAction === "add" || pendingAction === "update") {
       setFinancialData((prev) =>
@@ -744,6 +784,9 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
       setEditingFinancialId(null);
     } else if (pendingAction === "delete") {
       setFinancialData((prev) => prev.filter((row) => row.id !== pendingRow.id));
+    } else if (pendingAction === "back") {
+      // Only move back if user confirms
+      setActiveStep((prev) => prev - 1);
     }
 
     // Close modal and clear pending
@@ -751,6 +794,8 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
     setPendingAction("");
     setPendingRow(null);
   };
+
+
 
   const handleFinancialPreviewConfirm = () => {
     const rowData = { ...previewFinancialData, id: editingFinancialId || Date.now() };
@@ -1618,7 +1663,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
         confirmText={isUpdateMode ? "Update" : "Add"}
       />
 
-      <ConfirmationModal
+      {/* <ConfirmationModal
         isOpen={isConfirmationOpen}
         onClose={() => setIsConfirmationOpen(false)}
         onConfirm={handleConfirm}
@@ -1634,8 +1679,32 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
             ? "Are you sure you want to delete this financial record?"
             : `Are you sure you want to ${isUpdateMode ? "update" : "save"} this financial record?`
         }
-      />
+      /> */}
 
+      <ConfirmationModal
+        isOpen={isConfirmationOpen}
+        onClose={() => {
+          setIsConfirmationOpen(false);
+          setPendingAction(""); // clear pending action
+        }}
+        onConfirm={handleConfirm}
+        title={
+          pendingAction === "delete"
+            ? "Delete Record"
+            : pendingAction === "back"
+              ? "Go Back"
+              : isUpdateMode
+                ? "Update Record"
+                : "Save Record"
+        }
+        description={
+          pendingAction === "delete"
+            ? "Are you sure you want to delete this financial record?"
+            : pendingAction === "back"
+              ? "All your saved data will be lost, are you sure you want to continue?"
+              : `Are you sure you want to ${isUpdateMode ? "update" : "save"} this financial record?`
+        }
+      />
 
       {/* Validation Modal */}
       <ValidationModal
