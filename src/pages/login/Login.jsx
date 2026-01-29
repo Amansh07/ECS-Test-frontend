@@ -86,17 +86,17 @@ export default function Login() {
   };
 
   // ---------------- SHOW SESSION EXPIRED MODAL ----------------
-useEffect(() => {
-  const reason = AuthService.getLogoutReason();
+  useEffect(() => {
+    const reason = AuthService.getLogoutReason();
 
-  if (reason === "expired") {
-    setStatusModal({
-      isOpen: true,
-      status: false,
-      message: "Your session has expired. Please login again.",
-    });
-  }
-}, []);
+    if (reason === "expired") {
+      setStatusModal({
+        isOpen: true,
+        status: false,
+        message: "Your session has expired. Please login again.",
+      });
+    }
+  }, []);
 
   // ---------------- INITIAL CAPTCHA ON MOUNT ----------------
   useEffect(() => {
@@ -311,16 +311,18 @@ useEffect(() => {
         {/* ACTION BUTTONS */}
         <div className="h-[50px] flex justify-end gap-[10px]">
           <button
+            onClick={() => navigate("/registration")}   // or "/signup"
             className="
-            w-[102px]
-            border border-primary
-            rounded-lg
-            font-medium text-[16px]
-            text-primary
-          "
+    w-[102px]
+    border border-primary
+    rounded-lg
+    font-medium text-[16px]
+    text-primary
+  "
           >
             Signup
           </button>
+
 
           <button
             type="button"
