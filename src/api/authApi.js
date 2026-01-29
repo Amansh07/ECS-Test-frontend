@@ -13,6 +13,14 @@ export const login = async (username, password) => {
   return response;
 };
 
+// authApi.js
+export const refreshAccessToken = async (refreshToken) => {
+  return authApiClient.post("/api/v1/auth/refresh", {
+    refreshToken,
+  });
+};
+
+
 export const temprorayToken = async () => {
   const response = await authApiClient.post("api/v1/auth/temp-token", "");
 

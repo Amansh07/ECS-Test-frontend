@@ -8,7 +8,7 @@ import verify from "../../assets/verify.svg";
 import Captcha from "../../components/Captcha";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
-import StatusModal from "../../components/StatusModal"; // <-- import StatusModal
+import StatusModal from "../../components/StatusModal";
 import { login, generateCaptcha, verifyCaptchaApi } from "../../api/authApi";
 import { loginValidationSchema } from "./validation";
 import AuthService from "../../auth/AuthService";
@@ -19,8 +19,6 @@ export default function Login() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
   const [captchaError, setCaptchaError] = useState(false);
-  const [apiError, setApiError] = useState("");
-  const [showModal, setShowModal] = useState(false);
 
   const [captchaId, setCaptchaId] = useState(null);
   const [firstNumber, setFirstNumber] = useState(null);
@@ -44,9 +42,9 @@ export default function Login() {
         const payload = JSON.parse(atob(token.split(".")[1]));
         const isExpired = payload.exp * 1000 < Date.now();
         if (!isExpired) navigate("/member-management", { replace: true });
-        else AuthService.logout();
+        else AuthService.logout("expired");
       } catch {
-        AuthService.logout();
+        AuthService.logout("expired");
       }
     }
   }, [navigate]);
@@ -86,6 +84,19 @@ export default function Login() {
       });
     }
   };
+
+  // ---------------- SHOW SESSION EXPIRED MODAL ----------------
+useEffect(() => {
+  const reason = AuthService.getLogoutReason();
+
+  if (reason === "expired") {
+    setStatusModal({
+      isOpen: true,
+      status: false,
+      message: "Your session has expired. Please login again.",
+    });
+  }
+}, []);
 
   // ---------------- INITIAL CAPTCHA ON MOUNT ----------------
   useEffect(() => {

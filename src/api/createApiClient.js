@@ -1,5 +1,6 @@
 import axios from "axios";
 import AuthService from "../auth/AuthService";
+import { refreshAccessToken } from "./authApi";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -13,7 +14,7 @@ export const createApiClient = ({ baseURL, withAuth = true }) => {
     },
   });
 
-  // Attach token if required
+  // ---------------- REQUEST INTERCEPTOR ----------------
   if (withAuth) {
     client.interceptors.request.use((config) => {
       const token = AuthService.getAccessToken();
@@ -24,14 +25,54 @@ export const createApiClient = ({ baseURL, withAuth = true }) => {
     });
   }
 
-  // Global response + error handling
+  // ---------------- RESPONSE INTERCEPTOR ----------------
   client.interceptors.response.use(
     (response) => response.data,
+
     async (error) => {
       const originalRequest = error.config;
       const status = error?.response?.status;
 
-      // Retry GET once for 5xx
+      // ========== REFRESH TOKEN FLOW ==========
+      if (withAuth && status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+
+        try {
+          const refreshToken = AuthService.getRefreshToken();
+
+          // No refresh token → force logout
+          if (!refreshToken) {
+            AuthService.logout("expired");
+            return Promise.reject(error);
+          }
+
+          const refreshRes = await refreshAccessToken(refreshToken);
+
+          const newAccessToken = refreshRes?.accessToken;
+
+          if (!newAccessToken) {
+            // Refresh API didn't return token
+            AuthService.logout("expired");
+            return Promise.reject(error);
+          }
+
+          // Save new access token
+          AuthService.setAccessToken(newAccessToken);
+
+          // Retry original request
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          return client(originalRequest);
+
+        } catch (refreshError) {
+          console.error("Refresh token failed:", refreshError);
+
+          // Refresh token expired / invalid
+          AuthService.logout("expired");
+          return Promise.reject(refreshError);
+        }
+      }
+
+      // ========== RETRY GET ON 5xx ==========
       if (
         status &&
         [500, 502, 503, 504].includes(status) &&
@@ -43,11 +84,7 @@ export const createApiClient = ({ baseURL, withAuth = true }) => {
         return client(originalRequest);
       }
 
-      // 401 → logout
-      if (withAuth && status === 401) {
-        AuthService.logout();
-      }
-
+      // ========== NORMAL ERROR ==========
       const apiError = {
         status,
         message:

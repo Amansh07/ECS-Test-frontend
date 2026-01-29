@@ -1,5 +1,6 @@
 const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
+const LOGOUT_REASON_KEY = "logoutReason";
 
 const AuthService = {
   setTokens: (loginApiResponse) => {
@@ -13,6 +14,12 @@ const AuthService = {
     }
   },
 
+  setAccessToken: (accessToken) => {
+    if (accessToken) {
+      sessionStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+    }
+  },
+
   getAccessToken: () => sessionStorage.getItem(ACCESS_TOKEN_KEY),
   getRefreshToken: () => sessionStorage.getItem(REFRESH_TOKEN_KEY),
 
@@ -21,9 +28,20 @@ const AuthService = {
     sessionStorage.removeItem(REFRESH_TOKEN_KEY);
   },
 
-  logout: () => {
+  logout: (reason = "") => {
     AuthService.clearTokens();
+
+    if (reason) {
+      sessionStorage.setItem(LOGOUT_REASON_KEY, reason);
+    }
+
     window.location.href = "/login";
+  },
+
+  getLogoutReason: () => {
+    const reason = sessionStorage.getItem(LOGOUT_REASON_KEY);
+    sessionStorage.removeItem(LOGOUT_REASON_KEY);
+    return reason;
   },
 };
 
