@@ -21,6 +21,7 @@ import { uploadBulkDocumentsRegistration } from "../../api/upload";
 import { registerFPO } from "../../api/registration";
 import { temprorayToken } from "../../api/authApi";
 import StatusModal from "../../components/StatusModal";
+import Loader from "../../components/Loader";
 
 const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = false, imgConfig, pdfConfig, activeStep, setActiveStep, nextButtonClicked, setNextButtonClicked, backButtonClicked, setBackButtonClicked, saveButtonClicked, setSaveButtonClicked, steps }) => {
   // ---------------- INITIAL FORM VALUES ----------------
@@ -271,17 +272,25 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
     const hasError = await validationCheck();
     if (hasError) return;   // STOP if invalid
 
-    const uploadRes = await handleUploadDocuments();
+    setIsRegistrationLoading(true);
+    try {
+      const uploadRes = await handleUploadDocuments();
 
-    if (!uploadRes) {
+      if (!uploadRes) {
+        setIsRegistrationLoading(false);
+        return;
+      }
+
+      docIds = uploadRes.results.map(item => item.documentId);
+    } catch (error) {
+      setIsRegistrationLoading(false);
+      setStatusModal({
+        isOpen: true,
+        status: false,
+        message: error.message || "Document upload failed. Please try again.",
+      });
       return;
     }
-
-    const docIds = uploadRes.results.map(item => item.documentId);
-
-    console.log("docIds:", docIds);
-    // ["gRwreiUWOvfT-V40Toax", "NYF5l6GYs27GRCLqBahd"]
-
 
     // Prepare payload
     const payload = {
@@ -342,7 +351,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
 
         setStatusModal({
           isOpen: true,
-          status: true, // false = error, true = success
+          status: true,
           message: "Registration successful!",
         });
 
@@ -370,6 +379,8 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
         status: false, // false = error, true = success
         message: error.message || "Something went wrong. Please try again."
       });
+    } finally {
+      setIsRegistrationLoading(false);
     }
 
     // navigate("/", { replace: true });
@@ -452,6 +463,8 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
   const [hasFinancialError, setHasFinancialError] = useState(false);
   const [isNextInSecondClicked, setIsNextInSecondClicked] = useState(false);
   const [sameAsPrimary, setSameAsPrimary] = useState(false);
+
+  const [isRegistrationLoading, setIsRegistrationLoading] = useState(false);
 
   const handleSameAsPrimaryChange = (e) => {
     const checked = e.target.checked;
@@ -1634,10 +1647,21 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
 
       <StatusModal
         isOpen={statusModal.isOpen}
-        status={statusModal.status}
+        status={statusModal.status} // true = success, false = error
         message={statusModal.message}
-        onClose={() => setStatusModal(prev => ({ ...prev, isOpen: false }))}
+        onClose={() => {
+          setStatusModal(prev => ({ ...prev, isOpen: false }));
+
+          if (statusModal.status) { // only for successful registration
+            resetAllFormData();    // reset form
+            navigate("/");          // redirect
+          }
+          // for errors, just close modal, no navigation
+        }}
       />
+
+
+      {isRegistrationLoading && <Loader text="Registering..." />}
 
     </>
   );

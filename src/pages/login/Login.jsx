@@ -12,6 +12,7 @@ import StatusModal from "../../components/StatusModal";
 import { login, generateCaptcha, verifyCaptchaApi } from "../../api/authApi";
 import { loginValidationSchema } from "./validation";
 import AuthService from "../../auth/AuthService";
+import Loader from "../../components/Loader";
 
 export default function Login() {
   const [captchaAnswer, setCaptchaAnswer] = useState(null);
@@ -23,6 +24,7 @@ export default function Login() {
   const [captchaId, setCaptchaId] = useState(null);
   const [firstNumber, setFirstNumber] = useState(null);
   const [secondNumber, setSecondNumber] = useState(null);
+  const [isLoginLoading, setIsLoginLoading]= useState(false);
 
   const navigate = useNavigate();
   const mountedRef = useRef(true);
@@ -149,21 +151,19 @@ export default function Login() {
       }
 
       try {
+        setIsLoginLoading(true);
         const res = await login(values.username, values.password);
         AuthService.setTokens(res);
 
         // Show success StatusModal
-        setStatusModal({
-          isOpen: true,
-          status: true,
-          message: "Login successful! Redirecting...",
-        });
+        // setStatusModal({
+        //   isOpen: true,
+        //   status: true,
+        //   message: "Login successful! Redirecting...",
+        // });
 
-        // Redirect after 3 seconds
-        setTimeout(() => {
-          setStatusModal({ isOpen: false, status: true, message: "" });
-          navigate("/member-management", { replace: true });
-        }, 3000);
+        navigate("/member-management", { replace: true });
+    
       } catch (error) {
         setStatusModal({
           isOpen: true,
@@ -171,6 +171,7 @@ export default function Login() {
           message: error?.message || "Login failed. Please try again.",
         });
       } finally {
+        setIsLoginLoading(false);
         setSubmitting(false);
       }
     },
@@ -246,7 +247,6 @@ export default function Login() {
               a={firstNumber}
               b={secondNumber}
             />
-
           </div>
 
           <button
@@ -342,6 +342,7 @@ export default function Login() {
           </button>
         </div>
       </div>
+        {isLoginLoading && <Loader text="Logging in..." />}
     </>
   );
 }

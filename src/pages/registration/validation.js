@@ -10,7 +10,7 @@ const cinStrictRegex = /^[LU][0-9]{5}[A-Z]{2}[0-9]{4}[A-Z]{3}[0-9]{6}$/;
 const gigwPasswordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{8,20}$/;
 
-
+  
 export const registrationValidationSchema = Yup.object().shape({
   registeredUnder: Yup.number().required("Registered Under is required"),
   agency: Yup.string().required("Agency is required"),
