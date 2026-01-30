@@ -15,7 +15,7 @@ export const registrationValidationSchema = Yup.object().shape({
   registeredUnder: Yup.number().required("Registered Under is required"),
   agency: Yup.string().required("Agency is required"),
   blockId: Yup.string().required("Block is required"),
-  // districtId: Yup.string().required("District is required"),
+  districtId: Yup.string().required("District is required"),
   communicationAddress: Yup.string().required("Communication Address is required"),
   pincode: Yup.string()
     .matches(/^\d{6}$/, "Pincode must be exactly 6 digits")
