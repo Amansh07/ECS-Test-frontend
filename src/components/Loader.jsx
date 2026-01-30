@@ -1,23 +1,22 @@
 import React from 'react';
+import { TailChase } from 'ldrs/react'
+import 'ldrs/react/TailChase.css'
+
 
 const Loader = ({ text = "Getting things ready." }) => {
     return (
-        <div className="fixed inset-0 z-[100] flex items-end justify-start p-10 backdrop-blur-sm bg-black/5">
-            <div className="flex items-center gap-5 bg-[#152000] px-8 py-5 rounded-full shadow-2xl relative overflow-hidden min-w-[320px] animate-fade-in-up">
-                {/* Spinner */}
-                <div className="relative w-14 h-14 shrink-0 animate-spin">
-                    <div
-                        className="w-full h-full rounded-full"
-                        style={{
-                            background: 'conic-gradient(from 180deg at 50% 50%, #3C9718 0deg, #D6FF66 63.24deg, rgba(255, 255, 255, 0) 360deg)',
-                            maskImage: 'radial-gradient(closest-side, transparent 75%, black 76%)',
-                            WebkitMaskImage: 'radial-gradient(closest-side, transparent 75%, black 76%)'
-                        }}
-                    />
-                </div>
-
-                {/* Text */}
-                <span className="text-white text-xl font-semibold tracking-wide">{text}</span>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center backdrop-blur-md bg-black/20 transition-all duration-300">
+            <div className="flex flex-col items-center justify-center gap-4 animate-fade-in">
+                <TailChase
+                    size="60"
+                    speed="1.75"
+                    color="#D6FF66"
+                />
+                {text && (
+                    <span className="text-white text-lg font-medium tracking-wide drop-shadow-md">
+                        {text}
+                    </span>
+                )}
             </div>
         </div>
     );
