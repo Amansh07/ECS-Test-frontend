@@ -1283,12 +1283,12 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
             rowKey="id"
             renderActions={(row) => (
               <div className="flex gap-2 items-center justify-center">
-                <img
+                {!disabled && <img
                   src={editSvg}
                   alt="edit"
                   className="w-6 cursor-pointer"
                   onClick={() => handleEditFinancialRow(row)}
-                />
+                />}
                 <img
                   src={viewSvg}
                   alt="view"
@@ -1302,12 +1302,12 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
 
                 />
 
-                <img
+               {!disabled && <img
                   src={deleteSvg}
                   alt="Delete"
                   className="w-6 h-6 cursor-pointer"
                   onClick={() => handleDelete(row.id)}
-                />
+                />}
 
               </div>
             )}
