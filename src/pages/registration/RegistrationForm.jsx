@@ -167,6 +167,17 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
   //   }
   // }
 
+  const handleStatusClose = () => {
+    const isSuccess = statusModal.status;
+
+    setStatusModal(prev => ({ ...prev, isOpen: false }));
+
+    if (isSuccess) {
+      resetAllFormData();
+      navigate("/");
+    }
+  };
+
   const validationCheck = async () => {
     const errors = await formik.validateForm();
     let financialError = false;
@@ -355,12 +366,12 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
           message: "Registration successful!",
         });
 
-        setTimeout(() => {
-          resetAllFormData();
-        }, 300);
+        // setTimeout(() => {
+        //   resetAllFormData();
+        // }, 300);
 
-        // Optional: redirect or reset form
-        navigate("/");
+        // // Optional: redirect or reset form
+        // navigate("/");
       } else {
         // setValidationMessage(regRes.message || "Registration failed.");
         // setShowValidationModal(true);
@@ -1718,15 +1729,7 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
         isOpen={statusModal.isOpen}
         status={statusModal.status} // true = success, false = error
         message={statusModal.message}
-        onClose={() => {
-          setStatusModal(prev => ({ ...prev, isOpen: false }));
-
-          if (statusModal.status) { // only for successful registration
-            resetAllFormData();    // reset form
-            navigate("/");          // redirect
-          }
-          // for errors, just close modal, no navigation
-        }}
+        onClose={handleStatusClose}
       />
 
 
