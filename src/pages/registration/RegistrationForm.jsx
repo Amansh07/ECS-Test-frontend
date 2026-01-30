@@ -18,7 +18,7 @@ import UploadDocument from "../../components/UploadDocument";
 import { useNavigate } from "react-router-dom";
 import { getDistricts, getBlocksByDistrictId, getGeneral } from "../../api/master";
 import { uploadBulkDocumentsRegistration } from "../../api/upload";
-import { registerFPO } from "../../api/registration";
+import { registerFPO, checkDuplicate } from "../../api/registration";
 import { temprorayToken } from "../../api/authApi";
 import StatusModal from "../../components/StatusModal";
 import Loader from "../../components/Loader";
@@ -205,12 +205,48 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
       return touched;
     };
 
-    if (Object.keys(errors).length > 0 || financialError) {
+    if (Object.keys(errors).length > 0 || financialError || usernameAvailability.status === "taken" || cinAvailability.status === "taken" || regdNoAvailability.status === "taken" || emailAvailability.status === "taken" || mobileAvailability.status === "taken" || panAvailability.status === "taken") {
       // Mark all fields as touched so errors show
       formik.setTouched(markAllTouched(formik.values));
 
       // Set financial error state
       setHasFinancialError(financialError);
+
+      if (usernameAvailability.status === "taken") {
+        setValidationMessage("Username is already taken. Please choose another one.");
+        setShowValidationModal(true);
+        return true;
+      }
+
+      if (cinAvailability.status === "taken") {
+        setValidationMessage("CIN is already registered. Please check the details.");
+        setShowValidationModal(true);
+        return true;
+      }
+
+      if (regdNoAvailability.status === "taken") {
+        setValidationMessage("Registration Number is already registered.");
+        setShowValidationModal(true);
+        return true;
+      }
+
+      if (emailAvailability.status === "taken") {
+        setValidationMessage("Email Address is already registered.");
+        setShowValidationModal(true);
+        return true;
+      }
+
+      if (mobileAvailability.status === "taken") {
+        setValidationMessage("Mobile Number is already registered.");
+        setShowValidationModal(true);
+        return true;
+      }
+
+      if (panAvailability.status === "taken") {
+        setValidationMessage("FPO PAN is already registered.");
+        setShowValidationModal(true);
+        return true;
+      }
 
       // Show validation modal
       setValidationMessage(
@@ -491,6 +527,275 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
       setFieldValue("secondaryMobile", "");
     }
   };
+
+  // ---------------- USERNAME DUPLICATE CHECK ----------------
+  const [usernameAvailability, setUsernameAvailability] = useState({
+    status: "idle", // idle, checking, available, taken, error
+    message: "",
+  });
+
+  useEffect(() => {
+    const checkUsername = async () => {
+      const username = values.username;
+
+      if (!username) {
+        setUsernameAvailability({ status: "idle", message: "" });
+        return;
+      }
+
+      setUsernameAvailability({ status: "checking", message: "Checking availability..." });
+
+      try {
+        const res = await checkDuplicate("username", username);
+        // Assuming API returns { success: true, data: { isDuplicate: boolean } } or similar
+        // Adjust based on actual API response structure. 
+        // Logic: if returns true -> duplicate exists.
+
+        if (res.data) {
+          // If true, it means duplicate found
+          setUsernameAvailability({ status: "taken", message: "Username is already taken" });
+          formik.setFieldError("username", "Username is already taken");
+        } else {
+          setUsernameAvailability({ status: "available", message: "Username is available" });
+          // Clear specific error if it was "taken"
+          if (errors.username === "Username is already taken") {
+            formik.setFieldError("username", undefined);
+          }
+        }
+      } catch (error) {
+        console.error("Duplicate check error:", error);
+        setUsernameAvailability({ status: "error", message: "Error checking username unique" });
+      }
+    };
+
+    const debounceTimer = setTimeout(() => {
+      if (values.username) {
+        checkUsername();
+      }
+    }, 1000); // 1 second debounce
+
+    return () => clearTimeout(debounceTimer);
+  }, [values.username]);
+
+
+  // ---------------- CIN DUPLICATE CHECK ----------------
+  const [cinAvailability, setCinAvailability] = useState({
+    status: "idle", // idle, checking, available, taken, error
+    message: "",
+  });
+
+  useEffect(() => {
+    const checkCin = async () => {
+      const cin = values.companyDetails?.cin;
+
+      if (!cin) {
+        setCinAvailability({ status: "idle", message: "" });
+        return;
+      }
+
+      // Basic length check to avoid premature calls
+      if (cin.length < 5) return;
+
+      setCinAvailability({ status: "checking", message: "Checking availability..." });
+
+      try {
+        const res = await checkDuplicate("cin", cin);
+
+        if (res.data) {
+          setCinAvailability({ status: "taken", message: "CIN is already registered" });
+          formik.setFieldError("companyDetails.cin", "CIN is already registered");
+        } else {
+          setCinAvailability({ status: "available", message: "CIN is available" });
+          if (errors.companyDetails?.cin === "CIN is already registered") {
+            formik.setFieldError("companyDetails.cin", undefined);
+          }
+        }
+      } catch (error) {
+        // console.error("Duplicate check error:", error);
+        setCinAvailability({ status: "error", message: "Error checking CIN unique" });
+      }
+    };
+
+    const debounceTimer = setTimeout(() => {
+      if (values.companyDetails?.cin) {
+        checkCin();
+      }
+    }, 1000);
+
+    return () => clearTimeout(debounceTimer);
+  }, [values.companyDetails?.cin]);
+
+  // ---------------- REGD NO (SOCIETY) DUPLICATE CHECK ----------------
+  const [regdNoAvailability, setRegdNoAvailability] = useState({
+    status: "idle",
+    message: "",
+  });
+
+  useEffect(() => {
+    // Only check if society is selected
+    if (values.registeredUnder !== 7) {
+      setRegdNoAvailability({ status: "idle", message: "" });
+      return;
+    }
+
+    const checkRegdNo = async () => {
+      const regdNo = values.societyDetails?.regdNo;
+      if (!regdNo) {
+        setRegdNoAvailability({ status: "idle", message: "" });
+        return;
+      }
+
+      setRegdNoAvailability({ status: "checking", message: "Checking..." });
+
+      try {
+        const res = await checkDuplicate("registrationnumber", regdNo);
+        if (res.data) {
+          setRegdNoAvailability({ status: "taken", message: "Registration Number already registered" });
+          formik.setFieldError("societyDetails.regdNo", "Registration Number already registered");
+        } else {
+          setRegdNoAvailability({ status: "available", message: "Available" });
+          if (errors.societyDetails?.regdNo === "Registration Number already registered") {
+            formik.setFieldError("societyDetails.regdNo", undefined);
+          }
+        }
+      } catch (error) {
+        setRegdNoAvailability({ status: "error", message: "Error checking" });
+      }
+    };
+
+    const debounceTimer = setTimeout(() => {
+      if (values.societyDetails?.regdNo) checkRegdNo();
+    }, 1000);
+
+    return () => clearTimeout(debounceTimer);
+  }, [values.societyDetails?.regdNo, values.registeredUnder]);
+
+
+  // ---------------- EMAIL DUPLICATE CHECK ----------------
+  const [emailAvailability, setEmailAvailability] = useState({
+    status: "idle",
+    message: "",
+  });
+
+  useEffect(() => {
+    const checkEmail = async () => {
+      const email = values.emailAddress;
+      if (!email) {
+        setEmailAvailability({ status: "idle", message: "" });
+        return;
+      }
+
+      // Basic regex check before API call to avoid bad requests
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+
+      setEmailAvailability({ status: "checking", message: "Checking..." });
+
+      try {
+        const res = await checkDuplicate("email", email);
+        if (res.data) {
+          setEmailAvailability({ status: "taken", message: "Email already registered" });
+          formik.setFieldError("emailAddress", "Email already registered");
+        } else {
+          setEmailAvailability({ status: "available", message: "Available" });
+          if (errors.emailAddress === "Email already registered") {
+            formik.setFieldError("emailAddress", undefined);
+          }
+        }
+      } catch (error) {
+        setEmailAvailability({ status: "error", message: "Error checking" });
+      }
+    };
+
+    const debounceTimer = setTimeout(() => {
+      if (values.emailAddress) checkEmail();
+    }, 1000);
+
+    return () => clearTimeout(debounceTimer);
+  }, [values.emailAddress]);
+
+
+  // ---------------- MOBILE DUPLICATE CHECK ----------------
+  const [mobileAvailability, setMobileAvailability] = useState({
+    status: "idle",
+    message: "",
+  });
+
+  useEffect(() => {
+    const checkMobile = async () => {
+      const mobile = values.mobileNumber;
+      if (!mobile) {
+        setMobileAvailability({ status: "idle", message: "" });
+        return;
+      }
+
+      if (mobile.length < 10) return;
+
+      setMobileAvailability({ status: "checking", message: "Checking..." });
+
+      try {
+        const res = await checkDuplicate("mobile", mobile);
+        if (res.data) {
+          setMobileAvailability({ status: "taken", message: "Mobile number already registered" });
+          formik.setFieldError("mobileNumber", "Mobile number already registered");
+        } else {
+          setMobileAvailability({ status: "available", message: "Available" });
+          if (errors.mobileNumber === "Mobile number already registered") {
+            formik.setFieldError("mobileNumber", undefined);
+          }
+        }
+      } catch (error) {
+        setMobileAvailability({ status: "error", message: "Error checking" });
+      }
+    };
+
+    const debounceTimer = setTimeout(() => {
+      if (values.mobileNumber) checkMobile();
+    }, 1000);
+
+    return () => clearTimeout(debounceTimer);
+  }, [values.mobileNumber]);
+
+
+  // ---------------- PAN DUPLICATE CHECK ----------------
+  const [panAvailability, setPanAvailability] = useState({
+    status: "idle",
+    message: "",
+  });
+
+  useEffect(() => {
+    const checkPan = async () => {
+      const pan = values.fpoPanNo;
+      if (!pan) {
+        setPanAvailability({ status: "idle", message: "" });
+        return;
+      }
+
+      if (pan.length < 10) return;
+
+      setPanAvailability({ status: "checking", message: "Checking..." });
+
+      try {
+        const res = await checkDuplicate("panno", pan);
+        if (res.data) {
+          setPanAvailability({ status: "taken", message: "PAN already registered" });
+          formik.setFieldError("fpoPanNo", "PAN already registered");
+        } else {
+          setPanAvailability({ status: "available", message: "Available" });
+          if (errors.fpoPanNo === "PAN already registered") {
+            formik.setFieldError("fpoPanNo", undefined);
+          }
+        }
+      } catch (error) {
+        setPanAvailability({ status: "error", message: "Error checking" });
+      }
+    };
+
+    const debounceTimer = setTimeout(() => {
+      if (values.fpoPanNo) checkPan();
+    }, 1000);
+
+    return () => clearTimeout(debounceTimer);
+  }, [values.fpoPanNo]);
 
 
   useEffect(() => {
@@ -923,8 +1228,11 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                     value={values[detailsKey]?.regdNo || ""}
                     onChange={handleNestedChange}
                     onBlur={handleNestedBlur}
-                    error={errors.societyDetails?.regdNo}
-                    touched={touched.societyDetails?.regdNo}
+                    error={
+                      (regdNoAvailability.status === "taken" ? regdNoAvailability.message : null) ||
+                      errors.societyDetails?.regdNo
+                    }
+                    touched={touched.societyDetails?.regdNo || regdNoAvailability.status === "taken"}
                     disabled={disabled}
                   />
                   <TextField
@@ -1007,10 +1315,20 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                       setFieldValue(`${detailsKey}.cin`, value);
                     }}
                     onBlur={handleNestedBlur}
-                    error={errors.companyDetails?.cin}
-                    touched={touched.companyDetails?.cin}
+                    error={
+                      (cinAvailability.status === "taken"
+                        ? cinAvailability.message
+                        : null) || errors.companyDetails?.cin
+                    }
+                    touched={touched.companyDetails?.cin || cinAvailability.status === "taken"}
                     disabled={disabled}
                   />
+                  {/* {values[detailsKey]?.cin && cinAvailability.status === "checking" && (
+                     <p className="text-xs text-blue-500 mt-1">Checking availability...</p>
+                  )}
+                  {values[detailsKey]?.cin && cinAvailability.status === "available" && (
+                     <p className="text-xs text-green-600 mt-1">CIN is available</p>
+                  )} */}
 
 
                   {!disabled && <div className="pt-6">
@@ -1099,8 +1417,11 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
             value={values.emailAddress || ""}
             onChange={handleChange}
             onBlur={handleBlur}
-            error={errors.emailAddress}
-            touched={touched.emailAddress}
+            error={
+              (emailAvailability.status === "taken" ? emailAvailability.message : null) ||
+              errors.emailAddress
+            }
+            touched={touched.emailAddress || emailAvailability.status === "taken"}
             disabled={disabled}
           />
           <TextField
@@ -1117,8 +1438,11 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                 .replace(/\D/g, '')
                 .slice(0, 10);
             }}
-            error={errors.mobileNumber}
-            touched={touched.mobileNumber}
+            error={
+              (mobileAvailability.status === "taken" ? mobileAvailability.message : null) ||
+              errors.mobileNumber
+            }
+            touched={touched.mobileNumber || mobileAvailability.status === "taken"}
             disabled={disabled}
           />
         </div>
@@ -1553,10 +1877,22 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                   setFieldValue("username", value);
                 }}
                 onBlur={handleBlur}
-                error={errors.username}
-                touched={touched.username}
+                error={
+                  (usernameAvailability.status === "taken"
+                    ? usernameAvailability.message
+                    : null) || errors.username
+                }
+                // message={usernameAvailability.status === "available" ? "Username is available" : null}
+                // loading={usernameAvailability.status === "checking" ? "Checking availability..." : null}
+                touched={touched.username || usernameAvailability.status === "taken"}
                 disabled={disabled}
               />
+              {/* {values.username && usernameAvailability.status === "checking" && (
+                <p className="text-xs text-blue-500 mt-1">Checking availability...</p>
+              )}
+              {values.username && usernameAvailability.status === "available" && (
+                <p className="text-xs text-green-600 mt-1">Username is available</p>
+              )} */}
 
               <TextField
                 label="Password"
@@ -1612,8 +1948,11 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
                   setFieldValue("fpoPanNo", value);
                 }}
                 onBlur={handleBlur}
-                error={errors.fpoPanNo}
-                touched={touched.fpoPanNo}
+                error={
+                  (panAvailability.status === "taken" ? panAvailability.message : null) ||
+                  errors.fpoPanNo
+                }
+                touched={touched.fpoPanNo || panAvailability.status === "taken"}
                 disabled={disabled}
               />
 
