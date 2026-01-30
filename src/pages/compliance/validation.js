@@ -1,35 +1,43 @@
-// validation.js
 import * as Yup from "yup";
 
-/**
- * Convert a possibly comma-formatted string like "10,00,000"
- * into a number for Yup.number() to validate.
- * - If the user left it empty, return NaN so Yup triggers typeError/required as appropriate.
- */
+// Converts "5,00,000" -> 500000 before Yup.number() runs
 const toNumber = (originalValue) => {
   if (typeof originalValue === "string") {
+    // remove commas and spaces
     const stripped = originalValue.replace(/,/g, "").trim();
-    if (stripped === "") return NaN; // lets Yup raise required/typeError correctly
+    if (stripped === "") return NaN; // lets Yup trigger required/typeError correctly
+    // OPTIONAL: if you also want to tolerate stray symbols, use:
+    // const digitsOnly = stripped.replace(/[^\d.]/g, "");
+    // return digitsOnly === "" ? NaN : Number(digitsOnly);
     return Number(stripped);
   }
   return originalValue;
 };
 
-export const fpoCapitalValidationSchema = Yup.object({
-  totalEquity: Yup.string()
-    .matches(/^\d{0,50}$/, "Amount allowed only up to 50 digits")
-    .required("Total FPO Equity Capital is Required"),
-  isGrantReceived: Yup.string()
-    .required("Whether Equity Grant Recieved is required"),
-  grantReceived: Yup.string()
-    .when('isGrantRecieved', {
-      is: "Yes",
-      then: (schema) => schema.matches(/^\d{0,50}$/, "Amount allowed only up to 50 digits")
-        .required("Total FPO Equity Capital is Required"), // Rules if 'hasDiscount' is true
-      otherwise: (schema) => schema.notRequired(), // Rules if 'hasDiscount' is false
-    }),
 
+export const fpoCapitalValidationSchema = Yup.object({
+  totalEquity: Yup.number()
+    .transform((val, orig) => toNumber(orig))
+    .typeError("Total FPO Equity Capital must be a number")
+    .required("Total FPO Equity Capital is Required")
+    .min(0, "Total FPO Equity Capital cannot be negative"),
+
+  isGrantReceived: Yup.string()
+    .required("Whether Equity Grant Received is required"),
+
+  grantReceived: Yup.number()
+    .transform((val, orig) => toNumber(orig))
+    .typeError("FPO Equity Grant Received must be a number")
+    .when("isGrantReceived", {
+      is: "Yes",
+      then: (schema) =>
+        schema
+          .required("FPO Equity Grant Received is Required")
+          .min(0, "FPO Equity Grant Received cannot be negative"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
 });
+
 
 export const AGMMeetingValidationSchema = Yup.object({
   financialYear: Yup.string()
@@ -78,8 +86,7 @@ export const insecticideOrPesticideDetailsValidationSchema = Yup.object({
 });
 
 export const annualTurnoverValidationSchema = Yup.object({
-  financialYear: Yup.string()
-    .required("Financial Year is required"),
+  financialYear: Yup.string().required("Financial Year is required"),
 
   annualTurnover: Yup.number()
     .transform((val, orig) => toNumber(orig))
@@ -99,6 +106,7 @@ export const annualTurnoverValidationSchema = Yup.object({
     .min(0, "Total Dividend Paid cannot be negative")
     .nullable(),
 });
+
 
 export const bankDetailsValidationSchema = Yup.object({
   ifscCode: Yup.string()
