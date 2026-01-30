@@ -13,20 +13,18 @@ import viewSvg from "../../../assets/view.svg";
 import Toggle from "../../../components/Toggle";
 import { uploadDocument } from "../../../api/uploadMock";
 import { getProductCategories, getSubCategoriesById, getProductsBySubCategoryId } from "../../../api/masterMock";
-import {
-  listCommodityProduction,
-  createCommodityProduction,
-  updateCommodityProduction,
-  getCommodityProductionById
-} from "../../../api/productionDetailsMock";
 import { commodityProductionValidationSchema } from "../validation";
 import ValidationModal from "../../../components/ValidationModal";
+import { getProductCategoryList, getSubcategoriesByProductCategoryId, getProductsBySubcategoryId } from "../../../api/master";
+import { createCommodityProduction, updateCommodityProduction, getCommodityProductionList, getCommodityProductionById } from "../../../api/productionDetails";
+import { uploadSingleDocument } from "../../../api/upload";
+
 
 // ------------------- INITIAL VALUES -------------------
 const initialCommodityValues = {
   productCategoryId: "",
   productSubcategoryId: "",
-  productId: "",
+  productName: "",
   annualProductionCap: "",
   availableStock: "",
   inProduction: false,
@@ -46,7 +44,6 @@ export const CommodityProduction = () => {
   const [publishOnEmart, setPublishOnEmart] = useState(false);
   const [rowPreviewData, setRowPreviewData] = useState(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
-  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [statusConfig, setStatusConfig] = useState({ status: true, message: "" });
   const [isUpdateMode, setIsUpdateMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -56,6 +53,13 @@ export const CommodityProduction = () => {
   const [showValidationModal, setShowValidationModal] = useState(false);
   const [validationTitle, setValidationTitle] = useState("");
   const [validationMessage, setValidationMessage] = useState("");
+  const [statusModal, setStatusModal] = useState({
+    isOpen: false,
+    status: true,
+    message: "",
+  });
+
+  const [asyncPreviewData, setAsyncPreviewData] = useState(null);
 
   const uploadConfig = {
     title: "Select Poster Image",
@@ -70,16 +74,148 @@ export const CommodityProduction = () => {
     validateOnChange: false,
   });
 
-  // ------------------- LOAD CATEGORIES & COMMODITY LIST -------------------
   useEffect(() => {
-    const res = getProductCategories();
-    if (res.success) setCategories(res.data);
-    fetchCommodityList();
+    const fetchProducts = async () => {
+      try {
+        if (!formik.values.productSubcategoryId) {
+          setProducts([]);
+
+          if (!isUpdateMode) {
+            formik.setFieldValue("productName", "");
+          }
+          return;
+        }
+        const res = await getProductsBySubcategoryId(formik.values.productSubcategoryId);
+
+        if (!res?.success) {
+          throw new Error(res?.message || "Failed to fetch Products");
+        }
+
+        setProducts(res.data || []);
+
+        if (!isUpdateMode) {
+          formik.setFieldValue("productName", "");
+        }
+
+      } catch (err) {
+        console.error("Fetch Products failed:", err);
+
+        setStatusModal({
+          isOpen: true,
+          status: false,
+          message:
+            err?.response?.data?.message ||
+            err?.message ||
+            "Unable to fetch Products for selected Product Subcategory.",
+        });
+      }
+    };
+
+    fetchProducts();
+  }, [formik.values.productSubcategoryId, isUpdateMode]);
+
+  useEffect(() => {
+    const fetchProductSubCategories = async () => {
+      try {
+        if (!formik.values.productCategoryId) {
+          setSubcategories([]);
+          setProducts([]);
+
+          if (!isUpdateMode) {
+            formik.setFieldValue("productSubcategoryId", "");
+            formik.setFieldValue("productName", "");
+          }
+          return;
+        }
+
+        const res = await getSubcategoriesByProductCategoryId(formik.values.productCategoryId);
+
+        if (!res?.success) {
+          throw new Error(res?.message || "Failed to fetch Product SubCategories");
+        }
+
+        setSubcategories(res.data || []);
+
+        if (!isUpdateMode) {
+          formik.setFieldValue("productSubcategoryId", "");
+          formik.setFieldValue("productName", "");
+        }
+
+      } catch (err) {
+        console.error("Fetch Product SubCategory failed:", err);
+
+        setStatusModal({
+          isOpen: true,
+          status: false,
+          message:
+            err?.response?.data?.message ||
+            err?.message ||
+            "Unable to fetch Product Subcategories for selected Product Category.",
+        });
+      }
+    };
+
+    fetchProductSubCategories();
+  }, [formik.values.productCategoryId, isUpdateMode]);
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        // -------- Product Categories --------
+        const res = await getProductCategoryList();
+        if (res?.success) {
+          setCategories(res.data);
+        } else {
+          throw new Error(res?.message || "Failed to load seasons");
+        }
+
+        // -------- Commodity Production List --------
+        await fetchCommodityList();
+
+      } catch (err) {
+        console.error("Init load failed:", err);
+
+        setStatusModal({
+          isOpen: true,
+          status: false,
+          message:
+            err?.response?.data?.message ||
+            err?.message ||
+            "Failed to load initial data. Please try again.",
+        });
+      }
+    };
+
+    init();
   }, []);
 
-  const fetchCommodityList = () => {
-    const res = listCommodityProduction(1); // fpoId = 1 mock
-    if (res.success) setCommodityList(res.data);
+  const fetchCommodityList = async () => {
+    try {
+      const res = await getCommodityProductionList({
+        fpoId: 1,   // replace with dynamic fpoId if available
+        page: 0,
+        size: 10,
+        sort: "asc",
+      });
+
+      if (res?.success) {
+        setCommodityList(res.data);
+      } else {
+        throw new Error(res?.message || "Failed to fetch commodity production list");
+      }
+
+    } catch (err) {
+      console.error("Fetch commodity production list failed:", err);
+
+      setStatusModal({
+        isOpen: true,
+        status: false,
+        message:
+          err?.response?.data?.message ||
+          err?.message ||
+          "Unable to fetch commodity production list. Please try again.",
+      });
+    }
   };
 
   // ------------------- LOAD SUBCATEGORIES & PRODUCTS -------------------
@@ -89,7 +225,7 @@ export const CommodityProduction = () => {
       setProducts([]);
       if (!isUpdateMode) {
         formik.setFieldValue("productSubcategoryId", "");
-        formik.setFieldValue("productId", "");
+        formik.setFieldValue("productName", "");
       }
       return;
     }
@@ -103,13 +239,13 @@ export const CommodityProduction = () => {
   useEffect(() => {
     if (!formik.values.productSubcategoryId) {
       setProducts([]);
-      if (!isUpdateMode) formik.setFieldValue("productId", "");
+      if (!isUpdateMode) formik.setFieldValue("productName", "");
       return;
     }
     const prodRes = getProductsBySubCategoryId(Number(formik.values.productSubcategoryId));
     if (prodRes.success) {
       setProducts(prodRes.data);
-      if (!isUpdateMode) formik.setFieldValue("productId", "");
+      if (!isUpdateMode) formik.setFieldValue("productName", "");
     }
   }, [formik.values.productSubcategoryId, isUpdateMode]);
 
@@ -172,41 +308,94 @@ export const CommodityProduction = () => {
     let docId = existingDocId;
 
     if (uploadedFile) {
-      const uploadRes = await uploadDocument({ file: uploadedFile, fpoId: 1, docType: 1 });
-      if (uploadRes.status === 200 && uploadRes.data?.documentId) {
-        docId = uploadRes.data.documentId;
-        setExistingDocId(docId);
+      try {
+        const uploadRes = await uploadSingleDocument({
+          fpoId: 1,
+          docType: 923,
+          file: uploadedFile,
+        });
+
+        // Based on your axios unwrap pattern, adjust if needed
+        if (uploadRes?.success) {
+          docId = uploadRes.documentId;
+        } else {
+          throw new Error(uploadRes?.message || "Document upload failed");
+        }
+
+      } catch (err) {
+        console.error("Document Upload Failed:", err);
+
+        setStatusModal({
+          isOpen: true,
+          status: false,
+          message:
+            err?.message ||
+            "Failed to upload document. Please try again.",
+        });
+
+        setIsPreviewModalOpen(false);
+        return; // STOP submission if upload fails
       }
     }
 
     const payload = {
       ...formik.values,
-      productCategoryId: Number(formik.values.productCategoryId),
-      productSubcategoryId: Number(formik.values.productSubcategoryId),
-      productId: Number(formik.values.productId),
+      productCategoryId: parseInt(formik.values.productCategoryId),
+      productSubcategoryId: parseInt(formik.values.productSubcategoryId),
+      productName: parseInt(formik.values.productName),
       annualProductionCap: parseFloat(formik.values.annualProductionCap),
       availableStock: parseFloat(formik.values.availableStock),
       inProduction: formik.values.inProduction,
       dateOfAvailability: formik.values.dateOfAvailability,
       isOrganic: formik.values.isOrganic,
       emartPublish: publishOnEmart,
+      isActive: true,
       docId,
       fpoId: 1,
     };
 
-    if (isUpdateMode && editingId) {
-      console.log("update payload :", payload);
-      await updateCommodityProduction(editingId, payload);
-      setStatusConfig({ status: true, message: "Commodity Production Updated Successfully" });
-    } else {
-      console.log("create payload :", payload);
-      await createCommodityProduction(payload);
-      setStatusConfig({ status: true, message: "Commodity Production Added Successfully" });
+    try {
+      let res;
+
+      if (isUpdateMode && editingId) {
+        res = await updateCommodityProduction(editingId, payload);
+      } else {
+        res = await createCommodityProduction(payload);
+      }
+
+      // Optional: backend success check
+      if (!res?.data || !res.success) {
+        console.log("inside errorrrr");
+        throw new Error(res?.message || "Operation failed");
+      }
+
+      setStatusModal({
+        isOpen: true,
+        status: true,
+        message: isUpdateMode
+          ? "Commodity Production Updated Successfully"
+          : "Commodity Production Added Successfully",
+      });
+
+      setIsPreviewModalOpen(false);
+      resetAll();
+      fetchCommodityList();
+
+    } catch (error) {
+      console.error("Commodity Production API Error:", error);
+
+      setStatusModal({
+        isOpen: true,
+        status: false,
+        message:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Failed to save commodity production. Please try again.",
+      });
+
+      setIsPreviewModalOpen(false);
     }
-    setIsPreviewModalOpen(false);
-    setIsStatusModalOpen(true);
-    resetAll();
-    fetchCommodityList();
+    
   };
 
   const resetAll = () => {
@@ -222,25 +411,25 @@ export const CommodityProduction = () => {
 
   // ------------------- EDIT HANDLER -------------------
   const handleEdit = async (row) => {
-    setIsUpdateMode(true);
-    setEditingId(row.id);
+    try {
+      setIsUpdateMode(true);
+      setEditingId(row.id);
 
-    // Fetch by ID
-    const res = await getCommodityProductionById(row.id);
-    if (res.status === 200 && res.data.success && res.data.data) {
-      const data = res.data.data;
+      // Fetch by ID
+      const res = await getCommodityProductionById(row.id);
+      if (!res?.success || !res?.data) {
+        throw new Error(res?.message || "Failed to fetch crop production details");
+      }
+
+      const data = res.data;
 
       setExistingDocId(data.docId || null);
       setPublishOnEmart(data.emartPublish || false);
 
-      // Load subcategories & products
-      setSubcategories(getSubCategoriesById(data.productCategoryId).data);
-      setProducts(getProductsBySubCategoryId(data.productSubcategoryId).data);
-
       formik.setValues({
-        productCategoryId: data.productCategoryId?.toString() || "",
-        productSubcategoryId: data.productSubcategoryId?.toString() || "",
-        productId: data.productId?.toString() || "",
+        productCategoryId: data.productCategoryId || "",
+        productSubcategoryId: data.productSubcategoryId || "",
+        productName: data.productName || "",
         annualProductionCap: data.annualProductionCap?.toString() || "",
         availableStock: data.availableStock?.toString() || "",
         inProduction: data.inProduction || false,
@@ -250,6 +439,17 @@ export const CommodityProduction = () => {
 
       setUploadedFile(null);
       setPreviewImage(data.docId ? `/mock/uploads/${data.docId}.jpg` : null);
+    } catch (err) {
+      console.error("Edit load failed:", err);
+
+      setStatusModal({
+        isOpen: true,
+        status: false,
+        message:
+          err?.response?.data?.message ||
+          err?.message ||
+          "Failed to load crop production for editing.",
+      });
     }
   };
 
@@ -269,7 +469,7 @@ export const CommodityProduction = () => {
   const previewData = [
     { label: "Product Category", value: categories.find(c => c.productCategoryId == formik.values.productCategoryId)?.productCategoryName || "" },
     { label: "Subcategory", value: subcategories.find(s => s.productSubcategoryId == formik.values.productSubcategoryId)?.subcategoryName || "" },
-    { label: "Product Name", value: products.find(p => p.id == formik.values.productId)?.productName || "" },
+    { label: "Product Name", value: products.find(p => p.id == formik.values.productName)?.productName || "" },
     { label: "Is Organic", value: formik.values.isOrganic ? "Yes" : "No" },
     { label: "Annual Production Capacity", value: formik.values.annualProductionCap },
     { label: "In Production", value: formik.values.inProduction ? "Yes" : "No" },
@@ -278,46 +478,37 @@ export const CommodityProduction = () => {
     { label: "Publish on e-Mart", value: publishOnEmart ? "Yes" : "No" },
   ];
 
-  const mapRowToPreview = (row) => {
-    // Fetch category name
-    let categoryName = "";
-    const catRes = getProductCategories();
-    if (catRes.success) {
-      const cat = catRes.data.find(c => c.productCategoryId === Number(row.productCategoryId));
-      if (cat) categoryName = cat.productCategoryName;
-    }
+  // ------------------- RENDER -------------------
 
-    // Fetch subcategory name
-    let subcategoryName = "";
-    const subRes = getSubCategoriesById(Number(row.productCategoryId));
-    if (subRes.success) {
-      const sub = subRes.data.find(s => s.productSubcategoryId === Number(row.productSubcategoryId));
-      if (sub) subcategoryName = sub.subcategoryName;
-    }
+  const mapRowToPreview = async (id) => {
+    try {
+      // Fetch the full crop production row by ID
+      const res = await getCommodityProductionById(id);
+      if (!res?.success || !res?.data) throw new Error("Failed to fetch row data");
 
-    // Fetch product name
-    let productName = "";
-    const prodRes = getProductsBySubCategoryId(Number(row.productSubcategoryId));
-    if (prodRes.success) {
-      const prod = prodRes.data.find(p => p.id === Number(row.productId));
-      if (prod) productName = prod.productName;
-    }
+      const row = res.data;
+      console.log("row data :", row);
 
-    return [
-      { label: "Product Category", value: categoryName },
-      { label: "Subcategory", value: subcategoryName },
-      { label: "Product Name", value: productName },
-      { label: "Is Organic", value: row.isOrganic ? "Yes" : "No" },
-      { label: "Annual Production Capacity", value: row.annualProductionCap ?? "-" },
-      { label: "In Production", value: row.inProduction ? "Yes" : "No" },
-      { label: "Available Stock for Sale", value: row.availableStock ?? "-" },
-      { label: "Date of Availability", value: row.dateOfAvailability || "-" },
-      { label: "Publish on e-Mart", value: row.emartPublish ? "Yes" : "No" },
-      // { label: "Document", value: row.docId ? `/mock/uploads/${row.docId}.jpg` : "No File" },
-    ];
+      const a = [
+        { label: "Product Category", value: row.productCategoryName },
+        { label: "Subcategory", value: row.productSubcategoryName },
+        { label: "Product Name", value: row.productNameValue },
+        { label: "Is Organic", value: row.isOrganic ? "Yes" : "No" },
+        { label: "Annual Production Capacity", value: row.annualProductionCap ?? "-" },
+        { label: "In Production", value: row.inProduction ? "Yes" : "No" },
+        { label: "Available Stock for Sale", value: row.availableStock ?? "-" },
+        { label: "Date of Availability", value: row.dateOfAvailability || "-" },
+        { label: "Publish on e-Mart", value: row.emartPublish ? "Yes" : "No" },
+
+      ];
+      console.log("a value :", a);
+      return a;
+    } catch (err) {
+      console.error("Error in mapRowToPreview:", err);
+      throw err;
+    }
   };
 
-  // ------------------- RENDER -------------------
   return (
     <div>
       {/* FORM */}
@@ -356,12 +547,12 @@ export const CommodityProduction = () => {
           <SelectField
             label="Product Name"
             required
-            name="productId"
-            value={formik.values.productId}
+            name="productName"
+            value={formik.values.productName}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={formik.errors.productId}
-            touched={formik.touched.productId}
+            error={formik.errors.productName}
+            touched={formik.touched.productName}
           >
             <option value="">Select Product Name</option>
             {products.map(p => <option key={p.id} value={p.id}>{p.productName}</option>)}
@@ -465,7 +656,7 @@ export const CommodityProduction = () => {
           data={commodityList.map(row => ({
             "Product Category": row.productCategoryName || "-",
             Subcategory: row.productSubcategoryName || "-",
-            "Product Name": row.productName || "-",
+            "Product Name": row.productNameValue || "-",
             "Is Organic": row.isOrganic ? "Yes" : "No",
             "Annual Production Capacity": row.annualProductionCap ?? "-",
             "In Production": row.inProduction ? "Yes" : "No",
@@ -477,18 +668,31 @@ export const CommodityProduction = () => {
           renderActions={row => (
             <div className="flex gap-2 items-center justify-center">
               <img src={editSvg} alt="edit" className="w-6 cursor-pointer" onClick={() => handleEdit(row)} />
-              {/* <img src={viewSvg} alt="view" className="w-6 cursor-pointer" onClick={() => {
-                setPreviewImage(row.docId ? `/mock/uploads/${row.docId}.jpg` : null);
-                setIsPreviewModalOpen(true);
-              }} /> */}
+  
               <img
                 src={viewSvg}
                 alt="view"
                 className="w-6 cursor-pointer"
-                onClick={() => {
-                  setRowPreviewData(row);   // <-- store row data
-                  setPreviewTitle("View");
-                  setIsPreviewModalOpen(true);
+                onClick={async () => {
+                  try {
+                    setPreviewTitle("View");
+
+                    // Fetch preview data asynchronously
+                    const resolvedPreview = await mapRowToPreview(row.id);
+                    console.log("resolved :", resolvedPreview);
+                    setAsyncPreviewData(resolvedPreview); // store in state
+                    setIsPreviewModalOpen(true); // open modal
+                  } catch (err) {
+                    console.error("Preview load failed:", err);
+                    setStatusModal({
+                      isOpen: true,
+                      status: false,
+                      message:
+                        err?.response?.data?.message ||
+                        err?.message ||
+                        "Failed to load preview data",
+                    });
+                  }
                 }}
               />
               <div
@@ -504,33 +708,29 @@ export const CommodityProduction = () => {
         />
       </div>
 
-      {/* <PreviewModal
-        isOpen={isPreviewModalOpen}
-        onClose={() => setIsPreviewModalOpen(false)}
-        onConfirm={handlePreviewConfirm}
-        data={previewData}
-        image={previewImage}
-      /> */}
 
       <PreviewModal
         isOpen={isPreviewModalOpen}
         title={previewTitle}
-        data={rowPreviewData ? mapRowToPreview(rowPreviewData) : previewData}
-        onConfirm={rowPreviewData ? null : handlePreviewConfirm}
-        actionButton={rowPreviewData ? false : true}
+        data={asyncPreviewData ? asyncPreviewData : previewData}
+        onConfirm={asyncPreviewData ? null : handlePreviewConfirm}
+        actionButton={asyncPreviewData ? false : true}
         isDescriptionAvailable={false}
+        isUpdateMode={isUpdateMode}
         image={previewImage}
         onClose={() => {
-          setRowPreviewData(null); // reset after closing
+          setAsyncPreviewData(null); // reset after closing
           setIsPreviewModalOpen(false);
         }}
       />
 
       <StatusModal
-        isOpen={isStatusModalOpen}
-        onClose={() => setIsStatusModalOpen(false)}
-        status={statusConfig.status}
-        message={statusConfig.message}
+        isOpen={statusModal.isOpen}
+        onClose={() =>
+          setStatusModal((prev) => ({ ...prev, isOpen: false }))
+        }
+        status={statusModal.status}
+        message={statusModal.message}
       />
 
       <ValidationModal

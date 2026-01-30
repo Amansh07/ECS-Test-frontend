@@ -1,4 +1,5 @@
 import { api8084Client } from "./clients";
+
 // ---------------- CROP PRODUCTION CREATE ----------------
 export const createCropProduction = async (payload) => {
   const response = await api8084Client.post(
@@ -41,3 +42,48 @@ export const getCropProductionById = async (id) => {
   );
   return response;
 };
+
+
+// ---------------- CROP PRODUCTION CREATE ----------------
+export const createCommodityProduction = async (payload) => {
+  const response = await api8084Client.post(
+    "/api/v1/inventory/commodity-productions",
+    payload
+  );
+
+  // response is already unwrapped
+  return response;
+};
+
+// ---------------- CROP PRODUCTION UPDATE ----------------
+export const updateCommodityProduction = async (id, payload) => {
+  const response = await api8084Client.put(
+    `/api/v1/inventory/commodity-productions/${id}`,
+    payload
+  );
+  return response;
+};
+
+// ---------------- CROP PRODUCTION LIST ----------------
+export const getCommodityProductionList = async ({
+  fpoId,
+  page = 0,
+  size = 10,
+  sort = "asc",
+}) => {
+  const response = await api8084Client.get(
+    `/api/v1/inventory/commodity-productions/list?fpoId=${fpoId}&page=${page}&size=${size}&sort=${sort}`
+  );
+
+  // response is already unwrapped
+  return response;
+};
+
+// ---------------- CROP PRODUCTION GET BY ID ----------------
+export const getCommodityProductionById = async (id) => {
+  const response = await api8084Client.get(
+    `/api/v1/inventory/commodity-productions/${id}`
+  );
+  return response;
+};
+

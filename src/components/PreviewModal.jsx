@@ -4,6 +4,7 @@ export default function PreviewModal({
     isOpen,
     onClose,
     onConfirm,
+    isUpdateMode,
     title = "Preview",
     image,
     actionButton,
@@ -127,7 +128,7 @@ export default function PreviewModal({
                         onClick={() => onConfirm(descriptionText)}
                         className="w-full sm:w-auto px-6 py-2 rounded-md bg-success text-white font-medium hover:bg-[#2e7d10] transition-colors shadow-sm"
                     >
-                        Add to Production List
+                       {isUpdateMode ? "Update Production List" : "Add to Production List"}
                     </button>
                 </div>}
 

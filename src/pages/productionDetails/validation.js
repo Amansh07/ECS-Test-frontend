@@ -21,7 +21,7 @@ export const cropProductionValidationSchema = Yup.object().shape({
 export const commodityProductionValidationSchema = Yup.object({
   productCategoryId: Yup.string().required("Category is required"),
   productSubcategoryId: Yup.string().required("Subcategory is required"),
-  productId: Yup.string().required("Product is required"),
+  productName: Yup.string().required("Product is required"),
   annualProductionCap: Yup.number().typeError("Must be a number").required("Annual Production Cap is required"),
   availableStock: Yup.number().typeError("Must be a number").required("Available Stock is required"),
   dateOfAvailability: Yup.string().required("Date of Availability is required"),
