@@ -17,6 +17,7 @@ import {
 } from '../../api/workflow';
 import RegistrationForm from '../registration/RegistrationForm';
 import { getGeneral } from '../../api/master';
+import ViewForm from './ViewForm';
 
 
 
@@ -415,8 +416,8 @@ const AdminDashboard = () => {
                     isActive={activeTile === 'pending'}
                     tileClasses={`
                 relative flex items-center p-6 rounded-lg cursor-pointer transition-all duration-300 shadow-md
-                ${activeTile === 'pending' ? 'bg-warning-800 shadow-2xl shadow-orange-950' : 'bg-warning-500'}
-                hover:bg-warning-800
+                ${activeTile === 'pending' ? 'bg-warning-600 shadow-2xl shadow-orange-800' : 'bg-warning-500'}
+                hover:bg-warning-600
                 text-white gap-6 overflow-hidden h-[120px]
             `}
                     onClick={() => handleTileClick('pending')}
@@ -457,8 +458,8 @@ const AdminDashboard = () => {
                     <div className='mb-4'>
                         <span>FPO Name : </span> <span className='font-semibold text-primary-800'>{selectedRow?.fpoName}</span>
                     </div>
-                    <RegistrationForm disabled={true} />
-
+                    {/* <RegistrationForm disabled={true} data={selectedRow} /> */}
+                    <ViewForm disabled={true} data={selectedRow} />
                     <div className="mt-8 flex justify-center">
                         <Button
                             onClick={() => setIsActionModalOpen(true)}
