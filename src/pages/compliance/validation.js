@@ -1,4 +1,19 @@
+// validation.js
 import * as Yup from "yup";
+
+/**
+ * Convert a possibly comma-formatted string like "10,00,000"
+ * into a number for Yup.number() to validate.
+ * - If the user left it empty, return NaN so Yup triggers typeError/required as appropriate.
+ */
+const toNumber = (originalValue) => {
+  if (typeof originalValue === "string") {
+    const stripped = originalValue.replace(/,/g, "").trim();
+    if (stripped === "") return NaN; // lets Yup raise required/typeError correctly
+    return Number(stripped);
+  }
+  return originalValue;
+};
 
 export const fpoCapitalValidationSchema = Yup.object({
   totalEquity: Yup.string()
@@ -67,16 +82,19 @@ export const annualTurnoverValidationSchema = Yup.object({
     .required("Financial Year is required"),
 
   annualTurnover: Yup.number()
+    .transform((val, orig) => toNumber(orig))
     .typeError("Annual Turnover must be a number")
     .positive("Annual Turnover must be greater than zero")
     .required("Annual Turnover is required"),
 
   totalAnnualProfit: Yup.number()
+    .transform((val, orig) => toNumber(orig))
     .typeError("Total Annual Profit must be a number")
     .positive("Total Annual Profit must be greater than zero")
     .required("Total Annual Profit is required"),
 
   totalDividendPaid: Yup.number()
+    .transform((val, orig) => toNumber(orig))
     .typeError("Total Dividend Paid must be a number")
     .min(0, "Total Dividend Paid cannot be negative")
     .nullable(),
