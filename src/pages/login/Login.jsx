@@ -164,11 +164,11 @@ export default function Login() {
 
         localStorage.setItem("role", res.data.roles[3]);
         // Redirect after 3 seconds
-        setTimeout(() => {
+        // setTimeout(() => {
           setStatusModal({ isOpen: false, status: true, message: "" });
           if (res.data.roles[3] === "Admin") navigate("/adminDashboard", { replace: true });
           else navigate("/member-management", { replace: true });
-        }, 3000);
+        // }, 3000);
       } catch (error) {
         setStatusModal({
           isOpen: true,
