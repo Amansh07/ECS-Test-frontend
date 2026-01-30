@@ -203,7 +203,7 @@ export const AnnualTurnover = () => {
         <h2 className="text-base font-bold mb-6">Annual Turnover & Profit</h2>
 
         {/* Form Fields */}
-		<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <SelectField
             label="Financial Year"
             name="financialYear"
@@ -213,7 +213,7 @@ export const AnnualTurnover = () => {
             onBlur={formik.handleBlur}
             error={formik.errors.financialYear}
             touched={formik.touched.financialYear}
-			>
+          >
             <option value="">Financial Year</option>
             <option value="2024-25">2024-25</option>
             <option value="2023-24">2023-24</option>
@@ -304,7 +304,7 @@ export const AnnualTurnover = () => {
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-stroke-200">
+      <div className="bg-white p-6 mt-5 rounded-lg shadow-sm border border-stroke-200">
         <h3 className="text-lg font-semibold text-grey-900 mb-6">Annual Turnover and Profit Detail View Table</h3>
         <Table
           columns={[
@@ -318,7 +318,7 @@ export const AnnualTurnover = () => {
           data={turnoverList}
           renderActions={(row) => (
             <div className="flex items-center justify-center gap-4">
-			{/*<img src={editSvg} alt="Edit" className="w-6 h-6 cursor-pointer" onClick={() => handleEdit(row)} />
+              {/*<img src={editSvg} alt="Edit" className="w-6 h-6 cursor-pointer" onClick={() => handleEdit(row)} />
 			<img src={viewSvg} alt="View" className="w-6 h-6 cursor-pointer" />*/}
               <img src={deleteSvg} alt="Delete" className="w-6 h-6 cursor-pointer" onClick={() => handleDelete(row.id)} />
             </div>
@@ -343,7 +343,7 @@ export const AnnualTurnover = () => {
       </div>
 
       {/* Deleted List */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-stroke-200">
+      <div className="bg-white p-6 mt-5 rounded-lg shadow-sm border border-stroke-200">
         <h3 className="text-lg font-semibold text-grey-900 mb-6">Deleted Annual Turnover Data</h3>
         <Table
           columns={[

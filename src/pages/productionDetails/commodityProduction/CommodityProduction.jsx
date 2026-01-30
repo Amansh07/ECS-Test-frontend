@@ -321,7 +321,7 @@ export const CommodityProduction = () => {
   return (
     <div>
       {/* FORM */}
-      <div className="border border-stroke-200 rounded-[8px] p-[16px]">
+      <div className="border border-stroke-200 rounded-[8px] p-[16px] bg-white">
         <h2 className="text-base font-bold mb-6">{isUpdateMode ? "Update Commodity Production" : "Add Commodity Production"}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -459,7 +459,7 @@ export const CommodityProduction = () => {
       </div>
 
       {/* TABLE */}
-      <div className="mt-8">
+      <div className="mt-8 bg-white p-6 rounded-lg shadow-sm border border-stroke-200">
         <Table
           columns={columns}
           data={commodityList.map(row => ({

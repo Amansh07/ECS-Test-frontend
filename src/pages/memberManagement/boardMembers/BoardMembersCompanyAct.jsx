@@ -116,7 +116,7 @@ export const BoardMembersCompanyAct = () => {
 
     return (
         <div>
-            <div className='border border-stroke-200 rounded-[8px] p-[16px]'>
+            <div className='border border-stroke-200 rounded-[8px] p-[16px] bg-white'>
                 <h2 className="text-base font-bold mb-4">Board Member Details</h2>
 
                 <div className="grid grid-cols-12 gap-4">
@@ -136,31 +136,33 @@ export const BoardMembersCompanyAct = () => {
 
             <h2 className="text-base font-medium my-[16px]">Board Member Detail view form</h2>
 
-            <Table
-                columns={[
-                    "Name",
-                    "Father's/Husband's Name",
-                    "DIN",
-                    "DIN Status",
-                    "DOB",
-                    "Association Status",
-                    "Gender",
-                    "Mobile Number",
-                    "Actions"
-                ]}
-                data={sampleData}
-                stickyLastColumn={false}
-                renderActions={(row) => (
-                    <div className="flex items-center justify-center gap-[34px]">
-                        <img
-                            src={editSvg}
-                            alt="Edit"
-                            className="w-[32px] h-[32px] cursor-pointer"
-                            onClick={() => handleEditClick(row)}
-                        />
-                    </div>
-                )}
-            />
+            <div className="border border-stroke-200 rounded-[8px] p-[16px] bg-white">
+                <Table
+                    columns={[
+                        "Name",
+                        "Father's/Husband's Name",
+                        "DIN",
+                        "DIN Status",
+                        "DOB",
+                        "Association Status",
+                        "Gender",
+                        "Mobile Number",
+                        "Actions"
+                    ]}
+                    data={sampleData}
+                    stickyLastColumn={false}
+                    renderActions={(row) => (
+                        <div className="flex items-center justify-center gap-[34px]">
+                            <img
+                                src={editSvg}
+                                alt="Edit"
+                                className="w-[32px] h-[32px] cursor-pointer"
+                                onClick={() => handleEditClick(row)}
+                            />
+                        </div>
+                    )}
+                />
+            </div>
 
             {/* Form Modal */}
             <FormModal

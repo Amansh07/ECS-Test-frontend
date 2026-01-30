@@ -28,7 +28,7 @@ export const Infrastructure = () => {
     const [editingId, setEditingId] = useState(null);
     const [statusConfig, setStatusConfig] = useState({ success: true, message: '' });
     const [isStatusOpen, setIsStatusOpen] = useState(false);
-    
+
     // Validation Modal State
     const [showValidationModal, setShowValidationModal] = useState(false);
     const [validationTitle, setValidationTitle] = useState("");
@@ -53,7 +53,7 @@ export const Infrastructure = () => {
                     return acc;
                 }, {})
             );
-            
+
             // Show validation modal
             setValidationTitle("Validation Required");
             setValidationMessage("Please complete all required fields before proceeding.");
@@ -129,7 +129,7 @@ export const Infrastructure = () => {
     };
 
     return (
-        <div className='border border-stroke-200 rounded-[8px] p-[16px]'>
+        <div className='border border-stroke-200 rounded-[8px] p-[16px] bg-white'>
             <h2 className="text-base font-bold mb-6">FPO Infrastructure update form</h2>
 
             {/* Form Fields */}

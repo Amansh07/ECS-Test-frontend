@@ -105,7 +105,7 @@ export const BoardMembers = () => {
   /* ================= UI ================= */
   return (
     <div>
-      <div className="border border-stroke-200 rounded-[8px] p-[16px]">
+      <div className="border border-stroke-200 rounded-[8px] p-[16px] bg-white">
         <h2 className="text-base font-normal text-text-dark">
           Board Member Update Form
         </h2>
@@ -287,19 +287,21 @@ export const BoardMembers = () => {
         Board Member Detail view form
       </h2>
 
-      <Table
-        columns={["Name", "Father's/Husband's Name", "Designation", "Gender", "Actions"]}
-        data={sampleData}
-        renderActions={() => (
-          <div className="flex items-center justify-center gap-8">
-            <img
-              src={editSvg}
-              alt="Edit"
-              className="w-8 h-8 cursor-pointer"
-            />
-          </div>
-        )}
-      />
+      <div className="border border-stroke-200 rounded-[8px] p-[16px] bg-white">
+        <Table
+          columns={["Name", "Father's/Husband's Name", "Designation", "Gender", "Actions"]}
+          data={sampleData}
+          renderActions={() => (
+            <div className="flex items-center justify-center gap-8">
+              <img
+                src={editSvg}
+                alt="Edit"
+                className="w-8 h-8 cursor-pointer"
+              />
+            </div>
+          )}
+        />
+      </div>
     </div>
   );
 };

@@ -15,7 +15,7 @@ import viewSvg from "../../../assets/view.svg";
 import { cropProductionValidationSchema } from "../validation";
 import ValidationModal from "../../../components/ValidationModal";
 // import { startRecording, stopRecordingAndTranscribe } from "../../../utils/speechToText";
-import {  } from "../../../api/productionDetails";
+import { } from "../../../api/productionDetails";
 import { uploadSingleDocument } from "../../../api/upload";
 import { createCropProduction, updateCropProduction, getCropProductionList, getCropProductionById } from "../../../api/productionDetails";
 import { getGeneral, getCropsBySeason, getVarietiesByCrop } from "../../../api/master";
@@ -599,7 +599,7 @@ export const CropProduction = () => {
   return (
     <div>
       {/* FORM */}
-      <div className="border border-stroke-200 rounded-[8px] p-[16px]">
+      <div className="border border-stroke-200 rounded-[8px] p-[16px] bg-white">
         <h2 className="text-base font-bold mb-6">
           {isUpdateMode ? "Update Crop Production" : "Crop Production Update"}
         </h2>
@@ -767,7 +767,7 @@ export const CropProduction = () => {
       </div>
 
       {/* TABLE */}
-      <div className="mt-8">
+      <div className="mt-8 bg-white p-6 rounded-lg shadow-sm border border-stroke-200">
         <Table
           columns={columns}
           data={productionList.map((row) => ({

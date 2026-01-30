@@ -252,7 +252,7 @@ export const InsecticideOrPesticideDetails = () => {
   // ================= UI =================
   return (
     <div>
-      <div className="border border-stroke-200 rounded-[8px] p-[16px]">
+      <div className="border border-stroke-200 rounded-[8px] p-[16px] bg-white">
         <h2 className="text-base font-bold mb-6">Insecticide / Pesticide Details</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -407,65 +407,66 @@ export const InsecticideOrPesticideDetails = () => {
 
       <h3 className="font-bold text-base mb-[27px] mt-6">Insecticide / Pesticide Listing</h3>
 
-      <Table
-        columns={[
-          "Insecticide/Pesticide Type",
-          "Insecticide/Pesticide Name",
-          "Name of Manufacturer",
-          "Quantity Type",
-          "Quantity",
-          "CIB & RC Number",
-          "CIB & RC Issue Date",
-          "Insecticide/Pesticide Description",
-          "Actions",
-        ]}
-        data={insecticideList.map(row => ({
-          "Insecticide/Pesticide Type": row.insecticideTypeName || "-",
-          "Insecticide/Pesticide Name": row.insecticideName || "-",
-          "Name of Manufacturer": row.manufacturerName || "-",
-          "Quantity Type": row.quantityTypeName || "-",
-          "Quantity": row.quantity || "-",
-          "CIB & RC Number": row.cibRcNumber || "-",
-          "CIB & RC Issue Date": row.cibRcIssueDate || "-",
-          "Insecticide/Pesticide Description": row.remarks || "-",
-          ...row,
-        }))}
-        renderActions={(row) => (
-          <div className="flex gap-2 items-center">
-            <img
-              src={editSvg}
-              className="w-6 cursor-pointer"
-              onClick={() => handleEdit(row.id)}
-            />
-            {/* <img
+      <div className="border border-stroke-200 rounded-[8px] p-[16px] bg-white">
+        <Table
+          columns={[
+            "Insecticide/Pesticide Type",
+            "Insecticide/Pesticide Name",
+            "Name of Manufacturer",
+            "Quantity Type",
+            "Quantity",
+            "CIB & RC Number",
+            "CIB & RC Issue Date",
+            "Insecticide/Pesticide Description",
+            "Actions",
+          ]}
+          data={insecticideList.map(row => ({
+            "Insecticide/Pesticide Type": row.insecticideTypeName || "-",
+            "Insecticide/Pesticide Name": row.insecticideName || "-",
+            "Name of Manufacturer": row.manufacturerName || "-",
+            "Quantity Type": row.quantityTypeName || "-",
+            "Quantity": row.quantity || "-",
+            "CIB & RC Number": row.cibRcNumber || "-",
+            "CIB & RC Issue Date": row.cibRcIssueDate || "-",
+            "Insecticide/Pesticide Description": row.remarks || "-",
+            ...row,
+          }))}
+          renderActions={(row) => (
+            <div className="flex gap-2 items-center">
+              <img
+                src={editSvg}
+                className="w-6 cursor-pointer"
+                onClick={() => handleEdit(row.id)}
+              />
+              {/* <img
               src={viewSvg}
               className="w-6 cursor-pointer"
               onClick={() => alert("View functionality coming soon")}
             /> */}
 
-            <img
-              src={viewSvg}
-              alt="view"
-              className="w-6 cursor-pointer"
-              onClick={() => {
-                setRowPreviewData(row);   // <-- store row data
-                setPreviewTitle("View");
-                setIsPreviewModalOpen(true);
-              }}
-            />
+              <img
+                src={viewSvg}
+                alt="view"
+                className="w-6 cursor-pointer"
+                onClick={() => {
+                  setRowPreviewData(row);   // <-- store row data
+                  setPreviewTitle("View");
+                  setIsPreviewModalOpen(true);
+                }}
+              />
 
-            <div
-              className={`w-[137px] text-[14px] font-normal px-[12px] py-[6px] rounded-lg flex items-center justify-center
+              <div
+                className={`w-[137px] text-[14px] font-normal px-[12px] py-[6px] rounded-lg flex items-center justify-center
                 ${row.publishEmart ? "bg-primary-100 text-dark" : "bg-danger-50 text-dark"}
               `}
-            >
-              {row.publishEmart ? "✓ Publish Emart" : "Publish Emart"}
+              >
+                {row.publishEmart ? "✓ Publish Emart" : "Publish Emart"}
+              </div>
             </div>
-          </div>
-        )}
-        stickyLastColumn
-      />
-
+          )}
+          stickyLastColumn
+        />
+      </div>
       {/* <PreviewModal
         isOpen={isPreviewModalOpen}
         onClose={() => setIsPreviewModalOpen(false)}

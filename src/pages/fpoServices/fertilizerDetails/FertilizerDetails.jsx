@@ -263,7 +263,7 @@ export const FertilizerDetails = () => {
   // ================= UI =================
   return (
     <div>
-      <div className="border border-stroke-200 rounded-[8px] p-[16px]">
+      <div className="border border-stroke-200 rounded-[8px] p-[16px] bg-white">
         <h2 className="text-base font-bold mb-6">Fertilizer Details</h2>
 
         {/* FORM FIELDS */}
@@ -424,64 +424,65 @@ export const FertilizerDetails = () => {
       {/* LIST TABLE */}
       <h3 className="font-bold text-base mb-[27px] mt-6">Fertilizer Listing</h3>
 
-      <Table
-        columns={[
-          "Fertilizer Type",
-          "Fertilizer Name",
-          "Fertilizer Grade",
-          "Name of Manufacturer",
-          "Quantity Type",
-          "Quantity",
-          "Crop Description",
-          "Actions",
-        ]}
-        data={fertilizerList.map(row => ({
-          "Fertilizer Type": row.fertilizerTypeName || "-",
-          "Fertilizer Name": row.fertilizerName || "-",
-          "Fertilizer Grade": row.fertilizerGradeName || "-",
-          "Name of Manufacturer": row.manufacturerName || "-",
-          "Quantity Type": row.quantityTypeName || "-",
-          "Crop Description": row.remarks || "-",
-          "Quantity": row.quantity || "-",
-          ...row,
-        }))}
-        renderActions={(row) => (
-          <div className="flex gap-2 items-center justify-center">
-            <img
-              src={editSvg}
-              className="w-6 cursor-pointer"
-              onClick={() => handleEdit(row.id)}
-            />
+      <div className="border border-stroke-200 rounded-[8px] p-[16px] bg-white">
+        <Table
+          columns={[
+            "Fertilizer Type",
+            "Fertilizer Name",
+            "Fertilizer Grade",
+            "Name of Manufacturer",
+            "Quantity Type",
+            "Quantity",
+            "Crop Description",
+            "Actions",
+          ]}
+          data={fertilizerList.map(row => ({
+            "Fertilizer Type": row.fertilizerTypeName || "-",
+            "Fertilizer Name": row.fertilizerName || "-",
+            "Fertilizer Grade": row.fertilizerGradeName || "-",
+            "Name of Manufacturer": row.manufacturerName || "-",
+            "Quantity Type": row.quantityTypeName || "-",
+            "Crop Description": row.remarks || "-",
+            "Quantity": row.quantity || "-",
+            ...row,
+          }))}
+          renderActions={(row) => (
+            <div className="flex gap-2 items-center justify-center">
+              <img
+                src={editSvg}
+                className="w-6 cursor-pointer"
+                onClick={() => handleEdit(row.id)}
+              />
 
-            {/* <img
+              {/* <img
               src={viewSvg}
               className="w-6 cursor-pointer"
               onClick={() => alert("View functionality coming soon")}
             /> */}
 
-            <img
-              src={viewSvg}
-              alt="view"
-              className="w-6 cursor-pointer"
-              onClick={() => {
-                setRowPreviewData(row);   // <-- store row data
-                setPreviewTitle("View");
-                setIsPreviewModalOpen(true);
-              }}
-            />
+              <img
+                src={viewSvg}
+                alt="view"
+                className="w-6 cursor-pointer"
+                onClick={() => {
+                  setRowPreviewData(row);   // <-- store row data
+                  setPreviewTitle("View");
+                  setIsPreviewModalOpen(true);
+                }}
+              />
 
-            <div
-              className={`w-[137px] text-[14px] font-normal px-[12px] py-[6px] rounded-lg flex items-center justify-center
+              <div
+                className={`w-[137px] text-[14px] font-normal px-[12px] py-[6px] rounded-lg flex items-center justify-center
                 ${row.publishEmart ? "bg-primary-100 text-dark" : "bg-danger-50 text-dark"}
               `}
-            >
-              {row.publishEmart ? "✓ Publish Emart" : "Publish Emart"}
+              >
+                {row.publishEmart ? "✓ Publish Emart" : "Publish Emart"}
+              </div>
             </div>
-          </div>
-        )}
-        stickyLastColumn
-      />
-
+          )}
+          stickyLastColumn
+        />
+      </div>
       {/* PREVIEW MODAL */}
       {/* <PreviewModal
         isOpen={isPreviewModalOpen}

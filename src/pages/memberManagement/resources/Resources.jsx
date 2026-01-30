@@ -249,7 +249,7 @@ export const Resources = () => {
 
   /* ================= RENDER ================= */
   return (
-    <div>
+    <div className="border border-stroke-200 rounded-[8px] p-[16px] bg-white">
       <h2 className="text-base font-bold mb-6">FPO Resource Update Form</h2>
 
       {/* Form Fields */}
@@ -464,10 +464,10 @@ export const Resources = () => {
                   r?.gender === 1
                     ? "Male"
                     : r?.gender === 2
-                    ? "Female"
-                    : r?.gender === 3
-                    ? "Other"
-                    : "",
+                      ? "Female"
+                      : r?.gender === 3
+                        ? "Other"
+                        : "",
                 "Email Address": r?.emailAddress ?? "",
                 "Mobile Number": r?.mobileNo ?? "",
                 "District": r?.district ?? "",
@@ -481,7 +481,7 @@ export const Resources = () => {
             const src = row?.__raw ?? row;
             return (
               <div className="flex items-center justify-center gap-4">
-			  {/*<img
+                {/*<img
                   src={editSvg}
                   alt="Edit"
                   className="w-6 h-6 cursor-pointer"
