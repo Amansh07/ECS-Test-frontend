@@ -82,7 +82,8 @@ const StateExtension = ({ formik, pageId }) => {
   return (
     <div className="border border-stroke-200 rounded-[8px] p-[16px] bg-gray-50 mt-6 mb-6">
       <h3 className="text-base font-bold mb-4">
-        State Extension Details ({extensionData.stateCode})
+        Additional Required Details
+        {/* ({extensionData.stateCode}) */}
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -102,8 +103,8 @@ const StateExtension = ({ formik, pageId }) => {
                   value={formik.values.stateExtension?.[field.fieldName] || ''}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                   error={formik.errors.stateExtension?.[field.fieldName]}
-  touched={formik.touched.stateExtension?.[field.fieldName]}
+                  error={formik.errors.stateExtension?.[field.fieldName]}
+                  touched={formik.touched.stateExtension?.[field.fieldName]}
                 />
               );
 
@@ -117,8 +118,8 @@ const StateExtension = ({ formik, pageId }) => {
                   value={formik.values.stateExtension?.[field.fieldName] || ''}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                 error={formik.errors.stateExtension?.[field.fieldName]}
-  touched={formik.touched.stateExtension?.[field.fieldName]}
+                  error={formik.errors.stateExtension?.[field.fieldName]}
+                  touched={formik.touched.stateExtension?.[field.fieldName]}
                 >
                   <option value="">Select {field.label}</option>
                   {field.allowedValues.map(v => (
@@ -138,8 +139,8 @@ const StateExtension = ({ formik, pageId }) => {
                   value={formik.values.stateExtension?.[field.fieldName] || ''}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                   error={formik.errors.stateExtension?.[field.fieldName]}
-  touched={formik.touched.stateExtension?.[field.fieldName]}
+                  error={formik.errors.stateExtension?.[field.fieldName]}
+                  touched={formik.touched.stateExtension?.[field.fieldName]}
                 />
               );
 

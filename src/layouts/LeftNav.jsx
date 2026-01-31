@@ -9,10 +9,12 @@ import ProductionDetailsMenu from "../assets/ProductionDetailsMenu.svg";
 
 const navItems = [
   // { to: "/registration", label: "Registration", icon: "📝" },
-  { to: "/production-details", label: "Production Details", icon: "", src: ProductionDetailsMenu },
-  { to: "/compliance", label: "Compliance", icon: "", src: complianceMenu },
-  { to: "/fpo-services", label: "FPO Services", icon: "", src: FpoServices },
   { to: "/member-management", label: "Member Management", icon: "", src: memberManagement },
+  { to: "/production-details", label: "Production Details", icon: "", src: ProductionDetailsMenu },
+  { to: "/fpo-services", label: "FPO Services", icon: "", src: FpoServices },
+  { to: "/compliance", label: "Compliance", icon: "", src: complianceMenu },
+
+
   // { to: "/fpograding", label: "FPO Grading", icon: "", src: fpograding },
 ];
 

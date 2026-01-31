@@ -110,9 +110,9 @@ export default function MainLayout() {
     { title: "Farmers", path: "farmers" },
     { title: "Board Members", path: "board-members" },
     { title: "Board Members (Company Act)", path: "board-members-company-act" },
-    { title: "Resources", path: "resources" },
+    { title: "Employees", path: "employees" },
     { title: "Mentors", path: "mentors" },
-    { title: "FPO Land Details Update/View", path: "land-details" },
+    // { title: "FPO Land Details Update/View", path: "land-details" },
   ];
 
   const productionDetailsTabs = [

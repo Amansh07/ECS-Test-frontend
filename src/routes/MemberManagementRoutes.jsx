@@ -14,7 +14,7 @@ const MemberManagementRoutes = () => (
     <Route path="farmers" element={<Farmers />} />
     <Route path="board-members" element={<BoardMembers />} />
     <Route path="board-members-company-act" element={<BoardMembersCompanyAct />} />
-    <Route path="resources" element={<Resources />} />
+    <Route path="employees" element={<Resources />} />
     <Route path="mentors" element={<Mentors />} />
     <Route path="land-details" element={<FarmerLandDetails />} />
   </Route>

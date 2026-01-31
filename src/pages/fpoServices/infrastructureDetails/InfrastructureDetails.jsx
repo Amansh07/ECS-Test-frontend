@@ -61,6 +61,8 @@ export const InfrastructureDetails = () => {
         validateOnBlur: true,
     });
 
+    const { values, handleChange, handleBlur, setFieldValue, setFieldTouched, touched, errors } = formik;
+
     // ------------------- LOAD DATA -------------------
     useEffect(() => {
         fetchInfraList();
@@ -206,9 +208,24 @@ export const InfrastructureDetails = () => {
         setIsConfirmationOpen(true);
     };
 
+    useEffect(() => {
+        console.log("formik.values.category", formik.values.category);
+        formik.validateField('category');
+    }, [formik.values.category]);
+
+    useEffect(() => {
+        console.log("formik.values.subCategory", formik.values.subCategory);
+        formik.validateField('subCategory');
+    }, [formik.values.subCategory]);
+
+    useEffect(() => {
+        formik.validateField('capacity');
+    }, [formik.values.capacity])
+
     const handleChangeOnselectCategory = async (e) => {
         const categoryId = e.target.value;
         formik.handleChange(e);
+        console.log("categoryId", formik.values.category);
         formik.setFieldValue('subCategory', ''); // Reset subcategory
         formik.setFieldValue('unit', ''); // Reset unit
 
@@ -235,10 +252,25 @@ export const InfrastructureDetails = () => {
         setIsSubCategoryLoading(false);
     };
 
+    // useEffect(() => {
+    //     console.log(formik.values);
+
+
+    //     // if (formik.values.category && formik.values.subCategory) {
+    //     if (values.category && values.subCategory) {
+    //         const selectedOption = optionsData.find(opt => opt.value === values.subCategory);
+    //         if (selectedOption) {
+    //             formik.setFieldValue('unit', selectedOption.unit);
+    //         }
+    //     }
+    // }, [values.subCategory]);
     const handleChangeOnSelectSubCategory = (e) => {
         const subCategoryId = parseInt(e.target.value);
+        console.log(formik.values.subCategory);
+        console.log("subCategoryId", subCategoryId);
+        formik.setFieldValue('subCategory', subCategoryId);
         formik.handleChange(e);
-
+        console.log(formik.values.subCategory);
         // Find selected option to set Unit
         const selectedOption = optionsData.find(opt => opt.value === subCategoryId);
         if (selectedOption) {
@@ -269,7 +301,7 @@ export const InfrastructureDetails = () => {
                         label="Infrastructure Category"
                         name="category"
                         required
-                        value={formik.values.category}
+                        value={formik.values.category?.toString() || ''}
                         onChange={handleChangeOnselectCategory}
                         onBlur={formik.handleBlur}
                         error={formik.errors.category}
@@ -285,8 +317,9 @@ export const InfrastructureDetails = () => {
                         label="Infrastructure Subcategory"
                         name="subCategory"
                         required
-                        value={formik.values.subCategory}
+                        value={formik.values.subCategory?.toString() || ''}
                         onChange={handleChangeOnSelectSubCategory}
+                        // onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         error={formik.errors.subCategory}
                         touched={formik.touched.subCategory}

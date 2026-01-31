@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import "./header.css";
 import { Button } from "../components/Buttons";
 import companyLogo from "../assets/logo1.png";
+import companyLogo2 from "../assets/government-of-india.jpg";
 import indianEmblem from "../assets/logo2.png";
 import Breadcrumb from "../components/Breadcrumb";
 import { useNavigate } from "react-router-dom";
@@ -162,7 +163,9 @@ export default function Header() {
 					<div className="fpo-header-left">
 						{/* Logo block */}
 						<div className="fpo-logo-block">
-							<img src={companyLogo} width={"54"} height={"48"} className="cursor-pointer" alt="CompanyLogo" />
+							{/* <img src={companyLogo} width={"54"} height={"48"} className="cursor-pointer" alt="CompanyLogo" /> */}
+							{/* <img src={companyLogo} width={"54"} height={"48"} className="cursor-pointer" alt="CompanyLogo" /> */}
+							<img src={companyLogo2} width={"54"} height={"48"} className="cursor-pointer" alt="CompanyLogo" />
 							<div className="fpo-logo-icon" />
 							<img src={indianEmblem} width={"50"} height={"50"} className="cursor-pointer" alt="indian Emblem logo" />
 							<span className="fpo-logo-text">FPO Shakti</span>
@@ -346,7 +349,7 @@ export default function Header() {
 						<a href="/" className="fpo-nav-mobile-link">Home</a>
 						<a href="/services" className="fpo-nav-mobile-link">Services</a>
 						<a href="/about" className="fpo-nav-mobile-link">About</a>
-						<a href="/resources" className="fpo-nav-mobile-link">Resources</a>
+						<a href="/employees" className="fpo-nav-mobile-link">Employees</a>
 						<a href="/gallery" className="fpo-nav-mobile-link">Gallery</a>
 					</nav>
 				)}

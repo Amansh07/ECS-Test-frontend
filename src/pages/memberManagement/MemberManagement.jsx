@@ -9,9 +9,9 @@ const cards = [
   { title: "Farmers", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "farmers" },
   { title: "Board Members", description: "Lorem ipsum dolor sit amet", icon: boardMembers, path: "board-members" },
   { title: "Board Members (Company Act)", description: "Lorem ipsum dolor sit amet", icon: boardMembers, path: "board-members-company-act" },
-  { title: "Resources", description: "Lorem ipsum dolor sit amet", icon: resources, path: "resources" },
+  { title: "Employees", description: "Lorem ipsum dolor sit amet", icon: resources, path: "employees" },
   { title: "Mentors", description: "Lorem ipsum dolor sit amet", icon: mentors, path: "mentors" },
-  { title: "FPO Land Details Update/View", description: "Lorem ipsum dolor sit amet", icon: mentors, path: "land-details" },
+  // { title: "FPO Land Details Update/View", description: "Lorem ipsum dolor sit amet", icon: mentors, path: "land-details" },
 ];
 
 export const MemberManagement = () => {

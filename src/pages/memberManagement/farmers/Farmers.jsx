@@ -183,7 +183,8 @@ export const Farmers = () => {
 
         <div className="mb-6">
           <label className="text-sm font-medium text-grey-700 mb-1 block">
-            Enter Registered Mobile/ Aadhaar/ Farmer ID *
+            Enter Registered Mobile/ Aadhaar *
+            {/* / Farmer ID * */}
           </label>
           <div className="relative w-full md:w-1/2">
             <input

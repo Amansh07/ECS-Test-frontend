@@ -217,7 +217,7 @@ export const Resources = () => {
   /* ================= ADAPTER for Table ================= */
   const TABLE_COLUMNS = useMemo(
     () => [
-      "Resource Name",
+      "Employee Name",
       "Father's/Husband's Name",
       "Designation",
       "Gender",
@@ -233,7 +233,7 @@ export const Resources = () => {
   const uiRows = useMemo(
     () =>
       (Array.isArray(tableData) ? tableData : []).map((r) => ({
-        "Resource Name": r?.resourceName ?? "",
+        "Employee Name": r?.resourceName ?? "",
         "Father's/Husband's Name": r?.fatherHusbandName ?? "",
         "Designation": r?.designationId ? `ID: ${r.designationId}` : "",
         "Gender":
@@ -250,16 +250,16 @@ export const Resources = () => {
   /* ================= RENDER ================= */
   return (
     <div className="border border-stroke-200 rounded-[8px] p-[16px] bg-white">
-      <h2 className="text-base font-bold mb-6">FPO Resource Update Form</h2>
+      <h2 className="text-base font-bold mb-6">FPO Employee Form</h2>
 
       {/* Form Fields */}
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 md:col-span-6">
           <TextField
-            label="Resource Name"
+            label="Employee Name"
             required
             name="resourceName"
-            placeholder="Enter Resource Name"
+            placeholder="Enter Employee Name"
             value={formik.values.resourceName}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -439,12 +439,12 @@ export const Resources = () => {
       {/* Table */}
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <h2 className="text-base font-medium my-4 text-text-dark">
-          Resource Member Detail View Form
+          Employee Detail Form
         </h2>
 
         <Table
           columns={[
-            "Resource Name",
+            "Employee Name",
             "Father's/Husband's Name",
             "Designation",
             "Gender",
@@ -457,7 +457,7 @@ export const Resources = () => {
           data={useMemo(
             () =>
               (Array.isArray(tableData) ? tableData : []).map((r) => ({
-                "Resource Name": r?.resourceName ?? "",
+                "Employee Name": r?.resourceName ?? "",
                 "Father's/Husband's Name": r?.fatherHusbandName ?? "",
                 "Designation": r?.designationId ? `ID: ${r.designationId}` : "",
                 "Gender":
@@ -481,13 +481,13 @@ export const Resources = () => {
             const src = row?.__raw ?? row;
             return (
               <div className="flex items-center justify-center gap-4">
-                {/*<img
+                <img
                   src={editSvg}
                   alt="Edit"
                   className="w-6 h-6 cursor-pointer"
                   onClick={() => handleEditClick(row)}
                 />
-			  <img src={viewSvg} alt="View" className="w-6 h-6 cursor-pointer" />*/}
+                <img src={viewSvg} alt="View" className="w-6 h-6 cursor-pointer" />
                 <img
                   src={deleteSvg}
                   alt="Delete"
