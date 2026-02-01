@@ -4,8 +4,8 @@ import cropProduction from "../../assets/cropProduction.svg";
 import commodityProduction from "../../assets/commodityProduction.svg";
 
 const cards = [
-    { title: "Crop Production", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor", icon: cropProduction, path: "crop-production" },
-    { title: "Commodity Production", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor", icon: commodityProduction, path: "commodity-production" },
+    { title: "Crop Production", description: "Information on crops cultivated by member farmers under the FPO.", icon: cropProduction, path: "crop-production" },
+    { title: "Commodity Production", description: "Details of aggregated produce and processed commoditites handled by the FPO.", icon: commodityProduction, path: "commodity-production" },
 ];
 
 export const ProductionDetails = () => {

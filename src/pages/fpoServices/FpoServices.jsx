@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import farmers from "../../assets/farmers.svg";
 
 const cards = [
-  { title: "Fertilizer Details", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "fertilizer-details" },
-  { title: "Insecticide/Pesticide Details", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "insecticide-or-pesticide-details" },
-  { title: "Machinery/Equipment Details", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "machinery" },
-  { title: "Infrastructure Details", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "infrastructure-form" },
-  { title: "Storage/Infrastructure", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "infrastructure" },
+  { title: "Fertilizer Details", description: "Fertilizer types, availability, and distribution managed by the FPO.", icon: farmers, path: "fertilizer-details" },
+  { title: "Insecticide/Pesticide Details", description: "Crop protection products supplied or facilitated through the FPO.", icon: farmers, path: "insecticide-or-pesticide-details" },
+  { title: "Machinery/Equipment Details", description: "Farm machinery and equipment owned, rented, or shared by the FPO.", icon: farmers, path: "machinery" },
+  { title: "Infrastructure Details", description: "Physical assets such as buildings, processing units, and common facilities.", icon: farmers, path: "infrastructure-form" },
+  { title: "Storage/Infrastructure", description: "Warehousing, cold storage, and other storage facilities available with the FPO.", icon: farmers, path: "infrastructure" },
 ];
 
 export const FpoServices = () => {

@@ -4,7 +4,8 @@ import "./header.css";
 import { Button } from "../components/Buttons";
 import companyLogo from "../assets/logo1.png";
 import companyLogo2 from "../assets/government-of-india.jpg";
-import indianEmblem from "../assets/logo2.png";
+// import indianEmblem from "../assets/logo2.png";
+import indianEmblem from "../assets/Emblem_of_India.svg";
 import Breadcrumb from "../components/Breadcrumb";
 import { useNavigate } from "react-router-dom";
 import AuthService from "../auth/AuthService";
@@ -162,12 +163,12 @@ export default function Header() {
 				{<div className="fpo-header-top bg-primary-800">
 					<div className="fpo-header-left">
 						{/* Logo block */}
-						<div className="fpo-logo-block">
+						<div className="fpo-logo-block flex gap-[10px]">
 							{/* <img src={companyLogo} width={"54"} height={"48"} className="cursor-pointer" alt="CompanyLogo" /> */}
 							{/* <img src={companyLogo} width={"54"} height={"48"} className="cursor-pointer" alt="CompanyLogo" /> */}
 							<img src={companyLogo2} width={"54"} height={"48"} className="cursor-pointer" alt="CompanyLogo" />
-							<div className="fpo-logo-icon" />
-							<img src={indianEmblem} width={"50"} height={"50"} className="cursor-pointer" alt="indian Emblem logo" />
+							{/* <div className="fpo-logo-icon" /> */}
+							{/* <img src={indianEmblem} width={"30"} height={"30"} className="cursor-pointer" alt="indian Emblem logo" /> */}
 							<span className="fpo-logo-text">FPO Shakti</span>
 						</div>
 					</div>

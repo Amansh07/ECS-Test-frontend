@@ -14,6 +14,7 @@ import AdminDashboard from "../pages/adminDashboard/AdminDashboard";
 import ForgotPassword from "../pages/login/ForgotPassword";
 
 const AppRoutes = () => {
+  const role = localStorage.getItem("role");
   return (
     <Routes>
       {/* Public auth */}
@@ -26,20 +27,23 @@ const AppRoutes = () => {
 
       {/* Public main layout */}
       <Route element={<MainLayout />}>
-        <Route path="/dashboard" element={<Dashboard />} />
+        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
         <Route path="/" element={<Homepage />} />
         <Route path="/registration" element={<Registration />} />
 
-        {/* PROTECTED: Member Management ONLY */}
-        <Route element={<PrivateRoute />}>
+        {/* PROTECTED: Role Admin */}
+        <Route element={<PrivateRoute allowedRoles={["Admin"]} />}>
           <Route path="/adminDashboard" element={<AdminDashboard />} />
-          {MemberManagementRoutes()}
         </Route>
 
-        {/* Public */}
-        {ProductionDetailsRoutes()}
-        {ComplianceRoutes()}
-        {FpoServicesRoutes()}
+        {/* PROTECTED: Role Not an Admin */}
+        <Route element={<PrivateRoute blockedRoles={["Admin"]} />}>
+          {MemberManagementRoutes()}
+          {ProductionDetailsRoutes()}
+          {ComplianceRoutes()}
+          {FpoServicesRoutes()}
+        </Route>
+
       </Route>
     </Routes>
   );

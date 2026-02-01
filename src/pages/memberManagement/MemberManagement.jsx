@@ -6,11 +6,11 @@ import resources from "../../assets/resources.svg";
 import mentors from "../../assets/mentors.svg";
 
 const cards = [
-  { title: "Farmers", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "farmers" },
-  { title: "Board Members", description: "Lorem ipsum dolor sit amet", icon: boardMembers, path: "board-members" },
-  { title: "Board Members (Company Act)", description: "Lorem ipsum dolor sit amet", icon: boardMembers, path: "board-members-company-act" },
-  { title: "Employees", description: "Lorem ipsum dolor sit amet", icon: resources, path: "employees" },
-  { title: "Mentors", description: "Lorem ipsum dolor sit amet", icon: mentors, path: "mentors" },
+  { title: "Farmers", description: "Registered farmer members linked with the FPO, including basic profile and landholding details.", icon: farmers, path: "farmers" },
+  { title: "Board Members", description: "Details of board members responsible for FPO governance and decision-making.", icon: boardMembers, path: "board-members" },
+  { title: "Board Members (Company Act)", description: "Statutory director information as required under the Companies Act.", icon: boardMembers, path: "board-members-company-act" },
+  { title: "Employees", description: "Staff details including roles, contact information and association period.", icon: resources, path: "employees" },
+  { title: "Mentors", description: "Assigned mentors and professional support providers guiding FPO operations.", icon: mentors, path: "mentors" },
   // { title: "FPO Land Details Update/View", description: "Lorem ipsum dolor sit amet", icon: mentors, path: "land-details" },
 ];
 
