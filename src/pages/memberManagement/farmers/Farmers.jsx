@@ -16,7 +16,7 @@ import reload from '../../../assets/reload.svg';
 
 const validationSchema = Yup.object().shape({
   farmerName: Yup.string().required("Farmer's Name is required"),
-  farmerId: Yup.string().required("Farmer ID is required"),
+  // farmerId: Yup.string().required("Farmer ID is required"),
   fatherName: Yup.string().required("Father's/Husband's/Identifier's Name is required"),
   category: Yup.string().required("Category is required"),
   gender: Yup.string().required("Gender is required"),
@@ -31,7 +31,7 @@ const validationSchema = Yup.object().shape({
 
 const initialValues = {
   farmerName: '',
-  farmerId: '',
+  // farmerId: '',
   fatherName: '',
   category: '',
   gender: '',
@@ -227,7 +227,7 @@ export const Farmers = () => {
               error={formik.errors.farmerName}
               touched={formik.touched.farmerName}
             />
-            <TextField
+            {/* <TextField
               label="Farmer ID"
               required
               name="farmerId"
@@ -237,7 +237,7 @@ export const Farmers = () => {
               onBlur={formik.handleBlur}
               error={formik.errors.farmerId}
               touched={formik.touched.farmerId}
-            />
+            /> */}
             <TextField
               label="Father's/Husband's/Identifier's Name"
               required
@@ -413,7 +413,7 @@ export const Farmers = () => {
             ]}
             data={farmersList.map(item => ({
               ...item,
-              "Farmer Registration Number": item.farmerId,
+              // "Farmer Registration Number": item.farmerId,
               "Father/Husband Name": item.fatherName,
               "Username": item.farmerName,
               "Gender": item.gender,
