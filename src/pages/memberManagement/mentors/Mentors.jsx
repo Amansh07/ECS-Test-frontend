@@ -37,8 +37,8 @@ export const Mentors = () => {
       <div className="page-header">
         <h2 className="text-base font-bold mb-4">FPO Mentor Detail</h2>
       </div>
-      
-      <div className="table-container">
+
+      <div className="table-container p-6">
         <MentorTable
           data={paginatedData}
           filteredData={filteredData}

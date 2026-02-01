@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import farmers from "../../assets/farmers.svg";
 
 const cards = [
-    { title: "Annual Turnover", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "annual-turnover" },
-    { title: "FPO Capital Update/View", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "fpo-capital" },
-    { title: "AGM Meeting Update/View", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "agm-meeting" },
-    { title: "Bank Details", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "bank-details" },
-    { title: "License Update", description: "Lorem ipsum dolor sit amet", icon: farmers, path: "license-update" },
+    { title: "Annual Turnover", description: "Year-wise financial turnover of the FPO from all business activities.", icon: farmers, path: "annual-turnover" },
+    { title: "FPO Capital Update/View", description: "Paid-up share capital/member contribution details of the FPO.", icon: farmers, path: "fpo-capital" },
+    { title: "AGM Meeting Update/View", description: "Records of Annual General Meetings including dates, attendance and resolutions.", icon: farmers, path: "agm-meeting" },
+    { title: "Bank Details", description: "Active bank accounts linked with the FPO for compliance.", icon: farmers, path: "bank-details" },
+    { title: "License Update", description: "Licences, registrations and certifications held by the FPO with validity details.", icon: farmers, path: "license-update" },
 ];
 
 export const Compliance = () => {
