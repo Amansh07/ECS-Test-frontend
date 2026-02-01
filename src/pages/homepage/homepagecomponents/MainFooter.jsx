@@ -22,7 +22,7 @@ const MainFooter = () => {
 
                             {/* Description */}
                             <p className='text-white/70 text-base leading-relaxed mb-6 max-w-md'>
-                                A Government of India initiative empowering Farmer Producer Organizations through institutional support, capacity building, market linkages, and sustainable agricultural practices across the nation.
+                                A State Government initiative empowering Farmer Producer Organizations through institutional support, capacity building, market linkages, and sustainable agricultural practices across the nation.
                             </p>
 
                             {/* Contact Information */}

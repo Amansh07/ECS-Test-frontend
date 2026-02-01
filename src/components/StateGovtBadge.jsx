@@ -1,7 +1,7 @@
 import React from 'react';
 import './StateGovtBadge.css';
 
-export default function StateGovtBadge({ text = 'STATE GOVT. OF INDIA INITIATIVE', className = '' }) {
+export default function StateGovtBadge({ text = 'STATE GOVERNMENT INITIATIVE', className = '' }) {
   return (
     <div
       className={`state-govt-badge bg-grad-12-bg ${className}`}
