@@ -33,6 +33,7 @@ const initialCropProductionValues = {
 
 export const CropProduction = () => {
   const [seasons, setSeasons] = useState([]);
+  const [estimatedOrHarvested, setEstimatedOrHarvested] = useState([]);
   const [crops, setCrops] = useState([]);
   const [varieties, setVarieties] = useState([]);
   const [productionList, setProductionList] = useState([]);
@@ -72,6 +73,13 @@ export const CropProduction = () => {
     validateOnChange: false,
   });
 
+  const normalizeDate = (date) => {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
+
+
   // ------------------- LOAD DATA -------------------
   // useEffect(() => {
   //   const res = getGeneralMasterByType("Season");
@@ -88,6 +96,13 @@ export const CropProduction = () => {
           setSeasons(seasonRes.data);
         } else {
           throw new Error(seasonRes?.message || "Failed to load seasons");
+        }
+
+        const estimatedOrHarvestedRes = await getGeneral("ESTIMATED_HARVESTED");
+        if (estimatedOrHarvestedRes?.success) {
+          setEstimatedOrHarvested(estimatedOrHarvestedRes.data);
+        } else {
+          throw new Error(estimatedOrHarvestedRes?.message || "Failed to load Estimated Or Harvested");
         }
 
         // -------- Crop Production List --------
@@ -617,22 +632,37 @@ export const CropProduction = () => {
             type="date"
             name="dateOfHarvesting"
             value={formik.values.dateOfHarvesting}
-            onChange={formik.handleChange}
+            onChange={(e) => {
+              const selectedDate = normalizeDate(e.target.value);
+              const today = normalizeDate(new Date());
+
+              formik.setFieldValue("dateOfHarvesting", e.target.value);
+
+              if (selectedDate < today) {
+                formik.setFieldValue("estimatedOrHarvestedId", 988);
+              } else if (selectedDate > today) {
+                formik.setFieldValue("estimatedOrHarvestedId", 987);
+              }
+            }}
             onBlur={formik.handleBlur}
             error={formik.errors.dateOfHarvesting}
             touched={formik.touched.dateOfHarvesting}
           />
 
-          <TextField
+          <SelectField
             label="Estimated/Harvested"
             name="estimatedOrHarvestedId"
-            type="text"
             value={formik.values.estimatedOrHarvestedId}
-            onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={formik.errors.estimatedOrHarvestedId}
             touched={formik.touched.estimatedOrHarvestedId}
-          />
+            disabled={true}
+          >
+            <option value="">Select Estimated Or Harvested</option>
+            {estimatedOrHarvested.map((v) => (
+              <option key={v.id} value={v.id}>{v.name}</option>
+            ))}
+          </SelectField>
         </div>
 
         <div className="relative">
