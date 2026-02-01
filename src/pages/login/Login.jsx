@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
-import indianEmblem from "../../assets/indianEmblem.svg";
+import indianEmblem from "/assets/indianEmblem.svg";
 import { TextField } from "../../components/FormFields";
-import mail from "../../assets/mail.svg";
-import pass from "../../assets/pass.svg";
-import reload from "../../assets/reload.svg";
-import verify from "../../assets/verify.svg";
+import mail from "/assets/mail.svg";
+import pass from "/assets/pass.svg";
+import reload from "/assets/reload.svg";
+import verify from "/assets/verify.svg";
 import Captcha from "../../components/Captcha";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";

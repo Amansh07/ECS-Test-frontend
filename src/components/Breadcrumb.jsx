@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import frontslash from "../assets/frontslash.svg";
+import frontslash from "/assets/frontslash.svg";
 import "./Breadcrumb.css";
 
 const Breadcrumb = ({ customPath = [] }) => {

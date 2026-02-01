@@ -5,10 +5,10 @@ import Toggle from "../../components/Toggle";
 import PreviewModal from "../../components/PreviewModal";
 import StatusModal from "../../components/StatusModal";
 import { Button } from "../../components/Buttons";
-import reloadSvg from "../../assets/reload.svg";
-import editSvg from "../../assets/edit.svg";
-import viewSvg from "../../assets/view.svg";
-import deleteSvg from "../../assets/deleteAction.svg";
+import reloadSvg from "/assets/reload.svg";
+import editSvg from "/assets/edit.svg";
+import viewSvg from "/assets/view.svg";
+import deleteSvg from "/assets/deleteAction.svg";
 import "./Dashboard.css";
 
 

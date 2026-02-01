@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import farmers from "../../assets/farmers.svg";
+import farmers from "/assets/farmers.svg";
 
 const cards = [
   { title: "Fertilizer Details", description: "Fertilizer types, availability, and distribution managed by the FPO.", icon: farmers, path: "fertilizer-details" },

@@ -4,10 +4,10 @@ import Table from "../../components/Table";
 import { Button } from "../../components/Buttons";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import StatusModal from "../../components/StatusModal";
-import editSvg from "../../assets/edit.svg";
-import viewSvg from "../../assets/view.svg";
-import deleteSvg from "../../assets/deleteAction.svg";
-import reloadSvg from "../../assets/reload.svg";
+import editSvg from "/assets/edit.svg";
+import viewSvg from "/assets/view.svg";
+import deleteSvg from "/assets/deleteAction.svg";
+import reloadSvg from "/assets/reload.svg";
 import { useFormik } from "formik";
 import { fpoCapitalValidationSchema } from "./validation";
 import {

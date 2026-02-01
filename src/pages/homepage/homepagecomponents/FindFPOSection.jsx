@@ -254,7 +254,7 @@ const FindFPOSection = () => {
                                         {/* Members */}
                                         <div className="bg-[#FFF6E8] rounded-xl py-10 text-center flex flex-col items-center gap-2">
                                             <div className="w-10 h-10 rounded-md bg-white flex items-center justify-center shadow-sm">
-                                                <img src="/src/assets/personIcon.svg" alt="members" className="w-6 h-6" />
+                                                <img src="/assets/personIcon.svg" alt="members" className="w-6 h-6" />
                                             </div>
                                             <div className="text-xl font-bold text-primary-900">
                                                 {fpo.stats.members.toLocaleString()}
@@ -265,7 +265,7 @@ const FindFPOSection = () => {
                                         {/* Female farmers */}
                                         <div className="bg-[#FFF6E8] rounded-xl px-2 py-10 text-center flex flex-col items-center gap-2">
                                             <div className="w-10 h-10 rounded-md bg-white flex items-center justify-center shadow-sm">
-                                                <img src="/src/assets/farmer.svg" alt="female farmers" className="w-6 h-6" />
+                                                <img src="/assets/farmer.svg" alt="female farmers" className="w-6 h-6" />
                                             </div>
                                             <div className="text-xl font-bold text-primary-900">
                                                 {fpo.stats.femaleFarmers.toLocaleString()}
@@ -276,7 +276,7 @@ const FindFPOSection = () => {
                                         {/* Licenses */}
                                         <div className="bg-[#FFF6E8] rounded-xl py-10 text-center flex flex-col items-center gap-2">
                                             <div className="w-10 h-10 rounded-md bg-white flex items-center justify-center shadow-sm">
-                                                <img src="/src/assets/shield.svg" alt="licenses" className="w-6 h-6" />
+                                                <img src="/assets/shield.svg" alt="licenses" className="w-6 h-6" />
                                             </div>
                                             <div className="text-xl font-bold text-primary-900">
                                                 {fpo.stats.licenses}

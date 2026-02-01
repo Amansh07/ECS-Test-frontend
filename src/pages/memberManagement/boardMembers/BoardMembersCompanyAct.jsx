@@ -4,7 +4,7 @@ import Table from '../../../components/Table';
 import FormModal from '../../../components/FormModal';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import StatusModal from '../../../components/StatusModal';
-import editSvg from "../../../assets/edit.svg";
+import editSvg from "/assets/edit.svg";
 
 export const BoardMembersCompanyAct = () => {
     const [isFormModalOpen, setIsFormModalOpen] = useState(false);

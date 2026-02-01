@@ -20,14 +20,14 @@ const EmpoweringCommunitiesSection = () => {
                     <div className='relative z-20 pointer-events-auto flex flex-col justify-center items-center h-[700px] w-full px-16'>
                         <div className='w-full h-full mb-6 rounded-[24px] overflow-hidden border-[8px] border-white shadow-2xl'>
                             <img
-                                src="/src/assets/farmer1.jpg"
+                                src="/assets/farmer1.jpg"
                                 alt="card bottom"
                                 className="w-full h-full object-cover block"
                             />
                         </div>
                         <div className='w-full h-full mb-6 rounded-[24px] overflow-hidden border-[8px] border-white shadow-2xl'>
                             <img
-                                src="/src/assets/farmer2.jpg"
+                                src="/assets/farmer2.jpg"
                                 alt="card bottom"
                                 className="w-full h-full object-cover block"
                             />
@@ -48,7 +48,7 @@ const EmpoweringCommunitiesSection = () => {
                     <div className='flex'>
                         <div className='w-[40px] h-[40px] rounded-[50%] bg-primary-400 flex items-center justify-center mt-2 shadow-lg'>
                             <img
-                                src="/src/assets/Stars.svg"
+                                src="/assets/Stars.svg"
                                 alt="card bottom"
                                 className="w-[20px] h-[20px]"
                             />
@@ -72,7 +72,7 @@ const EmpoweringCommunitiesSection = () => {
                             <span className='font-medium text-xs leading-[20px] tracking-[0.1px] text-dark'>FPO Formation & Strengthening</span>
                             <div className='flex items-center gap-2'>
                                 <img
-                                    src="/src/assets/UpArrowHomepage.svg"
+                                    src="/assets/UpArrowHomepage.svg"
                                     alt="card bottom"
                                     className="w-[20px] h-[20px]"
                                 />
@@ -89,7 +89,7 @@ const EmpoweringCommunitiesSection = () => {
                             <span className='font-medium text-xs leading-[20px] tracking-[0.1px] text-dark'>Market Linkages & E-Commerce</span>
                             <div className='flex items-center gap-2'>
                                 <img
-                                    src="/src/assets/UpArrowHomepage.svg"
+                                    src="/assets/UpArrowHomepage.svg"
                                     alt="card bottom"
                                     className="w-[20px] h-[20px]"
                                 />
@@ -106,7 +106,7 @@ const EmpoweringCommunitiesSection = () => {
                             <span className='font-medium text-xs leading-[20px] tracking-[0.1px] text-dark'>Financial Assistance & Credit Linkage</span>
                             <div className='flex items-center gap-2'>
                                 <img
-                                    src="/src/assets/UpArrowHomepage.svg"
+                                    src="/assets/UpArrowHomepage.svg"
                                     alt="card bottom"
                                     className="w-[20px] h-[20px]"
                                 />

@@ -14,8 +14,8 @@ import StatusModal from "../../../components/StatusModal";
 import { Button } from "../../../components/Buttons";
 import { AccordionGroup } from "../../../components/Accordion";
 import ValidationModal from "../../../components/ValidationModal";
-import editSvg from "../../../assets/edit.svg";
-import viewSvg from "../../../assets/view.svg";
+import editSvg from "/assets/edit.svg";
+import viewSvg from "/assets/view.svg";
 
 import { insecticideOrPesticideDetailsValidationSchema } from "../validation";
 import { getGeneralMasterByType } from "../../../api/masterMock";

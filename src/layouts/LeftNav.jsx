@@ -1,11 +1,11 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { Button } from "../components/Buttons";
-import memberManagement from "../assets/memberManagement.svg";
-import fpograding from "../assets/fpograding.svg";
-import FpoServices from "../assets/FpoServices.svg";
-import complianceMenu from "../assets/ComplianceMenu.svg";
-import ProductionDetailsMenu from "../assets/ProductionDetailsMenu.svg";
+import memberManagement from "/assets/memberManagement.svg";
+import fpograding from "/assets/fpograding.svg";
+import FpoServices from "/assets/FpoServices.svg";
+import complianceMenu from "/assets/ComplianceMenu.svg";
+import ProductionDetailsMenu from "/assets/ProductionDetailsMenu.svg";
 
 const navItems = [
   // { to: "/registration", label: "Registration", icon: "📝" },

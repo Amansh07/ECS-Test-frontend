@@ -6,9 +6,9 @@ import { Button } from '../../../components/Buttons';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import StatusModal from '../../../components/StatusModal';
 import ValidationModal from '../../../components/ValidationModal';
-import editSvg from "../../../assets/edit.svg";
-import viewSvg from "../../../assets/view.svg";
-import deleteSvg from "../../../assets/deleteAction.svg";
+import editSvg from "/assets/edit.svg";
+import viewSvg from "/assets/view.svg";
+import deleteSvg from "/assets/deleteAction.svg";
 import { infrastructureValidationSchema } from "../validation"
 
 export const Infrastructure = () => {

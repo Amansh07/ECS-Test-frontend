@@ -42,7 +42,7 @@ const HeroSection = () => {
                     <div className='px-12 w-full'>
                         <div className='flex items-center gap-[10px]'>
                             <img
-                                src="/src/assets/ThreeButtonsHomepage.svg"
+                                src="/assets/ThreeButtonsHomepage.svg"
                                 alt="State Govt"
                                 className="w-12 h-12"
                             />
@@ -113,7 +113,7 @@ const HeroSection = () => {
                 <div className='relative w-full flex items-center justify-center'>
                     <div className='relative rounded-[48px] overflow-hidden border-[8px] border-white max-w-[720px] w-3/5 h-2/3' style={{ boxShadow: '0px 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
                         <img
-                            src="/src/assets/Farmers-collaboration.png"
+                            src="/assets/Farmers-collaboration.png"
                             alt="State Govt"
                             className="block w-full h-full object-cover"
                         />
@@ -132,7 +132,7 @@ const HeroSection = () => {
                                 {/* badge on the top-right */}
                                 <div className="flex-shrink-0 self-start">
                                     <div className="w-14 h-14 rounded-xl flex items-center justify-center shadow-lg border-2 border-white bg-grad-011-text">
-                                        <img src="/src/assets/SuccessIcon.svg" alt="badge" className="w-7 h-7" />
+                                        <img src="/assets/SuccessIcon.svg" alt="badge" className="w-7 h-7" />
                                     </div>
                                 </div>
                             </div>
@@ -143,7 +143,7 @@ const HeroSection = () => {
                     <div className="absolute top-0 right-0 translate-x-[-70%] translate-y-[70%] rounded-[18px] p-4 w-[140px] md:w-[180px] md:p-5 text-black shadow-2xl border-4 border-white bg-grad-011-text" aria-hidden>
                         <div className="flex items-start gap-2">
                             <img
-                                src="/src/assets/StarHomepage.svg"
+                                src="/assets/StarHomepage.svg"
                                 alt="State Govt"
                                 className='w-[33.3px] h-[33.3px]'
                             />
@@ -156,7 +156,7 @@ const HeroSection = () => {
                     {/* Mid-Left image card overlay positioned relative to the parent so it can overflow the image */}
                     <div className="absolute -rotate-[6deg] translate-x-[-150%] translate-y-[-20%] rounded-[18px] w-[167.06px] md:w-[167.06px] h-[167.06px] md:h-[167.06px] text-black shadow-2xl border-4 border-white overflow-hidden" aria-hidden>
                         <img
-                            src="/src/assets/farmingImage.jpg"
+                            src="/assets/farmingImage.jpg"
                             alt="farming"
                             className="w-full h-full object-cover block"
                         />
@@ -169,7 +169,7 @@ const HeroSection = () => {
                         <div className="relative flex items-center gap-6 px-[30px] py-[36px]">
                             <div className="flex-shrink-0">
                                 <div className="w-[56px] h-[56px] rounded-[14px] bg-[#E8B689] flex items-center justify-center">
-                                    <img src="/src/assets/UpArrowHomePage.svg" alt="trend" className="w-6 h-6" />
+                                    <img src="/assets/UpArrowHomePage.svg" alt="trend" className="w-6 h-6" />
                                 </div>
                             </div>
 
@@ -191,7 +191,7 @@ const HeroSection = () => {
                     <div>
                         <div className="flex-1 flex items-center gap-4">
                             <div className="w-16 h-16 rounded-2xl bg-grad-011-text flex items-center justify-center flex-shrink-0">
-                                <img src="/src/assets/SuccessIconGreen.svg" alt="icon" className="w-12 h-12" />
+                                <img src="/assets/SuccessIconGreen.svg" alt="icon" className="w-12 h-12" />
                             </div>
                             <div>
                                 <div className="text-white text-[12px] font-normal">ENDORSED BY</div>
@@ -204,7 +204,7 @@ const HeroSection = () => {
                         {/* stat item 2 */}
                         <div className="flex-1 flex items-center gap-4 bg-primary-800/20 border border-primary-700 px-6 py-4 rounded-2xl min-h-[88px]">
                             <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <img src="/src/assets/personIcon.svg" alt="icon" className="w-10 h-10" />
+                                <img src="/assets/personIcon.svg" alt="icon" className="w-10 h-10" />
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-white text-[28px] font-extrabold">2.5M+</span>
@@ -215,7 +215,7 @@ const HeroSection = () => {
                         {/* stat item 3 */}
                         <div className="flex-1 flex items-center gap-4 bg-primary-800/20 border border-primary-700 px-6 py-4 rounded-2xl min-h-[88px]">
                             <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <img src="/src/assets/LocationIcon.svg" alt="icon" className="w-10 h-10" />
+                                <img src="/assets/LocationIcon.svg" alt="icon" className="w-10 h-10" />
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-white text-[28px] font-extrabold">650</span>

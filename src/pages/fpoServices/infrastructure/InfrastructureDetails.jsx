@@ -5,11 +5,11 @@ import { Button } from '../../../components/Buttons';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import StatusModal from '../../../components/StatusModal';
 
-import editSvg from "../../../assets/edit.svg"
+import editSvg from "/assets/edit.svg"
 
-import viewSvg from "../../../assets/view.svg"
-import deleteSvg from "../../../assets/deleteAction.svg"
-import unarchive from "../../../assets/unarchive.svg"
+import viewSvg from "/assets/view.svg"
+import deleteSvg from "/assets/deleteAction.svg"
+import unarchive from "/assets/unarchive.svg"
 //import { AccordionGroup } from '../../../components/Accordion';
 import { useFormik } from "formik";
 import * as Yup from "yup";

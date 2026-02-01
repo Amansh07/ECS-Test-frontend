@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { useRef,useEffect } from "react";
-// import indianEmblem from "../../assets/indianEmblem.svg";
+// import indianEmblem from "/assets/indianEmblem.svg";
 import { TextField } from "../../components/FormFields";
-// import mail from "../../assets/mail.svg";
-import pass from "../../assets/pass.svg";
-import shield from "../../assets/shield.svg";
-import incorrect from "../../assets/incorrect.svg";
-import reload from "../../assets/reload.svg";
-import verify from "../../assets/verify.svg";
-import info from "../../assets/info.svg"
+// import mail from "/assets/mail.svg";
+import pass from "/assets/pass.svg";
+import shield from "/assets/shield.svg";
+import incorrect from "/assets/incorrect.svg";
+import reload from "/assets/reload.svg";
+import verify from "/assets/verify.svg";
+import info from "/assets/info.svg"
 import * as Yup from "yup";
 // import Captcha from "../../components/Captcha";
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import farmers from "../../assets/farmers.svg";
+import farmers from "/assets/farmers.svg";
 
 const cards = [
     { title: "Annual Turnover", description: "Year-wise financial turnover of the FPO from all business activities.", icon: farmers, path: "annual-turnover" },

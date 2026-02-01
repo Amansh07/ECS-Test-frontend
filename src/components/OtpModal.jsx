@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './Buttons';
-import OtpVector from '../assets/OtpVector.svg';
+import OtpVector from '/assets/OtpVector.svg';
 
 const OtpModal = ({
     isOpen,

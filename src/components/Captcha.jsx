@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import captcha from "../assets/captcha.jpeg";
+import captcha from "/assets/captcha.jpeg";
 
 export default function Captcha({ a = 0, b = 0 }) {
   const canvasRef = useRef(null);

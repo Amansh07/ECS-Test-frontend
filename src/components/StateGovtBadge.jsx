@@ -16,7 +16,7 @@ export default function StateGovtBadge({ text = 'STATE GOVERNMENT INITIATIVE', c
             <path d="M8.5 9.5C10 11 12 11 12 11s-1-2-3.5-1.5z" fill="#FFFFFF" opacity="0.3"/>
           </svg> */}
             <img
-                src="/src/assets/StateIconHomepage.svg"
+                src="/assets/StateIconHomepage.svg"
                 alt="State Govt"
                 className="w-4 h-4"
             />

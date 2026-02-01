@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
-import loginBackground from "../assets/loginBackground.jpg";
+import loginBackground from "/assets/loginBackground.jpg";
 
 export default function AuthLayout() {
   return (

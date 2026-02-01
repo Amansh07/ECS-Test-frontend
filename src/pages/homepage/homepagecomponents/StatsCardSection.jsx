@@ -2,14 +2,14 @@ import React from 'react'
 
 const StatsCardSection = () => {
     const CardsData = [
-        { title: 'Registered FPOs', value: '12,450', backgroundClass: 'bg-grad-card-1', icon: "/src/assets/building.svg" },
-        { title: 'Farmers', value: '2.8M+', backgroundClass: 'bg-grad-card-2', icon: '/src/assets/farmer.svg' },
-        { title: 'Pending Fresh Registration', value: '856', backgroundClass: 'bg-grad-card-3', icon: '/src/assets/factory.svg' },
-        { title: 'Warehouse/ColdStorage', value: '4,890+', backgroundClass: 'bg-grad-card-4', icon: '/src/assets/handshake.svg' },
-        { title: 'Machinery/Equipment', value: '12,450', backgroundClass: 'bg-grad-card-5', icon: '/src/assets/tractor.svg' },
-        { title: 'Buyers', value: '2.8M+', backgroundClass: 'bg-grad-card-6', icon: '/src/assets/money.svg' },
-        { title: 'Input Suppliers', value: '856', backgroundClass: 'bg-grad-card-7', icon: '/src/assets/brick.svg' },
-        { title: 'Startups', value: '4,890', backgroundClass: 'bg-grad-card-8', icon: '/src/assets/dress.svg' },
+        { title: 'Registered FPOs', value: '12,450', backgroundClass: 'bg-grad-card-1', icon: "/assets/building.svg" },
+        { title: 'Farmers', value: '2.8M+', backgroundClass: 'bg-grad-card-2', icon: '/assets/farmer.svg' },
+        { title: 'Pending Fresh Registration', value: '856', backgroundClass: 'bg-grad-card-3', icon: '/assets/factory.svg' },
+        { title: 'Warehouse/ColdStorage', value: '4,890+', backgroundClass: 'bg-grad-card-4', icon: '/assets/handshake.svg' },
+        { title: 'Machinery/Equipment', value: '12,450', backgroundClass: 'bg-grad-card-5', icon: '/assets/tractor.svg' },
+        { title: 'Buyers', value: '2.8M+', backgroundClass: 'bg-grad-card-6', icon: '/assets/money.svg' },
+        { title: 'Input Suppliers', value: '856', backgroundClass: 'bg-grad-card-7', icon: '/assets/brick.svg' },
+        { title: 'Startups', value: '4,890', backgroundClass: 'bg-grad-card-8', icon: '/assets/dress.svg' },
     ]
     return (
         <section className='mt-32 px-12'>

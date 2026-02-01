@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import SelectableCard from "../../components/SelectableCard";
 import PreviewModal from "../../components/PreviewModal";
-import FpcCoopVector from "../../assets/FpcCoopVectorRegs.svg";
-import BuyerTrader from "../../assets/BuyerTraderRegs.svg";
-import InputSupplier from "../../assets/InputSupplierRegs.svg";
-import AgriStartUp from "../../assets/AgriStartUpRegs.svg";
-import AgriIncubator from "../../assets/AgriIncubatorRegs.svg";
+import FpcCoopVector from "/assets/FpcCoopVectorRegs.svg";
+import BuyerTrader from "/assets/BuyerTraderRegs.svg";
+import InputSupplier from "/assets/InputSupplierRegs.svg";
+import AgriStartUp from "/assets/AgriStartUpRegs.svg";
+import AgriIncubator from "/assets/AgriIncubatorRegs.svg";
 const options = [
     { id: "fpc", icon: '', src: FpcCoopVector, text: "FPC / Cooperatives" },
     { id: "buyer", icon: "", src: BuyerTrader, text: "Buyer/Trader" },

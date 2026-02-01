@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import cropProduction from "../../assets/cropProduction.svg";
-import commodityProduction from "../../assets/commodityProduction.svg";
+import cropProduction from "/assets/cropProduction.svg";
+import commodityProduction from "/assets/commodityProduction.svg";
 
 const cards = [
     { title: "Crop Production", description: "Information on crops cultivated by member farmers under the FPO.", icon: cropProduction, path: "crop-production" },

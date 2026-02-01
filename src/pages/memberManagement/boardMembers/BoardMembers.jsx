@@ -4,7 +4,7 @@ import { useFormik } from "formik";
 import { TextField, RadioGroup, SelectField } from "../../../components/FormFields";
 import Table from "../../../components/Table";
 
-import editSvg from "../../../assets/edit.svg";
+import editSvg from "/assets/edit.svg";
 
 import { boardMembersValidationSchema } from "../validation";
 import { addBoardMember } from "../../../api/memberManagement";

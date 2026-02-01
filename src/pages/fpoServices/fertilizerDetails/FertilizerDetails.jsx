@@ -13,8 +13,8 @@ import PreviewModal from "../../../components/PreviewModal";
 import StatusModal from "../../../components/StatusModal";
 import { Button } from "../../../components/Buttons";
 import { AccordionGroup } from "../../../components/Accordion";
-import editSvg from "../../../assets/edit.svg";
-import viewSvg from "../../../assets/view.svg";
+import editSvg from "/assets/edit.svg";
+import viewSvg from "/assets/view.svg";
 import ValidationModal from "../../../components/ValidationModal";
 
 import { fertilizerDetailsValidationSchema } from "../validation";

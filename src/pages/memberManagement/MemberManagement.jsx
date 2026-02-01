@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import farmers from "../../assets/farmers.svg";
-import boardMembers from "../../assets/boardMembers.svg";
-import resources from "../../assets/resources.svg";
-import mentors from "../../assets/mentors.svg";
+import farmers from "/assets/farmers.svg";
+import boardMembers from "/assets/boardMembers.svg";
+import resources from "/assets/resources.svg";
+import mentors from "/assets/mentors.svg";
 
 const cards = [
   { title: "Farmers", description: "Registered farmer members linked with the FPO, including basic profile and landholding details.", icon: farmers, path: "farmers" },

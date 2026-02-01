@@ -8,7 +8,7 @@ const DepartmentsSection = () => {
             title: "FPO Registration & Formation",
             description:
                 "End-to-end support for legal registration, incorporation, and institutional framework setup for new and existing Farmer Producer Organizations.",
-            image: "/src/assets/farmer1.jpg",
+            image: "/assets/farmer1.jpg",
             icon: "⚡",
         },
         {
@@ -29,7 +29,7 @@ const DepartmentsSection = () => {
             title: "Training & Capacity Building",
             description:
                 "End-to-end support for legal registration, incorporation, and institutional framework setup for new and existing Farmer Producer Organizations.",
-            image: "/src/assets/farmer1.jpg",
+            image: "/assets/farmer1.jpg",
             icon: "📊",
         },
     ];

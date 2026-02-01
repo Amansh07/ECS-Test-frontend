@@ -6,12 +6,12 @@ import { TextField, SelectField, RadioGroup } from "../../components/FormFields"
 import { Button } from "../../components/Buttons";
 import Table from "../../components/Table";
 import AddDocuments from "../../components/AddDocuments";
-import editSvg from "../../assets/edit.svg";
-import viewSvg from "../../assets/view.svg";
+import editSvg from "/assets/edit.svg";
+import viewSvg from "/assets/view.svg";
 import "./Registration.css";
 import ValidationModal from "../../components/ValidationModal";
 import PreviewModal from "../../components/PreviewModal";
-import deleteSvg from '../../assets/deleteAction.svg';
+import deleteSvg from '/assets/deleteAction.svg';
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { registrationValidationSchema } from "./validation";
 import UploadDocument from "../../components/UploadDocument";

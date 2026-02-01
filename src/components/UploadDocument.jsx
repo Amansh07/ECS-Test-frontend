@@ -1,12 +1,12 @@
 import { useState, useCallback, useId } from "react";
-import uploadImg from "../assets/upload.svg";
+import uploadImg from "/assets/upload.svg";
 import Cropper from "react-easy-crop";
-import zoomOut from "../assets/zoomOut.svg";
-import zoomIn from "../assets/zoomIn.svg";
-import trailingIcon from "../assets/Trailing_icon.svg";
-import tickMark from "../assets/tickMark.svg";
-import Delete from "../assets/Delete.svg";
-import pdfUpload from "../assets/pdfUpload.svg";
+import zoomOut from "/assets/zoomOut.svg";
+import zoomIn from "/assets/zoomIn.svg";
+import trailingIcon from "/assets/Trailing_icon.svg";
+import tickMark from "/assets/tickMark.svg";
+import Delete from "/assets/Delete.svg";
+import pdfUpload from "/assets/pdfUpload.svg";
 import { Button } from "./Buttons";
 
 const UploadDocument = ({ config, onFileSelect, disabled = false }) => {

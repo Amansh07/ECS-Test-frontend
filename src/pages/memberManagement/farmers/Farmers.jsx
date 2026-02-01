@@ -9,10 +9,10 @@ import OtpModal from '../../../components/OtpModal';
 import StatusModal from '../../../components/StatusModal';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 
-import editSvg from '../../../assets/edit.svg';
-import viewSvg from '../../../assets/view.svg';
-import deleteSvg from '../../../assets/deleteAction.svg';
-import reload from '../../../assets/reload.svg';
+import editSvg from '/assets/edit.svg';
+import viewSvg from '/assets/view.svg';
+import deleteSvg from '/assets/deleteAction.svg';
+import reload from '/assets/reload.svg';
 
 const validationSchema = Yup.object().shape({
   farmerName: Yup.string().required("Farmer's Name is required"),
