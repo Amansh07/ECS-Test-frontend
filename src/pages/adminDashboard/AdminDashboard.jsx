@@ -142,6 +142,8 @@ const AdminDashboard = () => {
         },
     });
 
+    console.log(selectedRow, 'selectedRow');
+
     // Handle actual API call
     const handleConfirmSave = async (values) => {
         setConfirmationModal(prev => ({ ...prev, isOpen: false }));
@@ -168,10 +170,12 @@ const AdminDashboard = () => {
             const payload = {
                 fpoId: selectedRow?.id,
                 actionId: values.action, // Use values.action directly as it's the ID
-                userId: 1, // Hardcoded as requested
+                userId: selectedRow?.crtBy, // Hardcoded as requested
                 remarks: values.comment,
                 rejectionReason: isReject ? values.rejectionReason : null,
-                sendNotification: values.notification
+                sendNotification: values.notification,
+                recipientEmail: selectedRow.email,
+                regstrationNumber: selectedRow?.regNo
             };
 
             const response = await processWorkflowAction(payload);
