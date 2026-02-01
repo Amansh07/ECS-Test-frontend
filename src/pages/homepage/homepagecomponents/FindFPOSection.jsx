@@ -50,7 +50,7 @@ const FindFPOSection = () => {
                 femaleFarmers: 2221,
                 licenses: 34,
             },
-            image: "src/assets/sahyadri-farmers.jpg",
+            image: "/assets/sahyadri-farmers.jpg",
             cta: "View Profile",
         },
         {
@@ -66,7 +66,7 @@ const FindFPOSection = () => {
                 femaleFarmers: 2221,
                 licenses: 34,
             },
-            image: "src/assets/sahyadri-farmers.jpg",
+            image: "/assets/sahyadri-farmers.jpg",
             cta: "View Profile",
         },
         {
@@ -82,7 +82,7 @@ const FindFPOSection = () => {
                 femaleFarmers: 2221,
                 licenses: 34,
             },
-            image: "src/assets/sahyadri-farmers.jpg",
+            image: "/assets/sahyadri-farmers.jpg",
             cta: "View Profile",
         },
         // {
