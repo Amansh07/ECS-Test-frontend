@@ -270,10 +270,10 @@ const RegistrationForm = ({ showForm = true, showDocuments = true, disabled = fa
 
   const handleUploadDocuments = async () => {
     try {
-      const token = await temprorayToken();
+      // const token = await temprorayToken();
 
       const res = await uploadBulkDocumentsRegistration({
-        token: token.data.token, // get Temp Token
+        // token: token.data.token, // get Temp Token
         docTypes: [920, 921], // image + pdf
         files: [imageFile, pdfFile],
       });
