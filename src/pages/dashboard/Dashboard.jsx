@@ -175,10 +175,10 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       <div className="header">
-        <h1>Admin Dashboard</h1>
+        <h1>Dashboard</h1>
       </div>
-      <DashboardLegends onLegendClick={setActiveTab} activeTab={activeTab} />
-      {activeTab && <ViewForm type={activeTab} />}
+      {/* <DashboardLegends onLegendClick={setActiveTab} activeTab={activeTab} />
+      {activeTab && <ViewForm type={activeTab} />} */}
     </div>
   );
 };

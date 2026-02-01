@@ -15,6 +15,7 @@ import { MdOutlineGTranslate } from "react-icons/md";
 export default function Header() {
 	const token = AuthService.getAccessToken();
 	const isLoggedIn = !!token;
+	const role = localStorage.getItem("role");
 
 	const location = useLocation();
 	const isRegistrationPage = location.pathname === "/registration";
@@ -57,7 +58,7 @@ export default function Header() {
 	// const hideProfile = hideRoutes.includes(location.pathname);
 	// const hideNotification = hideRoutes.includes(location.pathname);
 
-	const hideRoutes = ["/registration", "/login", "/forgot-password"];
+	const hideRoutes = ["/registration", "/login", "/forgot-password", "/"];
 	const hideBreadcrumb = hideRoutes.includes(location.pathname);
 
 
@@ -240,12 +241,15 @@ export default function Header() {
 						{/* ================= LOGGED IN ================= */}
 						{isLoggedIn && (
 							<>
-								<button
-									onClick={() => navigate("/dashboard")}
-									className="h-[32px] w-[92px] border bg-green-600 text-white hover:bg-green-700 rounded-lg text-sm font-semibold"
-								>
-									Dashboard
-								</button>
+								{/* Dashboard ONLY on Home page */}
+								{location.pathname === "/" && (
+									<button
+										onClick={() => role === "Admin" ? navigate("/adminDashboard") : navigate("/dashboard")}
+										className="h-[32px] w-[92px] border bg-green-600 text-white hover:bg-green-700 rounded-lg text-sm font-semibold"
+									>
+										Dashboard
+									</button>
+								)}
 
 								<button
 									onClick={handleLogout}
@@ -260,20 +264,9 @@ export default function Header() {
 								>
 									G
 								</Button>
-
-								<Button
-									variant="ghost"
-									size="sm"
-									className="notification-btn"
-									onClick={() => setShowNotification(!showNotification)}
-								>
-									<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-										<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-										<path d="M13.73 21a2 2 0 0 1-3.46 0" />
-									</svg>
-								</Button>
 							</>
 						)}
+
 
 						{/* Notification Popup */}
 						{isLoggedIn && showNotification && (

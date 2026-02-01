@@ -28,6 +28,7 @@ export default function Login() {
 
   const navigate = useNavigate();
   const mountedRef = useRef(true);
+  const role = localStorage.getItem("role");
 
   // ---------------- Status Modal ----------------
   const [statusModal, setStatusModal] = useState({
@@ -43,7 +44,7 @@ export default function Login() {
       try {
         const payload = JSON.parse(atob(token.split(".")[1]));
         const isExpired = payload.exp * 1000 < Date.now();
-        if (!isExpired) navigate("/member-management", { replace: true });
+        if (!isExpired) role === "Admin" ? navigate("/adminDashboard", { replace: true }) : navigate("/member-management", { replace: true });
         else AuthService.logout("expired");
       } catch {
         AuthService.logout("expired");

@@ -27,7 +27,6 @@ const AppRoutes = () => {
 
       {/* Public main layout */}
       <Route element={<MainLayout />}>
-        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
         <Route path="/" element={<Homepage />} />
         <Route path="/registration" element={<Registration />} />
 
@@ -38,6 +37,7 @@ const AppRoutes = () => {
 
         {/* PROTECTED: Role Not an Admin */}
         <Route element={<PrivateRoute blockedRoles={["Admin"]} />}>
+          <Route path="/dashboard" element={<Dashboard />} />
           {MemberManagementRoutes()}
           {ProductionDetailsRoutes()}
           {ComplianceRoutes()}

@@ -9,6 +9,7 @@ import ProductionDetailsMenu from "../assets/ProductionDetailsMenu.svg";
 
 const navItems = [
   // { to: "/registration", label: "Registration", icon: "📝" },
+  { to: "/dashboard", label: "Dashboard", icon: "", src: memberManagement},
   { to: "/member-management", label: "Member Management", icon: "", src: memberManagement },
   { to: "/production-details", label: "Production Details", icon: "", src: ProductionDetailsMenu },
   { to: "/fpo-services", label: "FPO Services", icon: "", src: FpoServices },
