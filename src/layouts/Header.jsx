@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import "./header.css";
 import { Button } from "../components/Buttons";
 import companyLogo from "../assets/logo1.png";
-import companyLogo2 from "../assets/government-of-india.jpg";
+import companyLogo2 from "../assets/government-of-india-copy.jpg";
 // import indianEmblem from "../assets/logo2.png";
 import indianEmblem from "../assets/Emblem_of_India.svg";
 import Breadcrumb from "../components/Breadcrumb";
@@ -167,7 +167,7 @@ export default function Header() {
 						<div className="fpo-logo-block flex gap-[10px]">
 							{/* <img src={companyLogo} width={"54"} height={"48"} className="cursor-pointer" alt="CompanyLogo" /> */}
 							{/* <img src={companyLogo} width={"54"} height={"48"} className="cursor-pointer" alt="CompanyLogo" /> */}
-							<img src={companyLogo2} width={"54"} height={"48"} className="cursor-pointer" alt="CompanyLogo" />
+							<img src={companyLogo2} width={"54"} height={"48"} className="cursor-pointer mt-[5px]" alt="CompanyLogo" />
 							{/* <div className="fpo-logo-icon" /> */}
 							{/* <img src={indianEmblem} width={"30"} height={"30"} className="cursor-pointer" alt="indian Emblem logo" /> */}
 							<span className="fpo-logo-text">FPO Shakti</span>
